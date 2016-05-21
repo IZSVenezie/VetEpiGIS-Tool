@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/plugins/QVetTool">
+        <file>images/icon01.png</file>
+        <file>images/icon02.png</file>
+        <file>images/icon03.png</file>
+        <file>images/icon04.png</file>
+        <file>images/icon05.png</file>
+        <file>images/biological1.png</file>
+        <file>images/save26.png</file>
+        <file>images/mappointer15.png</file>
+        <file>images/pin56.png</file>
+        <file>images/data112.png</file>
+        <file>images/copy32.png</file>
+        <file>images/pencil148.png</file>
+        <file>images/love62.png</file>
+        <file>images/database19.png</file>
+        <file>images/verify8.png</file>
+        <file>images/music236.png</file>
+        <file>images/arrows.png</file>
+        <file>images/tool-1.png</file>
+        <file>images/qvettool-about-banner.png</file>
+    </qresource>
+</RCC>
