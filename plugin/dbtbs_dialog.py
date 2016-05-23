@@ -47,5 +47,5 @@ class Ui_DockWidget(object):
         QtCore.QMetaObject.connectSlotsByName(DockWidget)
 
     def retranslateUi(self, DockWidget):
-        DockWidget.setWindowTitle(_translate("DockWidget", "Qvet maps", None))
+        DockWidget.setWindowTitle(_translate("DockWidget", "VetEpiGIS maps", None))
 

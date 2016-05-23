@@ -237,7 +237,7 @@ class VetEpiGIStool:
 
         self.dbtabs = QAction(
             QIcon(':/plugins/VetEpiGIStool/images/data112.png'),
-            QCoreApplication.translate('VetEpiGIS-Tool', "Show/hide QVet database layers"),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Show/hide VetEpiGIS database layers"),
             self.iface.mainWindow())
         self.dbtabs.setCheckable(True)
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.dbtabs)
@@ -259,7 +259,7 @@ class VetEpiGIStool:
 
         self.Saver = QAction(
             QIcon(':/plugins/VetEpiGIStool/images/save26.png'),
-            QCoreApplication.translate('VetEpiGIS-Tool', "Save layer into Qvet database"),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Save layer into VetEpiGIS database"),
             self.iface.mainWindow())
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.Saver)
         self.Saver.triggered.connect(self.saveLayer)
@@ -280,7 +280,7 @@ class VetEpiGIStool:
 
         self.xprnt = QAction(
             QIcon(':/plugins/VetEpiGIStool/images/tool-1.png'),
-            QCoreApplication.translate('VetEpiGIS-Tool', "Print QVet template"),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Print VetEpiGIS template"),
             self.iface.mainWindow())
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.xprnt)
         self.xprnt.triggered.connect(self.printMap)
@@ -618,7 +618,7 @@ class VetEpiGIStool:
         if dlg.exec_() == QDialog.Accepted:
             QApplication.setOverrideCursor(Qt.WaitCursor)
             s = QSettings()
-            s.setValue('qvet/lang', dlg.comboBox.currentText())
+            s.setValue('vetepigis/lang', dlg.comboBox.currentText())
 
             if not self.db.open():
                 self.db.open()
@@ -657,7 +657,7 @@ class VetEpiGIStool:
 
     def dbMaintain(self):
         self.grp4.setDefaultAction(self.dbmaintain)
-        self.iface.messageBar().pushMessage('Information', 'For editing the QVet database all layers are removed from the workspace.', level=QgsMessageBar.INFO)
+        self.iface.messageBar().pushMessage('Information', 'For editing the VetEpiGIS database all layers are removed from the workspace.', level=QgsMessageBar.INFO)
         QgsMapLayerRegistry.instance().removeAllMapLayers()
 
         dlg = dbmaint.Dialog()
@@ -917,7 +917,7 @@ class VetEpiGIStool:
         self.grp4.setDefaultAction(self.dbtabs)
         if self.dbtabs.isChecked():
             self.iface.addDockWidget( Qt.LeftDockWidgetArea, self.dockw)
-            self.dockw.setWindowTitle('QVet layers')
+            self.dockw.setWindowTitle('VetEpiGIS layers')
         elif not self.dbtabs.isChecked():
             self.iface.removeDockWidget(self.dockw)
 
