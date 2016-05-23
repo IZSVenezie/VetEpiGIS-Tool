@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- QVeTool
+ VetEpiGIS-Tool
    A QGIS plugin
    Spatial functions for vet epidemiology
                               -------------------
@@ -112,7 +112,7 @@ class Dialog(QDialog, Ui_Dialog):
         self.dateEdit_2.setEnabled(False)
         self.dateEdit_3.setEnabled(False)
 
-        self.funcs = funcs.QVetFuncs()
+        self.funcs = funcs.VetEpiGISFuncs()
 
         self.lineEdit_3.textChanged.connect(self.saveCtrl)
         self.lineEdit_4.textChanged.connect(self.saveCtrl)

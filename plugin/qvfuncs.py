@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- QVeTool
+ VetEpiGIS-Tool
    A QGIS plugin 
    Spatial functions for vet epidemiology
                               -------------------
@@ -33,7 +33,7 @@ from qgis.core import QgsField, QgsSpatialIndex, QgsMessageLog, QgsProject, \
     QgsRectangle, QgsDataSourceURI, QgsDataProvider
 from qgis.gui import QgsMapTool, QgsMapToolEmitPoint, QgsMessageBar, QgsRubberBand
 
-class QVetFuncs:
+class VetEpiGISFuncs:
     def __init__(self):
         """Constructor for the class.
 

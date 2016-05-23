@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/plugins/QVetTool">
+    <qresource prefix="/plugins/VetEpiGIStool">
         <file>images/icon01.png</file>
         <file>images/icon02.png</file>
         <file>images/icon03.png</file>

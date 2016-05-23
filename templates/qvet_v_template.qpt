@@ -46,7 +46,7 @@
     <customproperties/>
    </ComposerItem>
   </ComposerLabel>
-  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="Created using QVetTool" htmlState="0" halign="1">
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="Created using VetEpiGIS-Tool" htmlState="0" halign="1">
    <LabelFont description="MS Shell Dlg 2,8,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="74" blue="74" green="74"/>
    <ComposerItem pagey="286.328" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="4" y="286.328" visibility="1" zValue="6" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="62.1248" outlineWidth="0.3" excludeFromExports="0" uuid="{6e729918-11dd-4035-9d35-533497238b01}" height="6.2" itemRotation="0" frame="false" pagex="4">

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- QVetTool
+ VetEpiGIS-Tool
    A QGIS plugin
    Spatial functions for vet epidemiology
                               -------------------
@@ -69,7 +69,7 @@ mutato = QCursor(
 
 
 
-class QVetTool:
+class VetEpiGIStool:
     """QGIS Plugin Implementation."""
 
     def __init__(self, iface):
@@ -93,7 +93,7 @@ class QVetTool:
         locale_path = os.path.join(
             self.plugin_dir,
             'i18n',
-            'QVetTool_{}.qm'.format(locale))
+            'VetEpiGIStool_{}.qm'.format(locale))
 
         self.vers = '0.7'
         self.prevcur = self.iface.mapCanvas().cursor()
@@ -134,7 +134,7 @@ class QVetTool:
         self.poiflds = self.obrflds[0:3]
         self.poiflds.append('activity')
 
-        self.funcs = qvfuncs.QVetFuncs()
+        self.funcs = qvfuncs.VetEpiGISFuncs()
 
 
     # noinspection PyMethodMayBeStatic
@@ -150,181 +150,181 @@ class QVetTool:
         :rtype: QString
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
-        return QCoreApplication.translate('QVetTool', message)
+        return QCoreApplication.translate('VetEpiGIS-Tool', message)
 
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
         self.newoutbreak = QAction(
-            QIcon(':/plugins/QVetTool/images/biological1.png'),
-            QCoreApplication.translate('QVetTool', "Create new outbreak layer"),
+            QIcon(':/plugins/VetEpiGIStool/images/biological1.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Create new outbreak layer"),
             self.iface.mainWindow())
-        self.iface.addPluginToMenu('&QVetTool', self.newoutbreak)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.newoutbreak)
         self.newoutbreak.triggered.connect(self.createOlayer)
 
         self.Caser = QAction(
-            QIcon(':/plugins/QVetTool/images/icon01.png'),
-            QCoreApplication.translate('QVetTool', "Add case (POINT)"),
+            QIcon(':/plugins/VetEpiGIStool/images/icon01.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Add case (POINT)"),
             self.iface.mainWindow())
         self.Caser.setCheckable(True)
-        self.iface.addPluginToMenu('&QVetTool', self.Caser)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.Caser)
         self.Caser.triggered.connect(self.caseCapture)
 # http://www.lutraconsulting.co.uk/blog/2014/10/17/getting-started-writing-qgis-python-plugins/
 
         self.handy = QAction(
-            QIcon(':/plugins/QVetTool/images/love62.png'),
-            QCoreApplication.translate('QVetTool', "Add case (POLYGON drawing)"),
+            QIcon(':/plugins/VetEpiGIStool/images/love62.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Add case (POLYGON drawing)"),
             self.iface.mainWindow())
         self.handy.setCheckable(True)
-        self.iface.addPluginToMenu('&QVetTool', self.handy)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.handy)
         self.handy.triggered.connect(self.handDrawing)
 
         self.copyselected = QAction(
-            QIcon(':/plugins/QVetTool/images/copy32.png'),
-            QCoreApplication.translate('QVetTool', "Copy an element to outbreak layer"),
+            QIcon(':/plugins/VetEpiGIStool/images/copy32.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Copy an element to outbreak layer"),
             self.iface.mainWindow())
-        self.iface.addPluginToMenu('&QVetTool', self.copyselected)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.copyselected)
         self.copyselected.triggered.connect(self.copySel)
 
         self.sep = QAction(self.iface.mainWindow())
         self.sep.setSeparator(True);
-        self.iface.addPluginToMenu('&QVetTool', self.sep)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.sep)
 
         self.newpoilayer = QAction(
-            QIcon(':/plugins/QVetTool/images/mappointer15.png'),
-            QCoreApplication.translate('QVetTool', "Create new POI layer"),
+            QIcon(':/plugins/VetEpiGIStool/images/mappointer15.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Create new POI layer"),
             self.iface.mainWindow())
-        self.iface.addPluginToMenu('&QVetTool', self.newpoilayer)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.newpoilayer)
         self.newpoilayer.triggered.connect(self.createPOIlayer)
 
         self.poier = QAction(
-            QIcon(':/plugins/QVetTool/images/pin56.png'),
-            QCoreApplication.translate('QVetTool', "Add POI"),
+            QIcon(':/plugins/VetEpiGIStool/images/pin56.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Add POI"),
             self.iface.mainWindow())
         self.poier.setCheckable(True)
-        self.iface.addPluginToMenu('&QVetTool', self.poier)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.poier)
         self.poier.triggered.connect(self.addPOI)
 
         self.sep2 = QAction(self.iface.mainWindow())
         self.sep2.setSeparator(True);
-        self.iface.addPluginToMenu('&QVetTool', self.sep2)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.sep2)
 
         self.Bufferer = QAction(
-            QIcon(':/plugins/QVetTool/images/icon03.png'),
-            QCoreApplication.translate('QVetTool', "Create buffers"),
+            QIcon(':/plugins/VetEpiGIStool/images/icon03.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Create buffers"),
             self.iface.mainWindow())
-        self.iface.addPluginToMenu('&QVetTool', self.Bufferer)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.Bufferer)
         self.Bufferer.triggered.connect(self.createBuffers)
 
         self.POIer = QAction(
-            QIcon(':/plugins/QVetTool/images/icon05.png'),
-            QCoreApplication.translate('QVetTool', "Select points from POI layer"),
+            QIcon(':/plugins/VetEpiGIStool/images/icon05.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Select points from POI layer"),
             self.iface.mainWindow())
-        self.iface.addPluginToMenu('&QVetTool', self.POIer)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.POIer)
         self.POIer.triggered.connect(self.selectPOIs)
 
         self.Zoner = QAction(
-            QIcon(':/plugins/QVetTool/images/icon04.png'),
-            QCoreApplication.translate('QVetTool', "Create zones"),
+            QIcon(':/plugins/VetEpiGIStool/images/icon04.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Create zones"),
             self.iface.mainWindow())
-        self.iface.addPluginToMenu('&QVetTool', self.Zoner)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.Zoner)
         self.Zoner.triggered.connect(self.selectROIs)
 
         self.sep3 = QAction(self.iface.mainWindow())
         self.sep3.setSeparator(True);
-        self.iface.addPluginToMenu('&QVetTool', self.sep3)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.sep3)
 
         self.dbtabs = QAction(
-            QIcon(':/plugins/QVetTool/images/data112.png'),
-            QCoreApplication.translate('QVetTool', "Show/hide QVet database layers"),
+            QIcon(':/plugins/VetEpiGIStool/images/data112.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Show/hide QVet database layers"),
             self.iface.mainWindow())
         self.dbtabs.setCheckable(True)
-        self.iface.addPluginToMenu('&QVetTool', self.dbtabs)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.dbtabs)
         self.dbtabs.triggered.connect(self.layersinDB)
 
         self.recedit = QAction(
-            QIcon(':/plugins/QVetTool/images/pencil148.png'),
-            QCoreApplication.translate('QVetTool', "Edit data (case and POI)"),
+            QIcon(':/plugins/VetEpiGIStool/images/pencil148.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Edit data (case and POI)"),
             self.iface.mainWindow())
-        self.iface.addPluginToMenu('&QVetTool', self.recedit)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.recedit)
         self.recedit.triggered.connect(self.featEdit)
 
         # self.grouping = QAction(
-        #     QIcon(':/plugins/QVetTool/images/filter11.png'),
-        #     QCoreApplication.translate('QVetTool', "Query tool"),
+        #     QIcon(':/plugins/VetEpiGIStool/images/filter11.png'),
+        #     QCoreApplication.translate('VetEpiGIS-Tool', "Query tool"),
         #     self.iface.mainWindow())
-        # self.iface.addPluginToMenu('&QVetTool', self.grouping)
+        # self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.grouping)
         # self.grouping.triggered.connect(self.aliasing)
 
         self.Saver = QAction(
-            QIcon(':/plugins/QVetTool/images/save26.png'),
-            QCoreApplication.translate('QVetTool', "Save layer into Qvet database"),
+            QIcon(':/plugins/VetEpiGIStool/images/save26.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Save layer into Qvet database"),
             self.iface.mainWindow())
-        self.iface.addPluginToMenu('&QVetTool', self.Saver)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.Saver)
         self.Saver.triggered.connect(self.saveLayer)
 
         self.dbmaintain = QAction(
-            QIcon(':/plugins/QVetTool/images/database19.png'),
-            QCoreApplication.translate('QVetTool', "Database maintenance"),
+            QIcon(':/plugins/VetEpiGIStool/images/database19.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Database maintenance"),
             self.iface.mainWindow())
-        self.iface.addPluginToMenu('&QVetTool', self.dbmaintain)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.dbmaintain)
         self.dbmaintain.triggered.connect(self.dbMaintain)
 
         self.xprt = QAction(
-            QIcon(':/plugins/QVetTool/images/arrows.png'),
-            QCoreApplication.translate('QVetTool', "Export layer"),
+            QIcon(':/plugins/VetEpiGIStool/images/arrows.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Export layer"),
             self.iface.mainWindow())
-        self.iface.addPluginToMenu('&QVetTool', self.xprt)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.xprt)
         self.xprt.triggered.connect(self.expLayer)
 
         self.xprnt = QAction(
-            QIcon(':/plugins/QVetTool/images/tool-1.png'),
-            QCoreApplication.translate('QVetTool', "Print QVet template"),
+            QIcon(':/plugins/VetEpiGIStool/images/tool-1.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Print QVet template"),
             self.iface.mainWindow())
-        self.iface.addPluginToMenu('&QVetTool', self.xprnt)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.xprnt)
         self.xprnt.triggered.connect(self.printMap)
 
         self.sep4 = QAction(self.iface.mainWindow())
         self.sep4.setSeparator(True);
-        self.iface.addPluginToMenu('&QVetTool', self.sep4)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.sep4)
 
         self.prop = QAction(
-            QIcon(':/plugins/QVetTool/images/music236.png'),
-            QCoreApplication.translate('QVetTool', "Settings"),
+            QIcon(':/plugins/VetEpiGIStool/images/music236.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Settings"),
             self.iface.mainWindow())
-        self.iface.addPluginToMenu('&QVetTool', self.prop)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.prop)
         self.prop.triggered.connect(self.saveSettings)
 
         self.copydb = QAction(
-            QIcon(':/plugins/QVetTool/images/music236.png'),
-            QCoreApplication.translate('QVetTool', "Copy database"),
+            QIcon(':/plugins/VetEpiGIStool/images/music236.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Copy database"),
             self.iface.mainWindow())
-        self.iface.addPluginToMenu('&QVetTool', self.copydb)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.copydb)
         # self.copydb.triggered.connect(self.fcopydb)
 
         # self.pluginupdate = QAction(
-        #     QIcon(':/plugins/QVetTool/images/music236.png'),
-        #     QCoreApplication.translate('QVetTool', "Update QVetTool plugin"),
+        #     QIcon(':/plugins/VetEpiGIStool/images/music236.png'),
+        #     QCoreApplication.translate('VetEpiGIS-Tool', "Update VetEpiGIS-Tool plugin"),
         #     self.iface.mainWindow())
-        # self.iface.addPluginToMenu('&QVetTool', self.pluginupdate)
+        # self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.pluginupdate)
         # self.pluginupdate.triggered.connect(self.fpluginupdate)
 
         self.sep5 = QAction(self.iface.mainWindow())
         self.sep5.setSeparator(True);
-        self.iface.addPluginToMenu('&QVetTool', self.sep5)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.sep5)
 
         self.actAbout = QAction(
-            QIcon(':/plugins/QVetTool/images/icon02.png'),
-            QCoreApplication.translate('QVetTool', 'About'),
+            QIcon(':/plugins/VetEpiGIStool/images/icon02.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', 'About'),
             self.iface.mainWindow())
-        self.iface.addPluginToMenu('&QVetTool', self.actAbout)
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.actAbout)
         self.actAbout.triggered.connect(self.about)
 
         self.toolbar = self.iface.addToolBar(
-            QCoreApplication.translate('QVetTool', 'QVetTool'))
+            QCoreApplication.translate('VetEpiGIS-Tool', 'VetEpiGIS-Tool'))
         self.toolbar.setObjectName(
-            QCoreApplication.translate('QVetTool', 'QVetTool'))
+            QCoreApplication.translate('VetEpiGIS-Tool', 'VetEpiGIS-Tool'))
 
         """Add buttons to the toolbar"""
         # self.toolbar.addAction(self.newoutbreak)
@@ -376,7 +376,7 @@ class QVetTool:
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
-        self.iface.removePluginMenu('&QVetTool', self.actAbout)
+        self.iface.removePluginMenu('&VetEpiGIS-Tool', self.actAbout)
         del self.toolbar
 
 
@@ -587,7 +587,7 @@ class QVetTool:
         x = (self.iface.mainWindow().x()+self.iface.mainWindow().width()/2)-dlg.width()/2
         y = (self.iface.mainWindow().y()+self.iface.mainWindow().height()/2)-dlg.height()/2
         dlg.move(x,y)
-        dlg.setWindowTitle('QVetTool settings')
+        dlg.setWindowTitle('VetEpiGIStool settings')
 
         dlg.comboBox.addItem('en')
         dlg.comboBox.addItem('it')
@@ -666,7 +666,7 @@ class QVetTool:
         dlg.move(x,y)
 
         dlg.setWindowTitle('Database maintenance')
-        dlg.toolButton.setIcon(QIcon(':/plugins/QVetTool/images/verify8.png'))
+        dlg.toolButton.setIcon(QIcon(':/plugins/VetEpiGIStool/images/verify8.png'))
 
         dlg.comboBox.addItem('')
         dlg.comboBox.addItem('Diseases')
@@ -1751,13 +1751,13 @@ class QVetTool:
     def about(self):
         dlg = xabout.Dialog()
         dlg.setWindowTitle('About')
-        dlg.label.setPixmap(QPixmap(':/plugins/QVetTool/images/qvettool-about-banner.png'))
+        dlg.label.setPixmap(QPixmap(':/plugins/VetEpiGIStool/images/qvettool-about-banner.png'))
         ow = dlg.textEdit.fontWeight()
 
         dlg.textEdit.setFontWeight(QFont.Bold)
-        dlg.textEdit.append('QVetTool ' + self.vers +'\n')
+        dlg.textEdit.append('VetEpiGIS-Tool ' + self.vers +'\n')
         dlg.textEdit.setFontWeight(ow)
-        dlg.textEdit.append('QVetTool is a free QGIS plugin helping veterinarians in the management of spatial data related to animal disease.\n')
+        dlg.textEdit.append('VetEpiGIS-Tool is a free QGIS plugin helping veterinarians in the management of spatial data related to animal disease.\n')
         dlg.textEdit.setFontWeight(QFont.Bold)
         dlg.textEdit.append('Developers:')
         dlg.textEdit.setFontWeight(ow)
@@ -1887,7 +1887,7 @@ class casePicker(QgsMapTool):
         self.tt = tt
         self.lab = lab
         self.lyr = lyr
-        self.funcs = qvfuncs.QVetFuncs()
+        self.funcs = qvfuncs.VetEpiGISFuncs()
 
         self.canvas.setCursor(mutato)
 
@@ -2021,7 +2021,7 @@ class polyDraw(QgsMapTool):
         self.pn = 0
         self.feat = QgsFeature()
         self.pts = []
-        self.funcs = qvfuncs.QVetFuncs()
+        self.funcs = qvfuncs.VetEpiGISFuncs()
 
         col = QColor(Qt.red)
         col.setAlpha(160)

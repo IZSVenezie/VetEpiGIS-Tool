@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'buffer_dialog_base.ui'
 #
-# Created: Sun May  8 08:38:43 2016
+# Created: Mon May 23 15:01:11 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!

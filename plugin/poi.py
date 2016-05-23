@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- QVeTool
+ VetEpiGIS-Tool
    A QGIS plugin
    Spatial functions for vet epidemiology
                               -------------------
@@ -55,7 +55,7 @@ class Dialog(QDialog, Ui_Dialog):
         self.lineEdit_5.textChanged.connect(self.saveCtrl)
         self.comboBox.currentIndexChanged.connect(self.saveCtrl)
 
-        self.funcs = funcs.QVetFuncs()
+        self.funcs = funcs.VetEpiGISFuncs()
 
 
     def trafo(self):

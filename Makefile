@@ -1,5 +1,5 @@
 #/***************************************************************************
-# QVetTool
+# VetEpiGIS-Tool
 #
 # Spatial functions for epidemiology, genomics
 #							 -------------------
@@ -40,7 +40,7 @@ SOURCES = \
 	__init__.py \
 	plugin/__init__.py
 
-PLUGINNAME = QVetTool
+PLUGINNAME = VetEpiGIStool
 
 PY_FILES = \
 	__init__.py \
