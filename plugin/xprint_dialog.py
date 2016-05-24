@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'xprint_dialog_base.ui'
 #
-# Created: Mon May 23 15:01:12 2016
+# Created: Tue May 24 14:31:33 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
