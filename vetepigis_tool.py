@@ -109,8 +109,8 @@ class VetEpiGIStool:
 
         self.dockw = dbtbs.DockWidget()
 
-        mac = '_'.join(("%012X" % get_mac())[i:i+2] for i in range(0, 12, 2))
-        dbuid = 'db_%s.sqlite' % mac
+        self.mac = '_'.join(("%012X" % get_mac())[i:i+2] for i in range(0, 12, 2))
+        dbuid = 'db_%s.sqlite' % self.mac
         dbfold = os.path.join(self.plugin_dir, 'db')
         dbuidpath = os.path.join(dbfold, dbuid)
         if not os.path.isfile(dbuidpath):

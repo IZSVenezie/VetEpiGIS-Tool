@@ -21,11 +21,12 @@
  ***************************************************************************/
 """
 
-import os
+import os, hashlib, datetime
 from PyQt4.QtGui import *
 from PyQt4.QtCore import SIGNAL, Qt, QSettings, QCoreApplication, QFile, QFileInfo, QDate, QVariant, \
     pyqtSignal, QRegExp, QDateTime, QTranslator
 from PyQt4.QtSql import *
+# from uuid import getnode as get_mac
 
 from qgis.core import QgsField, QgsSpatialIndex, QgsMessageLog, QgsProject, \
     QgsCoordinateTransform, QGis, QgsVectorFileWriter, QgsMapLayerRegistry, QgsFeature, \
@@ -38,6 +39,12 @@ class VetEpiGISFuncs:
         """Constructor for the class.
 
         """
+    def hashIDer(self, mac):
+        # mac = '_'.join(("%012X" % get_mac())[i:i+2] for i in range(0, 12, 2))
+        uid = '%s %s' % (mac, datetime.datetime.now())
+        hrid = hashlib.sha256(uid).hexdigest()
+        return hrid
+
 
     def outattrPrep(self, dlg, lyr):
         feat = QgsFeature()
