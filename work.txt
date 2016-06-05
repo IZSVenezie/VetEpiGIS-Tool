@@ -20,11 +20,12 @@ pyuic4 export_dialog_base.ui -o export_dialog.py
 pyuic4 xprint_dialog_base.ui -o xprint_dialog.py
 
 
-rm -rf /home/sn/.qgis2/python/plugins/VetEpiGIStool
-cp -avr /home/sn/dev/QGISplugins/VetEpiGIS/tool /home/sn/.qgis2/python/plugins/VetEpiGIStool
-cd /home/sn/.qgis2/python/plugins/VetEpiGIStool
+rm -rf /home/sn/.qgis2/python/plugins/VetEpiGIS-Tool
+cp -avr /home/sn/dev/QGISplugins/VetEpiGIS/tool /home/sn/.qgis2/python/plugins/VetEpiGIS-Tool
+cd /home/sn/.qgis2/python/plugins/VetEpiGIS-Tool
 rm *.pyc
 make test
 /home/sn/apps/bin/qgis.sh
+
 
 

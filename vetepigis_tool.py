@@ -130,9 +130,10 @@ class VetEpiGIStool:
 
         self.polyn = 0
 
-        self.obrflds = ['gid', 'localid', 'code', 'largescale', 'disease', 'animalno', 'species', 'production', 'year', 'status', 'suspect', 'confirmation', 'expiration', 'notes', 'timestamp', 'grouping']
+        self.obrflds = ['gid', 'localid', 'code', 'largescale', 'disease', 'animalno', 'species', 'production', 'year', 'status', 'suspect', 'confirmation', 'expiration', 'notes', 'hrid', 'timestamp', 'grouping']
         self.poiflds = self.obrflds[0:3]
         self.poiflds.append('activity')
+        self.poiflds.append('hrid')
 
         self.funcs = qvfuncs.VetEpiGISFuncs()
 
@@ -862,7 +863,7 @@ class VetEpiGIStool:
                 lyr.changeAttributeValue(fid, 11, self.dateCheck(dlg.dateEdit_2.date()))
                 lyr.changeAttributeValue(fid, 12, self.dateCheck(dlg.dateEdit_3.date()))
                 lyr.changeAttributeValue(fid, 13, dlg.textEdit.toPlainText())
-                lyr.changeAttributeValue(fid, 14, QDateTime.currentDateTimeUtc().toString('dd/MM/yyyy hh:mm:ss'))
+                lyr.changeAttributeValue(fid, 15, QDateTime.currentDateTimeUtc().toString('dd/MM/yyyy hh:mm:ss'))
                 lyr.commitChanges()
 
                 QApplication.restoreOverrideCursor()
@@ -1163,7 +1164,7 @@ class VetEpiGIStool:
             QApplication.setOverrideCursor(Qt.WaitCursor)
             s = dlg.lineEdit.text()
             self.db.open()
-            q = self.db.exec_("create table %s (gid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, localid text, code text, activity text)" % s)
+            q = self.db.exec_("create table %s (gid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, localid text, code text, activity text, hrid text)" % s)
             q = self.db.exec_("SELECT AddGeometryColumn('%s', 'geom', 4326, 'POINT', 'XY')" % s)
             self.db.commit()
             self.db.close()
@@ -1195,7 +1196,7 @@ class VetEpiGIStool:
             QApplication.setOverrideCursor(Qt.WaitCursor)
             s = dlg.lineEdit.text()
             self.db.open()
-            q = self.db.exec_("create table %s (gid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, localid text, code text, largescale text, disease text, animalno numeric, species text, production text, year numeric, status text, suspect text, confirmation text, expiration text, notes text, timestamp text, grouping text)" % s)
+            q = self.db.exec_("create table %s (gid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, localid text, code text, largescale text, disease text, animalno numeric, species text, production text, year numeric, status text, suspect text, confirmation text, expiration text, notes text, hrid text, timestamp text, grouping text)" % s)
             if dlg.comboBox.currentText()=='Point':
                 sld = self.sldOutbreakPoint
                 q = self.db.exec_("SELECT AddGeometryColumn('%s', 'geom', 4326, 'POINT', 'XY')" % s)
@@ -1389,6 +1390,7 @@ class VetEpiGIStool:
             nattrs.append(QgsField('vaccination', QVariant.String))
             nattrs.append(QgsField('other_measure', QVariant.String))
             nattrs.append(QgsField('related', QVariant.String))
+            nattrs.append(QgsField('hrid', QVariant.String))
             nattrs.append(QgsField('timestamp', QVariant.String))
 
             vl.dataProvider().addAttributes(nattrs)
@@ -1442,6 +1444,7 @@ class VetEpiGIStool:
             attrs.append(vaccination)
             attrs.append(other_measure)
             attrs.append(related)
+            attrs.append('')
             attrs.append(timestamp)
 
             index = QgsSpatialIndex()
@@ -1471,6 +1474,8 @@ class VetEpiGIStool:
                                 attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
                                 attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
                                 attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
+                                most = QDateTime.currentDateTimeUtc()
+                                attrs[19] = self.funcs.hashIDer(most)
 
                                 if geom.intersects(geomB):
                                     featC = QgsFeature()
@@ -1491,6 +1496,8 @@ class VetEpiGIStool:
                                 attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
                                 attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
                                 attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
+                                most = QDateTime.currentDateTimeUtc()
+                                attrs[19] = self.funcs.hashIDer(most)
 
                                 if geom.intersects(geomB):
                                     featC = QgsFeature()
@@ -1515,6 +1522,8 @@ class VetEpiGIStool:
                                 attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
                                 attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
                                 attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
+                                most = QDateTime.currentDateTimeUtc()
+                                attrs[19] = self.funcs.hashIDer(most)
 
                                 if geom.intersects(geomB):
                                     featC = QgsFeature()
@@ -1537,6 +1546,8 @@ class VetEpiGIStool:
                                 attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
                                 attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
                                 attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
+                                most = QDateTime.currentDateTimeUtc()
+                                attrs[19] = self.funcs.hashIDer(most)
 
                                 if geom.intersects(geomB):
                                     featC = QgsFeature()
@@ -1565,6 +1576,8 @@ class VetEpiGIStool:
                                 attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
                                 attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
                                 attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
+                                most = QDateTime.currentDateTimeUtc()
+                                attrs[19] = self.funcs.hashIDer(most)
 
                                 if geom.intersects(geomB):
                                     geomD = QgsGeometry(geom.intersection(geomB))
@@ -1585,6 +1598,8 @@ class VetEpiGIStool:
                                 attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
                                 attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
                                 attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
+                                most = QDateTime.currentDateTimeUtc()
+                                attrs[19] = self.funcs.hashIDer(most)
 
                                 if geom.intersects(geomB):
                                     geomD = QgsGeometry(geom.intersection(geomB))
@@ -1610,6 +1625,8 @@ class VetEpiGIStool:
                                 attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
                                 attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
                                 attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
+                                most = QDateTime.currentDateTimeUtc()
+                                attrs[19] = self.funcs.hashIDer(most)
 
                                 if geom.intersects(geomB):
                                     geomD = QgsGeometry(geom.intersection(geomB))
@@ -1631,6 +1648,8 @@ class VetEpiGIStool:
                                 attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
                                 attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
                                 attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
+                                most = QDateTime.currentDateTimeUtc()
+                                attrs[19] = self.funcs.hashIDer(most)
 
                                 if geom.intersects(geomB):
                                     geomD = QgsGeometry(geom.intersection(geomB))
@@ -1715,6 +1734,8 @@ class VetEpiGIStool:
                     attrs=[]
                     attrs.extend(feat.attributes())
                     bf.setAttributes(attrs)
+                    most = QDateTime.currentDateTimeUtc()
+                    bf.setAttribute(feat.fieldNameIndex('hrid'), self.funcs.hashIDer(most))
                     vl.addFeature(bf)
             else:
                 feats = lyp.selectedFeatures()
@@ -1729,6 +1750,8 @@ class VetEpiGIStool:
                     attrs=[]
                     attrs.extend(feat.attributes())
                     bf.setAttributes(attrs)
+                    most = QDateTime.currentDateTimeUtc()
+                    bf.setAttribute(feat.fieldNameIndex('hrid'), self.funcs.hashIDer(most))
                     vl.addFeature(bf)
                     self.iface.emit(SIGNAL('featureProcessed()'))
 
@@ -1976,6 +1999,7 @@ class casePicker(QgsMapTool):
                 feat.setAttribute(feat.fieldNameIndex('localid'), self.dlg.lineEdit_3.text())
                 feat.setAttribute(feat.fieldNameIndex('code'), self.dlg.lineEdit_5.text())
                 feat.setAttribute(feat.fieldNameIndex('activity'), self.dlg.comboBox.currentText())
+                feat.setAttribute(feat.fieldNameIndex('hrid'), self.funcs.hashIDer(QDateTime.currentDateTimeUtc()))
 
                 pnt = QgsGeometry.fromPoint(QgsPoint(x,y))
                 feat.setGeometry(pnt)

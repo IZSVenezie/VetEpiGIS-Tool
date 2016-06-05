@@ -26,7 +26,7 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import SIGNAL, Qt, QSettings, QCoreApplication, QFile, QFileInfo, QDate, QVariant, \
     pyqtSignal, QRegExp, QDateTime, QTranslator
 from PyQt4.QtSql import *
-# from uuid import getnode as get_mac
+from uuid import getnode as get_mac
 
 from qgis.core import QgsField, QgsSpatialIndex, QgsMessageLog, QgsProject, \
     QgsCoordinateTransform, QGis, QgsVectorFileWriter, QgsMapLayerRegistry, QgsFeature, \
@@ -39,9 +39,9 @@ class VetEpiGISFuncs:
         """Constructor for the class.
 
         """
-    def hashIDer(self, mac):
-        # mac = '_'.join(("%012X" % get_mac())[i:i+2] for i in range(0, 12, 2))
-        uid = '%s %s' % (mac, datetime.datetime.now())
+    def hashIDer(self, most):
+        mac = '_'.join(("%012X" % get_mac())[i:i+2] for i in range(0, 12, 2))
+        uid = '%s %s' % (mac, most.toString('dd/MM/yyyy hh:mm:ss.z'))
         hrid = hashlib.sha256(uid).hexdigest()
         return hrid
 
@@ -51,6 +51,7 @@ class VetEpiGISFuncs:
 
         species = ''
         production = ''
+        most = QDateTime.currentDateTimeUtc()
 
         rn = dlg.tableWidget.rowCount()
         for i in xrange(rn):
@@ -76,7 +77,8 @@ class VetEpiGISFuncs:
         feat.setAttribute(feat.fieldNameIndex('confirmation'), self.dateCheck(dlg.dateEdit_2.date()))
         feat.setAttribute(feat.fieldNameIndex('expiration'), self.dateCheck(dlg.dateEdit_3.date()))
         feat.setAttribute(feat.fieldNameIndex('notes'), dlg.textEdit.toPlainText())
-        feat.setAttribute(feat.fieldNameIndex('timestamp'), QDateTime.currentDateTimeUtc().toString('dd/MM/yyyy hh:mm:ss'))
+        feat.setAttribute(feat.fieldNameIndex('hrid'), self.hashIDer(most))
+        feat.setAttribute(feat.fieldNameIndex('timestamp'), most.toString('dd/MM/yyyy hh:mm:ss'))
         return feat
 
 
