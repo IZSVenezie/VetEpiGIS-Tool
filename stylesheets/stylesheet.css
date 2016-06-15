@@ -56,8 +56,8 @@ a {
 .page-header {
   color: #fff;
   text-align: center;
-  background: #004184 url("http://gis.izsvenezie.it/vetepigis-suite/blue.png") no-repeat bottom center; 
-  background-size: 85%;
+  background: #004184 url("http://gis.izsvenezie.it/vetepigis-suite/blue.png") no-repeat center center; 
+  background-size: 90%;
 }
 
 @media screen and (min-width: 64em) {
