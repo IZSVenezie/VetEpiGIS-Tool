@@ -57,7 +57,7 @@ a {
   color: #fff;
   text-align: center;
   background: #004184 url("http://gis.izsvenezie.it/vetepigis-suite/blue.png") no-repeat bottom center; 
-  background-size: 65%
+  background-size: 85%;
 }
 
 @media screen and (min-width: 64em) {
