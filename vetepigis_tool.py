@@ -95,7 +95,7 @@ class VetEpiGIStool:
             'i18n',
             'VetEpiGIStool_{}.qm'.format(locale))
 
-        self.vers = '0.7'
+        self.vers = '0.71'
         self.prevcur = self.iface.mapCanvas().cursor()
 
         self.origtool = QgsMapTool(self.iface.mapCanvas())
@@ -1711,7 +1711,8 @@ class VetEpiGIStool:
             oattrs = provider.fields().toList()
             nattrs = []
             for attr in oattrs:
-                if vl.fieldNameIndex(attr.name())==-1:
+                # if (vl.fieldNameIndex(attr.name())==-1) and attr.name()!='grouping':
+                if vl.fieldNameIndex(attr.name()) == -1:
                     nattrs.append(QgsField(attr.name(),attr.type()))
                     vl.dataProvider().addAttributes(nattrs)
                     vl.updateFields()
@@ -1733,6 +1734,7 @@ class VetEpiGIStool:
                     bf.setGeometry(bfa)
                     attrs=[]
                     attrs.extend(feat.attributes())
+                    # del attrs[-16]
                     bf.setAttributes(attrs)
                     most = QDateTime.currentDateTimeUtc()
                     bf.setAttribute(feat.fieldNameIndex('hrid'), self.funcs.hashIDer(most))
@@ -1749,11 +1751,19 @@ class VetEpiGIStool:
                     bf.setGeometry(bfa)
                     attrs=[]
                     attrs.extend(feat.attributes())
+                    # del attrs[-16]
                     bf.setAttributes(attrs)
                     most = QDateTime.currentDateTimeUtc()
                     bf.setAttribute(feat.fieldNameIndex('hrid'), self.funcs.hashIDer(most))
                     vl.addFeature(bf)
                     self.iface.emit(SIGNAL('featureProcessed()'))
+
+            vl.commitChanges()
+            # vl.updateExtents()
+
+            dfl = list()
+            dfl.append(16)
+            vl.dataProvider().deleteAttributes(dfl)
 
             vl.commitChanges()
             vl.updateExtents()

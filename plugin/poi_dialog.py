@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'poi_dialog_base.ui'
 #
-# Created: Sun Jun  5 16:13:28 2016
+# Created: Mon Aug 22 06:41:37 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
