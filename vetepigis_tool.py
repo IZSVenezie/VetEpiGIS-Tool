@@ -487,6 +487,10 @@ class VetEpiGIStool:
                 item = QTableWidgetItem(str(it))
                 dlg.tableWidget_2.setItem(nr, 0, item)
 
+
+            dlg.tableWidget.selectAll();
+            dlg.tableWidget_2.selectAll();
+
         if dlg.exec_() == QDialog.Accepted:
             QApplication.setOverrideCursor(Qt.WaitCursor)
 
@@ -500,6 +504,7 @@ class VetEpiGIStool:
                         'system',
                         QgsCoordinateReferenceSystem(prv.crs().srsid()),
                         'ESRI Shapefile')
+
                 elif dlg.comboBox.currentText()=='Comma separated value (CSV)':
                     lops = []
                     if dlg.comboBox_2.currentText()==';':
@@ -517,7 +522,17 @@ class VetEpiGIStool:
                         'system',
                         None,
                         'CSV', layerOptions=lops)
+
                 elif dlg.comboBox.currentText()=='SQLite database':
+                    lsta = []
+                    lstb = []
+                    for it in dlg.tableWidget.selectedItems():
+                        lsta.append(it.text())
+                        # self.iface.messageBar().pushMessage('Information', '%s' % it.text(), level=QgsMessageBar.INFO)
+
+                    for it in dlg.tableWidget_2.selectedItems():
+                        lstb.append(str(it.text()))
+
                     uri = QgsDataSourceURI()
                     uri.setDatabase(dlg.lineEdit.text())
                     edb = QSqlDatabase.addDatabase('QSPATIALITE')
@@ -526,21 +541,6 @@ class VetEpiGIStool:
                     lgt = lyr.geometryType()
                     if lgt == 1:
                         return
-
-                    # nslst = []
-                    # tlst = []
-                    # flds = lyr.dataProvider().fields()
-                    # for fld in flds:
-                    #     nslst.append(fld.name())
-                    #     tlst.append(fld.type())
-
-                    # didx = lyr.fieldNameIndex('disease')
-                    # yidx = lyr.fieldNameIndex('year')
-                    # if nslst==self.obrflds:
-                    #     prv = lyr.dataProvider()
-                    #     feats = prv.getFeatures()
-                    #     feat = QgsFeature()
-                    #     while feats.nextFeature(feat):
 
                     ntlst = self.fieldCheck(nslst)
                     sql = 'create table %s (' % ln
@@ -572,7 +572,9 @@ class VetEpiGIStool:
                     feats = prv.getFeatures()
                     feat = QgsFeature()
                     while feats.nextFeature(feat):
-                        vl.addFeature(feat)
+                        # self.iface.messageBar().pushMessage('Information', '%s %s' % (feat.attributes()[didx], feat.attributes()[yidx]), level=QgsMessageBar.INFO)
+                        if (feat.attributes()[didx] in lsta) and (str(feat.attributes()[yidx]) in lstb):
+                            vl.addFeature(feat)
 
                     vl.commitChanges()
                     vl.updateExtents()

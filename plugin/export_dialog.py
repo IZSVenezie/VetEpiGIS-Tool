@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'export_dialog_base.ui'
 #
-# Created: Mon Nov 21 13:42:17 2016
+# Created: Mon Nov 21 18:01:26 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -79,6 +79,7 @@ class Ui_Dialog(object):
         self.label_5.setObjectName(_fromUtf8("label_5"))
         self.gridLayout_3.addWidget(self.label_5, 0, 1, 1, 1)
         self.tableWidget = QtGui.QTableWidget(self.tab_2)
+        self.tableWidget.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
         self.tableWidget.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
         self.tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.tableWidget.setObjectName(_fromUtf8("tableWidget"))
@@ -86,8 +87,13 @@ class Ui_Dialog(object):
         self.tableWidget.setRowCount(0)
         item = QtGui.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(0, item)
+        self.tableWidget.horizontalHeader().setSortIndicatorShown(True)
+        self.tableWidget.horizontalHeader().setStretchLastSection(True)
+        self.tableWidget.verticalHeader().setVisible(False)
+        self.tableWidget.verticalHeader().setStretchLastSection(False)
         self.gridLayout_3.addWidget(self.tableWidget, 1, 0, 1, 1)
         self.tableWidget_2 = QtGui.QTableWidget(self.tab_2)
+        self.tableWidget_2.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
         self.tableWidget_2.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
         self.tableWidget_2.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.tableWidget_2.setObjectName(_fromUtf8("tableWidget_2"))
@@ -95,6 +101,10 @@ class Ui_Dialog(object):
         self.tableWidget_2.setRowCount(0)
         item = QtGui.QTableWidgetItem()
         self.tableWidget_2.setHorizontalHeaderItem(0, item)
+        self.tableWidget_2.horizontalHeader().setSortIndicatorShown(True)
+        self.tableWidget_2.horizontalHeader().setStretchLastSection(True)
+        self.tableWidget_2.verticalHeader().setVisible(False)
+        self.tableWidget_2.verticalHeader().setStretchLastSection(False)
         self.gridLayout_3.addWidget(self.tableWidget_2, 1, 1, 1, 1)
         self.tabWidget.addTab(self.tab_2, _fromUtf8(""))
         self.gridLayout_2.addWidget(self.tabWidget, 2, 0, 1, 3)
@@ -120,8 +130,10 @@ class Ui_Dialog(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("Dialog", "CSV", None))
         self.label_4.setText(_translate("Dialog", "Disease:", None))
         self.label_5.setText(_translate("Dialog", "Year:", None))
+        self.tableWidget.setSortingEnabled(True)
         item = self.tableWidget.horizontalHeaderItem(0)
         item.setText(_translate("Dialog", "Disease", None))
+        self.tableWidget_2.setSortingEnabled(True)
         item = self.tableWidget_2.horizontalHeaderItem(0)
         item.setText(_translate("Dialog", "Year", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("Dialog", "SQLite filter", None))
