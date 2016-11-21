@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'xsettings_dialog_base.ui'
 #
-# Created: Mon Aug 22 06:41:38 2016
+# Created: Mon Nov 21 13:42:16 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!

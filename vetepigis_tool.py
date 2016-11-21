@@ -112,12 +112,12 @@ class VetEpiGIStool:
         self.mac = '_'.join(("%012X" % get_mac())[i:i+2] for i in range(0, 12, 2))
         dbuid = 'db_%s.sqlite' % self.mac
         dbfold = os.path.join(self.plugin_dir, 'db')
-        dbuidpath = os.path.join(dbfold, dbuid)
-        if not os.path.isfile(dbuidpath):
-            shutil.copy(os.path.join(dbfold, 'base.sqlite'), dbuidpath)
+        self.dbuidpath = os.path.join(dbfold, dbuid)
+        if not os.path.isfile(self.dbuidpath):
+            shutil.copy(os.path.join(dbfold, 'base.sqlite'), self.dbuidpath)
 
         self.uri = QgsDataSourceURI()
-        self.uri.setDatabase(dbuidpath)
+        self.uri.setDatabase(self.dbuidpath)
 
         self.db = QSqlDatabase.addDatabase('QSPATIALITE')
         self.db.setDatabaseName(self.uri.database())
@@ -274,7 +274,7 @@ class VetEpiGIStool:
 
         self.xprt = QAction(
             QIcon(':/plugins/VetEpiGIStool/images/arrows.png'),
-            QCoreApplication.translate('VetEpiGIS-Tool', "Export layer"),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Export"),
             self.iface.mainWindow())
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.xprt)
         self.xprt.triggered.connect(self.expLayer)
@@ -451,34 +451,131 @@ class VetEpiGIStool:
         dlg.move(x,y)
         dlg.setWindowTitle('Export selected layer')
 
+        lyr = self.checklayer()
+        ln = str(lyr.name()).lower()
+        prv = lyr.dataProvider()
+        didx = lyr.fieldNameIndex('disease')
+        yidx = lyr.fieldNameIndex('year')
+        nslst = []
+        tlst = []
+        flds = lyr.dataProvider().fields()
+        for fld in flds:
+            nslst.append(fld.name())
+            tlst.append(fld.type())
+
+        lst1 = []
+        lst2 = []
+        feats = prv.getFeatures()
+        feat = QgsFeature()
+        if nslst==self.obrflds:
+            while feats.nextFeature(feat):
+                lst1.append(feat.attributes()[didx])
+                lst2.append(feat.attributes()[yidx])
+
+            lst1 = sorted(set(lst1))
+            lst2 = sorted(set(lst2))
+
+            for it in lst1:
+                dlg.tableWidget.insertRow(dlg.tableWidget.rowCount())
+                nr = dlg.tableWidget.rowCount() - 1
+                item = QTableWidgetItem(it)
+                dlg.tableWidget.setItem(nr, 0, item)
+
+            for it in lst2:
+                dlg.tableWidget_2.insertRow(dlg.tableWidget_2.rowCount())
+                nr = dlg.tableWidget_2.rowCount() - 1
+                item = QTableWidgetItem(str(it))
+                dlg.tableWidget_2.setItem(nr, 0, item)
+
         if dlg.exec_() == QDialog.Accepted:
             QApplication.setOverrideCursor(Qt.WaitCursor)
-            lyr = self.checklayer()
-            ln = str(lyr.name()).lower()
-            prv = lyr.dataProvider()
-            if dlg.comboBox.currentText()=='ESRI shape file':
-                wrt = QgsVectorFileWriter.writeAsVectorFormat(lyr,
-                    os.path.join(dlg.lineEdit.text(), '%s.shp' % ln ),
-                    'system',
-                    QgsCoordinateReferenceSystem(prv.crs().srsid()),
-                    'ESRI Shapefile')
-            elif dlg.comboBox.currentText()=='Comma separated value (CSV)':
-                lops = []
-                if dlg.comboBox_2.currentText()==';':
-                    lops.append('SEPARATOR=SEMICOLON')
-                elif dlg.comboBox_2.currentText()==',':
-                    lops.append('SEPARATOR=COMMA')
-                elif dlg.comboBox_2.currentText()=='tab':
-                    lops.append('SEPARATOR=TAB')
 
-                if dlg.checkBox.isChecked():
-                    lops.append('GEOMETRY=AS_WKT')
+            if dlg.comboBox.currentText()=='Copy complete database':
+                if dlg.lineEdit.text()!='':
+                    shutil.copy(self.dbuidpath, dlg.lineEdit.text())
+            else:
+                if dlg.comboBox.currentText()=='ESRI shape file':
+                    wrt = QgsVectorFileWriter.writeAsVectorFormat(lyr,
+                        os.path.join(dlg.lineEdit.text(), '%s.shp' % ln ),
+                        'system',
+                        QgsCoordinateReferenceSystem(prv.crs().srsid()),
+                        'ESRI Shapefile')
+                elif dlg.comboBox.currentText()=='Comma separated value (CSV)':
+                    lops = []
+                    if dlg.comboBox_2.currentText()==';':
+                        lops.append('SEPARATOR=SEMICOLON')
+                    elif dlg.comboBox_2.currentText()==',':
+                        lops.append('SEPARATOR=COMMA')
+                    elif dlg.comboBox_2.currentText()=='tab':
+                        lops.append('SEPARATOR=TAB')
 
-                wrt = QgsVectorFileWriter.writeAsVectorFormat(lyr,
-                    os.path.join(dlg.lineEdit.text(), '%s.csv' % ln ),
-                    'system',
-                    None,
-                    'CSV', layerOptions=lops)
+                    if dlg.checkBox.isChecked():
+                        lops.append('GEOMETRY=AS_WKT')
+
+                    wrt = QgsVectorFileWriter.writeAsVectorFormat(lyr,
+                        os.path.join(dlg.lineEdit.text(), '%s.csv' % ln ),
+                        'system',
+                        None,
+                        'CSV', layerOptions=lops)
+                elif dlg.comboBox.currentText()=='SQLite database':
+                    uri = QgsDataSourceURI()
+                    uri.setDatabase(dlg.lineEdit.text())
+                    edb = QSqlDatabase.addDatabase('QSPATIALITE')
+                    edb.setDatabaseName(uri.database())
+
+                    lgt = lyr.geometryType()
+                    if lgt == 1:
+                        return
+
+                    # nslst = []
+                    # tlst = []
+                    # flds = lyr.dataProvider().fields()
+                    # for fld in flds:
+                    #     nslst.append(fld.name())
+                    #     tlst.append(fld.type())
+
+                    # didx = lyr.fieldNameIndex('disease')
+                    # yidx = lyr.fieldNameIndex('year')
+                    # if nslst==self.obrflds:
+                    #     prv = lyr.dataProvider()
+                    #     feats = prv.getFeatures()
+                    #     feat = QgsFeature()
+                    #     while feats.nextFeature(feat):
+
+                    ntlst = self.fieldCheck(nslst)
+                    sql = 'create table %s (' % ln
+                    for i in xrange(len(ntlst)):
+                        t = 'text'
+                        if tlst[i] == 2:
+                            t = 'numeric'
+
+                        sql += '%s %s, ' % (ntlst[i], t)
+
+                    sql += ')'
+                    sql = sql.replace(', )', ')')
+
+                    edb.open()
+                    q = edb.exec_(sql)
+                    if lgt == 0:
+                        sql = "SELECT AddGeometryColumn('%s', 'geom', 4326, 'POINT', 'XY')" % ln
+                    elif lgt == 2:
+                        sql = "SELECT AddGeometryColumn('%s', 'geom', 4326, 'MULTIPOLYGON', 'XY')" % ln
+                    q = edb.exec_(sql)
+                    edb.commit()
+                    edb.close()
+
+                    uri.setDataSource('', ln, 'geom')
+                    vl = QgsVectorLayer(uri.uri(), ln, 'spatialite')
+                    vl.startEditing()
+
+                    prv = lyr.dataProvider()
+                    feats = prv.getFeatures()
+                    feat = QgsFeature()
+                    while feats.nextFeature(feat):
+                        vl.addFeature(feat)
+
+                    vl.commitChanges()
+                    vl.updateExtents()
 
             QApplication.restoreOverrideCursor()
 
