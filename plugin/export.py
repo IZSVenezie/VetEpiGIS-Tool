@@ -48,6 +48,9 @@ class Dialog(QDialog, Ui_Dialog):
         self.comboBox_2.addItem(',')
         self.comboBox_2.addItem('tab')
 
+        self.tabWidget.setTabEnabled(0, False)
+        self.tabWidget.setTabEnabled(1, False)
+
         self.seler()
 
         self.toolButton.clicked.connect(self.filer)
@@ -75,20 +78,30 @@ class Dialog(QDialog, Ui_Dialog):
     def seler(self):
         # self.buttonBox.setEnabled(True)
         if self.comboBox.currentText()=='ESRI shape file':
-            self.comboBox_2.setEnabled(False)
-            self.checkBox.setEnabled(False)
+            self.tabWidget.setTabEnabled(0, False)
+            self.tabWidget.setTabEnabled(1, False)
+            # self.comboBox_2.setEnabled(False)
+            # self.checkBox.setEnabled(False)
             self.setWindowTitle('Export selected layer')
         elif self.comboBox.currentText()=='Comma separated value (CSV)':
-            self.comboBox_2.setEnabled(True)
-            self.checkBox.setEnabled(True)
+            # self.comboBox_2.setEnabled(True)
+            # self.checkBox.setEnabled(True)
+            self.tabWidget.setTabEnabled(0, True)
+            self.tabWidget.setTabEnabled(1, False)
+            self.tabWidget.setCurrentIndex(0)
             self.setWindowTitle('Export selected layer')
         if self.comboBox.currentText()=='SQLite database':
-            self.comboBox_2.setEnabled(False)
-            self.checkBox.setEnabled(False)
+            self.tabWidget.setTabEnabled(0, False)
+            self.tabWidget.setTabEnabled(1, True)
+            self.tabWidget.setCurrentIndex(1)
+            # self.comboBox_2.setEnabled(False)
+            # self.checkBox.setEnabled(False)
             self.setWindowTitle('Export selected layer')
         elif self.comboBox.currentText()=='Copy complete database':
-            self.comboBox_2.setEnabled(False)
-            self.checkBox.setEnabled(False)
+            # self.comboBox_2.setEnabled(False)
+            # self.checkBox.setEnabled(False)
+            self.tabWidget.setTabEnabled(0, False)
+            self.tabWidget.setTabEnabled(1, False)
             self.setWindowTitle('Copy complete database')
         # elif self.comboBox.currentText()=='INSPIRE':
         #     self.comboBox_2.setEnabled(False)

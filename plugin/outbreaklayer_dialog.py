@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'outbreaklayer_dialog_base.ui'
 #
-# Created: Mon Nov 21 18:01:25 2016
+# Created: Mon Nov 21 18:12:48 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!

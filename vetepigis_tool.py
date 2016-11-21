@@ -95,7 +95,7 @@ class VetEpiGIStool:
             'i18n',
             'VetEpiGIStool_{}.qm'.format(locale))
 
-        self.vers = '0.77'
+        self.vers = '0.78'
         self.prevcur = self.iface.mapCanvas().cursor()
 
         self.origtool = QgsMapTool(self.iface.mapCanvas())
