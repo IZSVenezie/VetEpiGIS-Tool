@@ -1790,7 +1790,7 @@ class VetEpiGIStool:
         dlg.textEdit.setFontWeight(QFont.Bold)
         dlg.textEdit.append('VetEpiGIS-Tool ' + self.vers +'\n')
         dlg.textEdit.setFontWeight(ow)
-        dlg.textEdit.append('VetEpiGIS-Tool is a free QGIS plugin helping veterinarians in the management of spatial data related to animal disease.\n')
+        dlg.textEdit.append("VetEpiGIS-Tool is a free QGIS tool that helps veterinarian users in the management of spatial data related to animal disease. This plug-in combined the huge amount of GIS functions offered by QGIS with a simple user interface that allows to the user the possibility to manage data without the necessity to define the data model, the data organization model, and the data presentation, because these issues are pre-organised in the 'piece' of software specifically developed.\n")
         dlg.textEdit.setFontWeight(QFont.Bold)
         dlg.textEdit.append('Developers:')
         dlg.textEdit.setFontWeight(ow)
