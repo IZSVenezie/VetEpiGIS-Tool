@@ -9,7 +9,7 @@
 [general]
 name=VetEpiGIStool
 qgisMinimumVersion=2.8
-description=Spatial functions for veterinary epidemiology
+description=QGIS plugin to support animal disease control measures
 version=0.77
 author=Norbert Solymosi
 email=gis@izsvenezie.it
