@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'export_dialog_base.ui'
 #
-# Created: Mon Nov 21 18:12:48 2016
+# Created: Mon Nov 21 18:15:17 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -115,7 +115,7 @@ class Ui_Dialog(object):
         self.gridLayout_2.addWidget(self.buttonBox, 3, 1, 1, 2)
 
         self.retranslateUi(Dialog)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), Dialog.accept)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), Dialog.reject)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
