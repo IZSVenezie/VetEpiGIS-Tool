@@ -95,7 +95,7 @@ class VetEpiGIStool:
             'i18n',
             'VetEpiGIStool_{}.qm'.format(locale))
 
-        self.vers = '0.78'
+        self.vers = '0.79'
         self.prevcur = self.iface.mapCanvas().cursor()
 
         self.origtool = QgsMapTool(self.iface.mapCanvas())
@@ -1229,12 +1229,22 @@ class VetEpiGIStool:
                 elif lyr.name()== dlg.comboBox_5.currentText():
                     dst = lyr
 
+            prvsrc = src.dataProvider()
+            prvdst = dst.dataProvider()
+
             sfeats = src.selectedFeatures()
             sg = QgsGeometry()
-            self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(sfeats))
-            for sf in sfeats:
-                sg = sf.geometry()
-                self.iface.emit(SIGNAL('featureProcessed()'))
+            if prvsrc.crs().toWkt()!=prvdst.crs().toWkt():
+                trafo = QgsCoordinateTransform(prvsrc.crs().toWkt(), prvdst.crs().toWkt())
+                self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(sfeats))
+                for sf in sfeats:
+                    sg = sf.geometry().transform(trafo)
+                    self.iface.emit(SIGNAL('featureProcessed()'))
+            else:
+                self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(sfeats))
+                for sf in sfeats:
+                    sg = sf.geometry()
+                    self.iface.emit(SIGNAL('featureProcessed()'))
 
             dst.startEditing()
             feat = self.funcs.outattrPrep(dlg, dst)
