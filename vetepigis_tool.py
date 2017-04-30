@@ -1807,29 +1807,6 @@ class VetEpiGIStool:
 
             provider.reloadData()
             psrid = provider.crs().srsid()
-#            Pseudo Mercator: srid 3857
-#            trA = QgsCoordinateTransform(psrid, 3857)
-#            trB = QgsCoordinateTransform(3857, psrid)
-
-#            trA = QgsCoordinateTransform(psrid, 27891)
-#            trB = QgsCoordinateTransform(27891, psrid)
-
-            # crs = QgsCoordinateReferenceSystem(102014, QgsCoordinateReferenceSystem.EpsgCrsId)
-            # crs.srsid()
-            #trA = QgsCoordinateTransform(psrid, 27137)
-            #trB = QgsCoordinateTransform(27137, psrid)
-
-            #ccrs = QgsCoordinateReferenceSystem(102031, QgsCoordinateReferenceSystem.EpsgCrsId)
-            #trA = QgsCoordinateTransform(psrid, ccrs.srsid())
-            #trB = QgsCoordinateTransform(ccrs.srsid(), psrid)
-            # 54027,
-#            ccrs = QgsCoordinateReferenceSystem(54010, QgsCoordinateReferenceSystem.EpsgCrsId)
-#            trA = QgsCoordinateTransform(psrid, ccrs.srsid())
-#            trB = QgsCoordinateTransform(ccrs.srsid(), psrid)
-
-            #ccrs = QgsCoordinateReferenceSystem(54025, QgsCoordinateReferenceSystem.EpsgCrsId)
-            #trA = QgsCoordinateTransform(psrid, ccrs.srsid())
-            #trB = QgsCoordinateTransform(ccrs.srsid(), psrid)
 
             r = dlg.spinBox.value()
 
