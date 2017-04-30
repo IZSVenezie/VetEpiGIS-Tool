@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'xaffected_dialog_base.ui'
 #
-# Created: Sun Apr 30 06:34:57 2017
+# Created: Sun Apr 30 06:50:38 2017
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
