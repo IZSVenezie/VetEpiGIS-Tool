@@ -1914,9 +1914,9 @@ class VetEpiGIStool:
         else:
             epsg = int('327%s' % str(zn).zfill(2))
 
-        utm = QgsCoordinateReferenceSystem(epsg, QgsCoordinateReferenceSystem.EpsgCrsId)
+        utmz = QgsCoordinateReferenceSystem(epsg, QgsCoordinateReferenceSystem.EpsgCrsId)
 
-        return utm
+        return utmz
 
 
     def about(self):
