@@ -21,7 +21,7 @@
  ***************************************************************************/
 """
 
-import os, shutil
+import os, shutil, math
 from PyQt4.QtGui import *
 from PyQt4.QtCore import SIGNAL, Qt, QSettings, QCoreApplication, QFile, QFileInfo, QDate, QVariant, \
     pyqtSignal, QRegExp, QDateTime, QTranslator, QSize
@@ -1819,13 +1819,13 @@ class VetEpiGIStool:
             #trA = QgsCoordinateTransform(psrid, 27137)
             #trB = QgsCoordinateTransform(27137, psrid)
 
-            ccrs = QgsCoordinateReferenceSystem(102031, QgsCoordinateReferenceSystem.EpsgCrsId)
-            trA = QgsCoordinateTransform(psrid, ccrs.srsid())
-            trB = QgsCoordinateTransform(ccrs.srsid(), psrid)
-
-            #ccrs = QgsCoordinateReferenceSystem(54027, QgsCoordinateReferenceSystem.EpsgCrsId)
+            #ccrs = QgsCoordinateReferenceSystem(102031, QgsCoordinateReferenceSystem.EpsgCrsId)
             #trA = QgsCoordinateTransform(psrid, ccrs.srsid())
             #trB = QgsCoordinateTransform(ccrs.srsid(), psrid)
+            # 54027,
+#            ccrs = QgsCoordinateReferenceSystem(54010, QgsCoordinateReferenceSystem.EpsgCrsId)
+#            trA = QgsCoordinateTransform(psrid, ccrs.srsid())
+#            trB = QgsCoordinateTransform(ccrs.srsid(), psrid)
 
             #ccrs = QgsCoordinateReferenceSystem(54025, QgsCoordinateReferenceSystem.EpsgCrsId)
             #trA = QgsCoordinateTransform(psrid, ccrs.srsid())
@@ -1855,6 +1855,11 @@ class VetEpiGIStool:
 
             if lyp.selectedFeatureCount()==0:
                 for feat in provi.getFeatures(QgsFeatureRequest()):
+
+                    ccrs = QgsCoordinateReferenceSystem(self.getUTMzone(feat,psrid), QgsCoordinateReferenceSystem.EpsgCrsId)
+                    trA = QgsCoordinateTransform(psrid, ccrs.srsid())
+                    trB = QgsCoordinateTransform(ccrs.srsid(), psrid)
+
                     ba = QgsGeometry(feat.geometry())
                     ba.transform(trA)
                     bfa = ba.buffer(r, r)
@@ -1872,6 +1877,11 @@ class VetEpiGIStool:
                 feats = lyp.selectedFeatures()
                 self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(feats))
                 for feat in feats:
+
+                    ccrs = QgsCoordinateReferenceSystem(self.getUTMzone(feat,psrid), QgsCoordinateReferenceSystem.EpsgCrsId)
+                    trA = QgsCoordinateTransform(psrid, ccrs.srsid())
+                    trB = QgsCoordinateTransform(ccrs.srsid(), psrid)
+
                     ba = QgsGeometry(feat.geometry())
                     ba.transform(trA)
                     bfa = ba.buffer(r, r)
@@ -1908,6 +1918,26 @@ class VetEpiGIStool:
             QgsMapLayerRegistry.instance().addMapLayer(vl)
 
             QApplication.restoreOverrideCursor()
+
+
+    def getUTMzone(self, feat, psrid):
+        #http://www.qgistutorials.com/tr/docs/custom_python_functions.html
+        tfeat = feat
+
+        if psrid != 3452:
+            trA = QgsCoordinateTransform(psrid, 3452)
+            tfeat = trA.transform(feat)
+
+        geom = tfeat.geometry()
+        pt = geom.asPoint()
+
+        zn = int(math.floor(((pt.x()+180)/6) % 60)+1)
+        if pt.y()>0:
+            epsg = int('326%s' % str(zn).zfill(2))
+        else:
+            epsg = int('327%s' % str(zn).zfill(2))
+
+        return epsg
 
 
     def about(self):
