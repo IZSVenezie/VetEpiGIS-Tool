@@ -95,7 +95,7 @@ class VetEpiGIStool:
             'i18n',
             'VetEpiGIStool_{}.qm'.format(locale))
 
-        self.vers = '0.791'
+        self.vers = '0.792'
         self.prevcur = self.iface.mapCanvas().cursor()
 
         self.origtool = QgsMapTool(self.iface.mapCanvas())
@@ -958,9 +958,9 @@ class VetEpiGIStool:
                 lyr.changeAttributeValue(fid, 7, production)
                 lyr.changeAttributeValue(fid, 8, dlg.lineEdit_4.text())
                 lyr.changeAttributeValue(fid, 9, dlg.comboBox_3.currentText())
-                lyr.changeAttributeValue(fid, 10, self.dateCheck(dlg.dateEdit.date()))
-                lyr.changeAttributeValue(fid, 11, self.dateCheck(dlg.dateEdit_2.date()))
-                lyr.changeAttributeValue(fid, 12, self.dateCheck(dlg.dateEdit_3.date()))
+                lyr.changeAttributeValue(fid, 10, self.funcs.dateCheck(dlg.dateEdit.date()))
+                lyr.changeAttributeValue(fid, 11, self.funcs.dateCheck(dlg.dateEdit_2.date()))
+                lyr.changeAttributeValue(fid, 12, self.funcs.dateCheck(dlg.dateEdit_3.date()))
                 lyr.changeAttributeValue(fid, 13, dlg.textEdit.toPlainText())
                 lyr.changeAttributeValue(fid, 15, QDateTime.currentDateTimeUtc().toString('dd/MM/yyyy hh:mm:ss'))
                 lyr.commitChanges()
