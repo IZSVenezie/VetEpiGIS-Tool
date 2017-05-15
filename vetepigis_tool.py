@@ -95,7 +95,7 @@ class VetEpiGIStool:
             'i18n',
             'VetEpiGIStool_{}.qm'.format(locale))
 
-        self.vers = '0.792'
+        self.vers = '0.793'
         self.prevcur = self.iface.mapCanvas().cursor()
 
         self.origtool = QgsMapTool(self.iface.mapCanvas())
@@ -1056,6 +1056,7 @@ class VetEpiGIStool:
 
             self.uri.setDataSource('', lnb,'geom')
             vl = QgsVectorLayer(self.uri.uri(), lnb, 'spatialite')
+            vl.setCrs(lyr.crs())
             QgsMapLayerRegistry.instance().addMapLayer(vl)
 
             QApplication.restoreOverrideCursor()
@@ -1252,6 +1253,7 @@ class VetEpiGIStool:
             feat.setValid(True)
             dst.addFeature(feat)
             dst.commitChanges()
+            dst.setCrs(src.crs()) #????
             dst.updateExtents()
 
 

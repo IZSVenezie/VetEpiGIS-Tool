@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'zone_dialog_base.ui'
 #
-# Created: Mon May  1 07:15:34 2017
+# Created: Mon May 15 10:09:38 2017
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!

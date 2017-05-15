@@ -26,3 +26,7 @@ cd /home/sn/.qgis2/python/plugins/VetEpiGIS-Tool
 rm *.pyc
 make test
 /home/sn/apps/bin/qgis.sh
+
+
+
+
