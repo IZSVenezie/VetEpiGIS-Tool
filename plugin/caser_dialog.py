@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'caser_dialog_base.ui'
 #
-# Created: Mon May 15 10:09:38 2017
+# Created: Mon May 15 13:10:59 2017
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
