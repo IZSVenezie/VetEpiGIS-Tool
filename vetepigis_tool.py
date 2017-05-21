@@ -95,7 +95,7 @@ class VetEpiGIStool:
             'i18n',
             'VetEpiGIStool_{}.qm'.format(locale))
 
-        self.vers = '0.793'
+        self.vers = '0.794'
         self.prevcur = self.iface.mapCanvas().cursor()
 
         self.origtool = QgsMapTool(self.iface.mapCanvas())
@@ -1239,7 +1239,8 @@ class VetEpiGIStool:
                 trafo = QgsCoordinateTransform(prvsrc.crs().toWkt(), prvdst.crs().toWkt())
                 self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(sfeats))
                 for sf in sfeats:
-                    sg = sf.geometry().transform(trafo)
+                    sg = sf.geometry()
+                    sg.transform(trafo)
                     self.iface.emit(SIGNAL('featureProcessed()'))
             else:
                 self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(sfeats))
@@ -1253,8 +1254,8 @@ class VetEpiGIStool:
             feat.setValid(True)
             dst.addFeature(feat)
             dst.commitChanges()
-            dst.setCrs(src.crs()) #????
             dst.updateExtents()
+            dst.triggerRepaint()
 
 
     def createPOIlayer(self):
