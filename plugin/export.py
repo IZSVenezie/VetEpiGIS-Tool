@@ -21,10 +21,10 @@
  ***************************************************************************/
 """
 
-from PyQt4.QtGui import QDialog, QFileDialog
-from PyQt4.QtCore import QFileInfo, QDir
+from qgis.PyQt.QtCore import QFileInfo, QDir
+from qgis.PyQt.QtWidgets import QDialog, QFileDialog
 
-from export_dialog import Ui_Dialog
+from .export_dialog import Ui_Dialog
 
 
 class Dialog(QDialog, Ui_Dialog):         

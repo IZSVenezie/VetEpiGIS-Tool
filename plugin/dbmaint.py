@@ -21,12 +21,14 @@
  ***************************************************************************/
 """
 
-from PyQt4.QtSql import *
-from PyQt4.QtCore import QRegExp, SIGNAL, Qt, QModelIndex
-from PyQt4.QtGui import *
+from qgis.PyQt.QtGui import *
+from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QMessageBox
+from qgis.PyQt.QtCore import QRegExp, Qt, QModelIndex
+from qgis.PyQt.QtSql import *
 
-from dbmaint_dialog import Ui_Dialog
-import xitem as insdlg
+
+from .dbmaint_dialog import Ui_Dialog
+from .xitem import Dialog as insdlg
 
 
 class Dialog(QDialog, Ui_Dialog):         
@@ -87,7 +89,7 @@ class Dialog(QDialog, Ui_Dialog):
     def renameLayer(self):
         if len(self.tableView_2.selectedIndexes())!=1:
             return
-        dlg = insdlg.Dialog()
+        dlg = insdlg()
         dlg.setWindowTitle('Rename layer')
         dlg.label.setText('New name:')
         x = (self.x()+self.width()/2)-dlg.width()/2
@@ -197,7 +199,7 @@ class Dialog(QDialog, Ui_Dialog):
 
 
     def saveEn(self):
-        dlg = insdlg.Dialog()
+        dlg = insdlg()
         x = (self.x()+self.width()/2)-dlg.width()/2
         y = (self.y()+self.height()/2)-dlg.height()/2
         dlg.move(x,y)

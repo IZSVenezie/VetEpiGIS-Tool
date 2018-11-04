@@ -22,16 +22,16 @@
 """
 
 import os, hashlib, datetime
-from PyQt4.QtGui import *
-from PyQt4.QtCore import SIGNAL, Qt, QSettings, QCoreApplication, QFile, QFileInfo, QDate, QVariant, \
+from qgis.PyQt.QtGui import *
+from qgis.PyQt.QtCore import Qt, QSettings, QCoreApplication, QFile, QFileInfo, QDate, QVariant, \
     pyqtSignal, QRegExp, QDateTime, QTranslator
-from PyQt4.QtSql import *
+from qgis.PyQt.QtSql import *
 from uuid import getnode as get_mac
 
 from qgis.core import QgsField, QgsSpatialIndex, QgsMessageLog, QgsProject, \
-    QgsCoordinateTransform, QGis, QgsVectorFileWriter, QgsMapLayerRegistry, QgsFeature, \
+    QgsCoordinateTransform, Qgis, QgsVectorFileWriter, QgsFeature, \
     QgsGeometry, QgsFeatureRequest, QgsPoint, QgsVectorLayer, QgsCoordinateReferenceSystem, \
-    QgsRectangle, QgsDataSourceURI, QgsDataProvider
+    QgsRectangle, QgsDataSourceUri, QgsDataProvider
 from qgis.gui import QgsMapTool, QgsMapToolEmitPoint, QgsMessageBar, QgsRubberBand
 
 class VetEpiGISFuncs:
@@ -42,7 +42,7 @@ class VetEpiGISFuncs:
     def hashIDer(self, most):
         mac = '_'.join(("%012X" % get_mac())[i:i+2] for i in range(0, 12, 2))
         uid = '%s %s' % (mac, most.toString('dd/MM/yyyy hh:mm:ss.z'))
-        hrid = hashlib.sha256(uid).hexdigest()
+        hrid = hashlib.sha256(uid.encode('utf-8')).hexdigest()
         return hrid
 
 
@@ -54,7 +54,7 @@ class VetEpiGISFuncs:
         most = QDateTime.currentDateTimeUtc()
 
         rn = dlg.tableWidget.rowCount()
-        for i in xrange(rn):
+        for i in range(rn):
             if i==0:
                 species = dlg.tableWidget.item(i, 0).text()
                 production = dlg.tableWidget.item(i, 1).text()

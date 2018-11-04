@@ -22,21 +22,28 @@
 """
 
 import os, shutil, math
-from PyQt4.QtGui import *
-from PyQt4.QtCore import SIGNAL, Qt, QSettings, QCoreApplication, QFile, QFileInfo, QDate, QVariant, \
+from qgis.PyQt.QtGui import *
+from qgis.PyQt.QtCore import Qt, QSettings, QCoreApplication, QFile, QFileInfo, QDate, QVariant, \
     pyqtSignal, QRegExp, QDateTime, QTranslator, QSize
-from PyQt4.QtSql import *
-from PyQt4.QtXml import *
+from qgis.PyQt.QtSql import *
+from qgis.PyQt.QtXml import *
+from qgis.PyQt.QtWidgets import *
 
 from qgis.core import QgsField, QgsSpatialIndex, QgsMessageLog, QgsProject, \
-    QgsCoordinateTransform, QGis, QgsVectorFileWriter, QgsMapLayerRegistry, QgsFeature, \
+    QgsCoordinateTransform, Qgis, QgsVectorFileWriter, QgsFeature, \
     QgsGeometry, QgsFeatureRequest, QgsPoint, QgsVectorLayer, QgsCoordinateReferenceSystem, \
-    QgsRectangle, QgsDataSourceURI, QgsDataProvider, QgsComposition, QgsComposerMap, QgsAtlasComposition
+    QgsRectangle, QgsDataSourceUri, QgsDataProvider, QgsWkbTypes, QgsPointXY
+
+#Composer
+#All composer related methods have been removed from the public API and Python bindings. These classes have been replaced with the new layouts engine, based on QgsLayout, QgsLayoutItem, and the other related classes.
+#, QgsComposition, QgsComposerMap, QgsAtlasComposition
+
 from qgis.gui import QgsMapTool, QgsMapToolEmitPoint, QgsMessageBar, QgsRubberBand
 
-from plugin import buffer, caser, select, outbreaklayer, xabout, poi, dbtbs, dbmaint, xsettings, \
+from .plugin import buffer, caser, select, outbreaklayer, xabout, poi, dbtbs, dbmaint, xsettings, \
     qvfuncs, xcoordtrafo, query, zone, export, xprint
-import resources_rc
+
+from .resources_rc import *
 # import lxml.etree as etree
 
 from uuid import getnode as get_mac
@@ -95,7 +102,7 @@ class VetEpiGIStool:
             'i18n',
             'VetEpiGIStool_{}.qm'.format(locale))
 
-        self.vers = '0.794'
+        self.vers = '0.800'
         self.prevcur = self.iface.mapCanvas().cursor()
 
         self.origtool = QgsMapTool(self.iface.mapCanvas())
@@ -116,7 +123,7 @@ class VetEpiGIStool:
         if not os.path.isfile(self.dbuidpath):
             shutil.copy(os.path.join(dbfold, 'base.sqlite'), self.dbuidpath)
 
-        self.uri = QgsDataSourceURI()
+        self.uri = QgsDataSourceUri()
         self.uri.setDatabase(self.dbuidpath)
 
         self.db = QSqlDatabase.addDatabase('QSPATIALITE')
@@ -454,8 +461,8 @@ class VetEpiGIStool:
         lyr = self.checklayer()
         ln = str(lyr.name()).lower()
         prv = lyr.dataProvider()
-        didx = lyr.fieldNameIndex('disease')
-        yidx = lyr.fieldNameIndex('year')
+        didx = lyr.fields().indexFromName('disease')
+        yidx = lyr.fields().indexFromName('year')
         nslst = []
         tlst = []
         flds = lyr.dataProvider().fields()
@@ -528,7 +535,7 @@ class VetEpiGIStool:
                     lstb = []
                     for it in dlg.tableWidget.selectedItems():
                         lsta.append(it.text())
-                        # self.iface.messageBar().pushMessage('Information', '%s' % it.text(), level=QgsMessageBar.INFO)
+                        # self.iface.messageBar().pushMessage('Information', '%s' % it.text(), level=Qgis.Info)
 
                     for it in dlg.tableWidget_2.selectedItems():
                         lstb.append(str(it.text()))
@@ -544,7 +551,7 @@ class VetEpiGIStool:
 
                     ntlst = self.fieldCheck(nslst)
                     sql = 'create table %s (' % ln
-                    for i in xrange(len(ntlst)):
+                    for i in range(len(ntlst)):
                         t = 'text'
                         if tlst[i] == 2:
                             t = 'numeric'
@@ -572,7 +579,7 @@ class VetEpiGIStool:
                     feats = prv.getFeatures()
                     feat = QgsFeature()
                     while feats.nextFeature(feat):
-                        # self.iface.messageBar().pushMessage('Information', '%s %s' % (feat.attributes()[didx], feat.attributes()[yidx]), level=QgsMessageBar.INFO)
+                        # self.iface.messageBar().pushMessage('Information', '%s %s' % (feat.attributes()[didx], feat.attributes()[yidx]), level=Qgis.Info)
                         if (feat.attributes()[didx] in lsta) and (str(feat.attributes()[yidx]) in lstb):
                             vl.addFeature(feat)
 
@@ -642,10 +649,10 @@ class VetEpiGIStool:
         while feats.nextFeature(feat):
             attr = feat.attributes()
             sl = str(attr[6]).split(' | ')
-            for i in xrange(len(sl)):
+            for i in range(len(sl)):
                 slst.append(sl[i])
             pl = str(attr[7]).split(' | ')
-            for i in xrange(len(pl)):
+            for i in range(len(pl)):
                 plst.append(pl[i])
 
         dlg.usl = list(set(slst))
@@ -665,7 +672,7 @@ class VetEpiGIStool:
             items = []
             aliases = []
             rn = dlg.tableWidget.rowCount()
-            for i in xrange(rn):
+            for i in range(rn):
                 items.append(dlg.tableWidget.item(i, 0).text())
                 aliases.append(dlg.tableWidget.item(i, 1).text())
 
@@ -674,7 +681,7 @@ class VetEpiGIStool:
                 attr = feat.attributes()
                 lanc = str(attr[n])
                 fid = feat.id()
-                for i in xrange(len(items)):
+                for i in range(len(items)):
                     if lanc.find(items[i])!=-1:
                         lyr.changeAttributeValue(fid, 15, aliases[i])
 
@@ -757,8 +764,8 @@ class VetEpiGIStool:
 
     def dbMaintain(self):
         self.grp4.setDefaultAction(self.dbmaintain)
-        self.iface.messageBar().pushMessage('Information', 'For editing the VetEpiGIS database all layers are removed from the workspace.', level=QgsMessageBar.INFO)
-        QgsMapLayerRegistry.instance().removeAllMapLayers()
+        self.iface.messageBar().pushMessage('Information', 'For editing the VetEpiGIS database all layers are removed from the workspace.', level=Qgis.Info)
+        QgsProject.instance().removeAllMapLayers()
 
         dlg = dbmaint.Dialog()
         x = (self.iface.mainWindow().x()+self.iface.mainWindow().width()/2)-dlg.width()/2
@@ -899,7 +906,7 @@ class VetEpiGIStool:
 
             slst = str(attr[6]).split(' | ')
             plst = str(attr[7]).split(' | ')
-            for i in xrange(len(slst)):
+            for i in range(len(slst)):
                 dlg.tableWidget.insertRow(dlg.tableWidget.rowCount())
                 nr = dlg.tableWidget.rowCount() - 1
                 item = QTableWidgetItem(slst[i])
@@ -941,7 +948,7 @@ class VetEpiGIStool:
                 species = ''
                 production = ''
                 rn = dlg.tableWidget.rowCount()
-                for i in xrange(rn):
+                for i in range(rn):
                     if i==0:
                         species = dlg.tableWidget.item(i, 0).text()
                         production = dlg.tableWidget.item(i, 1).text()
@@ -969,7 +976,7 @@ class VetEpiGIStool:
 
 
     def checklayer(self):
-        if QgsMapLayerRegistry.instance().count()==0:
+        if QgsProject.instance().count()==0:
             QMessageBox.warning(self.iface.mainWindow(),
                 "Warning", "Please add a vector layer.",
                 buttons=QMessageBox.Ok, defaultButton=QMessageBox.NoButton)
@@ -1010,7 +1017,7 @@ class VetEpiGIStool:
     def layerCheck(self, l):
         s = l.dataProvider().dataSourceUri()
         if s.find('db.sqlite')> -1:
-            self.iface.messageBar().pushMessage(' ', 'spatialite', level=QgsMessageBar.INFO)
+            self.iface.messageBar().pushMessage(' ', 'spatialite', level=Qgis.Info)
 
 
     def layersinDB(self):
@@ -1028,7 +1035,7 @@ class VetEpiGIStool:
         ln = str(self.model.itemData(idx)[0])
         self.uri.setDataSource('', ln, 'geom')
         vl = QgsVectorLayer(self.uri.uri(), ln, 'spatialite')
-        QgsMapLayerRegistry.instance().addMapLayer(vl)
+        QgsProject.instance().addMapLayer(vl)
         QApplication.restoreOverrideCursor()
 
 
@@ -1057,7 +1064,7 @@ class VetEpiGIStool:
             self.uri.setDataSource('', lnb,'geom')
             vl = QgsVectorLayer(self.uri.uri(), lnb, 'spatialite')
             vl.setCrs(lyr.crs())
-            QgsMapLayerRegistry.instance().addMapLayer(vl)
+            QgsProject.instance().addMapLayer(vl)
 
             QApplication.restoreOverrideCursor()
 
@@ -1076,7 +1083,7 @@ class VetEpiGIStool:
 
         ntlst = self.fieldCheck(nslst)
         sql = 'create table %s (' % ln
-        for i in xrange(len(ntlst)):
+        for i in range(len(ntlst)):
             t = 'text'
             if tlst[i]==2:
                 t = 'numeric'
@@ -1111,7 +1118,7 @@ class VetEpiGIStool:
 
 
     def fieldCheck(self, lst):
-        for i in xrange(len(lst)):
+        for i in range(len(lst)):
             if lst[i].lower()=='geom':
                lst[i]='ge_om_old'
 
@@ -1128,12 +1135,12 @@ class VetEpiGIStool:
             flst = self.funcs.ofielder(lyr)
 
             if flst != self.obrflds:
-                self.iface.messageBar().pushMessage(' ', 'It is not an OUTBREAK layer!', level=QgsMessageBar.WARNING)
+                self.iface.messageBar().pushMessage(' ', 'It is not an OUTBREAK layer!', level=Qgis.Warning)
                 self.handy.setChecked(False)
                 return
 
-            if flst == self.obrflds and lyr.geometryType() != QGis.Polygon:
-                self.iface.messageBar().pushMessage(' ', 'It is not an AREA outbreak layer!', level=QgsMessageBar.WARNING)
+            if flst == self.obrflds and lyr.geometryType() != QgsWkbTypes.PolygonGeometry:
+                self.iface.messageBar().pushMessage(' ', 'It is not an AREA outbreak layer!', level=Qgis.Warning)
                 self.handy.setChecked(False)
                 return
 
@@ -1153,7 +1160,7 @@ class VetEpiGIStool:
 
             dlg.lstb = self.lstb
 
-            if lyr.geometryType() == QGis.Polygon:
+            if lyr.geometryType() == QgsWkbTypes.PolygonGeometry:
                 psrid = self.iface.mapCanvas().mapSettings().destinationCrs().srsid()
                 tool = polyDraw(dlg, psrid, self.iface, self.handy)
                 self.iface.mapCanvas().setMapTool(tool)
@@ -1182,32 +1189,32 @@ class VetEpiGIStool:
 
         dlg.lstb = self.lstb
 
-        lyrs = self.iface.legendInterface().layers()
+        lyrs = [layer for layer in QgsProject.instance().mapLayers().values()]        
         lrs = []
         tlrs = []
         n = 0
         fldn = 0
         for lyr in lyrs:
             if lyr.type()==0:
-                if lyr.geometryType() != QGis.Line:
+                if lyr.geometryType() != QgsWkbTypes.LineGeometry:
                     flst = self.funcs.ofielder(lyr)
                     if flst == self.obrflds:
                         fldn += 1
 
                     lrs.append(lyr.name())
-                    if lyr.geometryType() == QGis.Point:
+                    if lyr.geometryType() == QgsWkbTypes.PointGeometry:
                         tlrs.append('point')
-                    if lyr.geometryType() == QGis.Polygon:
+                    if lyr.geometryType() == QgsWkbTypes.PolygonGeometry:
                         tlrs.append('poly')
                     if lyr.selectedFeatureCount()==1:
                         dlg.comboBox.addItem(lyr.name())
                         n += 1
         if n==0:
-            self.iface.messageBar().pushMessage(' ', 'There is no selected object to copy!', level=QgsMessageBar.WARNING)
+            self.iface.messageBar().pushMessage(' ', 'There is no selected object to copy!', level=Qgis.Warning)
             return
 
         if fldn==0:
-            self.iface.messageBar().pushMessage(' ', 'There is no OUTBREAK layer!', level=QgsMessageBar.WARNING)
+            self.iface.messageBar().pushMessage(' ', 'There is no OUTBREAK layer!', level=Qgis.Warning)
             return
 
         dlg.lrs = lrs
@@ -1237,16 +1244,16 @@ class VetEpiGIStool:
             sg = QgsGeometry()
             if prvsrc.crs().toWkt()!=prvdst.crs().toWkt():
                 trafo = QgsCoordinateTransform(prvsrc.crs().toWkt(), prvdst.crs().toWkt())
-                self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(sfeats))
+                #self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(sfeats))
                 for sf in sfeats:
                     sg = sf.geometry()
                     sg.transform(trafo)
-                    self.iface.emit(SIGNAL('featureProcessed()'))
+                    #self.iface.emit(SIGNAL('featureProcessed()'))
             else:
-                self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(sfeats))
+                #self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(sfeats))
                 for sf in sfeats:
                     sg = sf.geometry()
-                    self.iface.emit(SIGNAL('featureProcessed()'))
+                    #self.iface.emit(SIGNAL('featureProcessed()'))
 
             dst.startEditing()
             feat = self.funcs.outattrPrep(dlg, dst)
@@ -1282,9 +1289,9 @@ class VetEpiGIStool:
             self.db.close()
             self.uri.setDataSource('', s,'geom')
             vl = QgsVectorLayer(self.uri.uri(), s, 'spatialite')
-            sld = self.sldPOI
-            vl.loadSldStyle(sld)
-            QgsMapLayerRegistry.instance().addMapLayer(vl)
+            #sld = self.sldPOI
+            #vl.loadSldStyle(sld)
+            QgsProject.instance().addMapLayer(vl)
             self.poier.activate(0)
 
             self.loadModel()
@@ -1310,17 +1317,18 @@ class VetEpiGIStool:
             self.db.open()
             q = self.db.exec_("create table %s (gid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, localid text, code text, largescale text, disease text, animalno numeric, species text, production text, year numeric, status text, suspect text, confirmation text, expiration text, notes text, hrid text, timestamp text, grouping text)" % s)
             if dlg.comboBox.currentText()=='Point':
-                sld = self.sldOutbreakPoint
+                #sld = self.sldOutbreakPoint
                 q = self.db.exec_("SELECT AddGeometryColumn('%s', 'geom', 4326, 'POINT', 'XY')" % s)
             else:
-                sld = self.sldOutbreakArea
+                #sld = self.sldOutbreakArea
                 q = self.db.exec_("SELECT AddGeometryColumn('%s', 'geom', 4326, 'POLYGON', 'XY')" % s)
             self.db.commit()
             self.db.close()
             self.uri.setDataSource('', s,'geom')
             vl = QgsVectorLayer(self.uri.uri(), s, 'spatialite')
-            vl.loadSldStyle(sld)
-            QgsMapLayerRegistry.instance().addMapLayer(vl)
+            #vl.loadSldStyle(sld)
+
+            QgsProject.instance().addMapLayer(vl)
             self.loadModel()
             QApplication.restoreOverrideCursor()
 
@@ -1333,12 +1341,12 @@ class VetEpiGIStool:
         dlg.move(x,y)
         dlg.setWindowTitle('Select POIs by polygons')
 
-        lyrs = self.iface.legendInterface().layers()
+        lyrs = [layer for layer in QgsProject.instance().mapLayers().values()]
         for lyr in lyrs:
             if lyr.type()==0:
-                if lyr.geometryType() == QGis.Polygon:
+                if lyr.geometryType() == QgsWkbTypes.PolygonGeometry:
                     dlg.comboBox.addItem(lyr.name())
-                if lyr.geometryType() == QGis.Point:
+                if lyr.geometryType() == QgsWkbTypes.PointGeometry:
                     dlg.comboBox_2.addItem(lyr.name())
 
         dlg.lineEdit.setText('_selected_by_')
@@ -1363,7 +1371,8 @@ class VetEpiGIStool:
             oattrs = prv2.fields().toList()
             nattrs = []
             for attr in oattrs:
-                if vl.fieldNameIndex(attr.name())==-1:
+                # if vl.fieldNameIndex(attr.name())==-1:
+                if vl.fields().indexFromName(attr.name()) == -1:
                     nattrs.append(QgsField(attr.name(),attr.type()))
                     vl.dataProvider().addAttributes(nattrs)
                     vl.updateFields()
@@ -1372,7 +1381,8 @@ class VetEpiGIStool:
             nattrs = []
             for attr in oattrs:
                 s = 'selby_%s' % attr.name()
-                if vl.fieldNameIndex(s)==-1:
+                # if vl.fieldNameIndex(s)==-1:
+                if vl.fields().indexFromName(s) == -1:
                     nattrs.append(QgsField(s, attr.type()))
                     vl.dataProvider().addAttributes(nattrs)
                     vl.updateFields()
@@ -1395,11 +1405,13 @@ class VetEpiGIStool:
             if l1.selectedFeatureCount()==0:
                 feats = prv1.getFeatures()
                 while feats.nextFeature(feat):
-                    geom = feat.constGeometry()
+                    # geom = feat.constGeometry()
+                    geom = feat.geometry()
                     idxs = index.intersects(geom.boundingBox())
                     for idx in idxs:
                         rqst = QgsFeatureRequest().setFilterFid(idx)
-                        featB = prv2.getFeatures(rqst).next()
+                        featB = QgsFeature()
+                        prv2.getFeatures(rqst).nextFeature(featB)
                         geomB = QgsGeometry(featB.geometry())
                         attrs=[]
                         attrs.extend(featB.attributes())
@@ -1411,13 +1423,15 @@ class VetEpiGIStool:
                             vl.addFeature(featC)
             else:
                 feats = l1.selectedFeatures()
-                self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(feats))
+                #self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(feats))
                 for feat in feats:
-                    geom = feat.constGeometry()
+                    # geom = feat.constGeometry()
+                    geom = feat.geometry()
                     idxs = index.intersects(geom.boundingBox())
                     for idx in idxs:
                         rqst = QgsFeatureRequest().setFilterFid(idx)
-                        featB = prv2.getFeatures(rqst).next()
+                        featB = QgsFeature()
+                        prv2.getFeatures(rqst).nextFeature(featB)
                         geomB = QgsGeometry(featB.geometry())
                         attrs=[]
                         attrs.extend(featB.attributes())
@@ -1428,7 +1442,7 @@ class VetEpiGIStool:
                             featC.setAttributes(attrs)
                             vl.addFeature(featC)
 
-                    self.iface.emit(SIGNAL('featureProcessed()'))
+                    #self.iface.emit(SIGNAL('featureProcessed()'))
 
 
             vl.commitChanges()
@@ -1440,7 +1454,7 @@ class VetEpiGIStool:
                 self.uri.setDataSource('', ln,'geom')
                 vl = QgsVectorLayer(self.uri.uri(), ln, 'spatialite')
 
-            QgsMapLayerRegistry.instance().addMapLayer(vl)
+            QgsProject.instance().addMapLayer(vl)
             QApplication.restoreOverrideCursor()
 
 
@@ -1454,10 +1468,10 @@ class VetEpiGIStool:
         dlg.label_2.setText("ROI layer:")
         dlg.lstb = self.lstb
         dlg.comboBox_13.addItem('No related zone layer')
-        lyrs = self.iface.legendInterface().layers()
+        lyrs = [layer for layer in QgsProject.instance().mapLayers().values()]
         for lyr in lyrs:
             if lyr.type()==0:
-                if lyr.geometryType() == QGis.Polygon:
+                if lyr.geometryType() == QgsWkbTypes.PolygonGeometry:
                     dlg.comboBox.addItem(lyr.name())
                     dlg.comboBox_2.addItem(lyr.name())
                     dlg.comboBox_13.addItem(lyr.name())
@@ -1514,7 +1528,7 @@ class VetEpiGIStool:
 
             subpopulation = ''
             rn = dlg.tableWidget.rowCount()
-            for i in xrange(rn):
+            for i in range(rn):
                 if i==0:
                     subpopulation = dlg.tableWidget.item(i, 0).text()
                 else:
@@ -1575,12 +1589,15 @@ class VetEpiGIStool:
                         trA = QgsCoordinateTransform(prv1.crs().toWkt(), prv2.crs().toWkt())
                         trB = QgsCoordinateTransform(prv2.crs().toWkt(), prv1.crs().toWkt())
                         while feats.nextFeature(feat):
-                            geom = feat.constGeometry()
+                            # geom = feat.constGeometry()
+                            geom = feat.geometry()
                             geom.transform(trA)
                             idxs = index.intersects(geom.boundingBox())
                             for idx in idxs:
                                 rqst = QgsFeatureRequest().setFilterFid(idx)
-                                featB = prv2.getFeatures(rqst).next()
+                                # featB = prv2.getFeatures(rqst).next()
+                                featB = QgsFeature()
+                                prv2.getFeatures(rqst).nextFeature(featB)
                                 geomB = QgsGeometry(featB.geometry())
 
                                 attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
@@ -1598,11 +1615,14 @@ class VetEpiGIStool:
                                     vl.addFeature(featC)
                     else:
                         while feats.nextFeature(feat):
-                            geom = feat.constGeometry()
+                            # geom = feat.constGeometry()
+                            geom = feat.geometry()
                             idxs = index.intersects(geom.boundingBox())
                             for idx in idxs:
                                 rqst = QgsFeatureRequest().setFilterFid(idx)
-                                featB = prv2.getFeatures(rqst).next()
+                                # featB = prv2.getFeatures(rqst).next()
+                                featB = QgsFeature()
+                                prv2.getFeatures(rqst).nextFeature(featB)
                                 geomB = QgsGeometry(featB.geometry())
 
                                 attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
@@ -1618,17 +1638,20 @@ class VetEpiGIStool:
                                     vl.addFeature(featC)
                 else:
                     feats = l1.selectedFeatures()
-                    self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(feats))
+                    #self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(feats))
                     if prv1.crs().toWkt()!=prv2.crs().toWkt():
                         trA = QgsCoordinateTransform(prv1.crs().toWkt(), prv2.crs().toWkt())
                         trB = QgsCoordinateTransform(prv2.crs().toWkt(), prv1.crs().toWkt())
                         for feat in feats:
-                            geom = feat.constGeometry()
+                            # geom = feat.constGeometry()
+                            geom = feat.geometry()
                             geom.transform(trA)
                             idxs = index.intersects(geom.boundingBox())
                             for idx in idxs:
                                 rqst = QgsFeatureRequest().setFilterFid(idx)
-                                featB = prv2.getFeatures(rqst).next()
+                                # featB = prv2.getFeatures(rqst).next()
+                                featB = QgsFeature()
+                                prv2.getFeatures(rqst).nextFeature(featB)
                                 geomB = QgsGeometry(featB.geometry())
 
                                 attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
@@ -1645,14 +1668,17 @@ class VetEpiGIStool:
                                     featC.setAttributes(attrs)
                                     vl.addFeature(featC)
 
-                            self.iface.emit(SIGNAL('featureProcessed()'))
+                            #self.iface.emit(SIGNAL('featureProcessed()'))
                     else:
                         for feat in feats:
-                            geom = feat.constGeometry()
+                            # geom = feat.constGeometry()
+                            geom = feat.geometry()
                             idxs = index.intersects(geom.boundingBox())
                             for idx in idxs:
                                 rqst = QgsFeatureRequest().setFilterFid(idx)
-                                featB = prv2.getFeatures(rqst).next()
+                                # featB = prv2.getFeatures(rqst).next()
+                                featB = QgsFeature()
+                                prv2.getFeatures(rqst).nextFeature(featB)
                                 geomB = QgsGeometry(featB.geometry())
 
                                 attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
@@ -1667,22 +1693,25 @@ class VetEpiGIStool:
                                     featC.setAttributes(attrs)
                                     vl.addFeature(featC)
 
-                            self.iface.emit(SIGNAL('featureProcessed()'))
+                            #self.iface.emit(SIGNAL('featureProcessed()'))
 
             elif dlg.comboBox_4.currentText()=='Intersections only':
-                zonsty = self.sldZoneB
+                #zonsty = self.sldZoneB
                 if l1.selectedFeatureCount()==0:
                     feats = prv1.getFeatures()
                     if prv1.crs().toWkt()!=prv2.crs().toWkt():
                         trA = QgsCoordinateTransform(prv1.crs().toWkt(), prv2.crs().toWkt())
                         trB = QgsCoordinateTransform(prv2.crs().toWkt(), prv1.crs().toWkt())
                         while feats.nextFeature(feat):
-                            geom = feat.constGeometry()
+                            # geom = feat.constGeometry()
+                            geom = feat.geometry()
                             geom.transform(trA)
                             idxs = index.intersects(geom.boundingBox())
                             for idx in idxs:
                                 rqst = QgsFeatureRequest().setFilterFid(idx)
-                                featB = prv2.getFeatures(rqst).next()
+                                # featB = prv2.getFeatures(rqst).next()
+                                featB = QgsFeature()
+                                prv2.getFeatures(rqst).nextFeature(featB)
                                 geomB = QgsGeometry(featB.geometry())
 
                                 attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
@@ -1700,11 +1729,14 @@ class VetEpiGIStool:
                                     vl.addFeature(featD)
                     else:
                         while feats.nextFeature(feat):
-                            geom = feat.constGeometry()
+                            # geom = feat.constGeometry()
+                            geom = feat.geometry()
                             idxs = index.intersects(geom.boundingBox())
                             for idx in idxs:
                                 rqst = QgsFeatureRequest().setFilterFid(idx)
-                                featB = prv2.getFeatures(rqst).next()
+                                # featB = prv2.getFeatures(rqst).next()
+                                featB = QgsFeature()
+                                prv2.getFeatures(rqst).nextFeature(featB)
                                 geomB = QgsGeometry(featB.geometry())
 
                                 attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
@@ -1721,17 +1753,20 @@ class VetEpiGIStool:
                                     vl.addFeature(featD)
                 else:
                     feats = l1.selectedFeatures()
-                    self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(feats))
+                    #self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(feats))
                     if prv1.crs().toWkt()!=prv2.crs().toWkt():
                         trA = QgsCoordinateTransform(prv1.crs().toWkt(), prv2.crs().toWkt())
                         trB = QgsCoordinateTransform(prv2.crs().toWkt(), prv1.crs().toWkt())
                         for feat in feats:
-                            geom = feat.constGeometry()
+                            # geom = feat.constGeometry()
+                            geom = feat.geometry()
                             geom.transform(trA)
                             idxs = index.intersects(geom.boundingBox())
                             for idx in idxs:
                                 rqst = QgsFeatureRequest().setFilterFid(idx)
-                                featB = prv2.getFeatures(rqst).next()
+                                # featB = prv2.getFeatures(rqst).next()
+                                featB = QgsFeature()
+                                prv2.getFeatures(rqst).nextFeature(featB)
                                 geomB = QgsGeometry(featB.geometry())
 
                                 attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
@@ -1747,14 +1782,17 @@ class VetEpiGIStool:
                                     featD.setGeometry(geomD)
                                     featD.setAttributes(attrs)
                                     vl.addFeature(featD)
-                            self.iface.emit(SIGNAL('featureProcessed()'))
+                            #self.iface.emit(SIGNAL('featureProcessed()'))
                     else:
                         for feat in feats:
-                            geom = feat.constGeometry()
+                            # geom = feat.constGeometry()
+                            geom = feat.geometry()
                             idxs = index.intersects(geom.boundingBox())
                             for idx in idxs:
                                 rqst = QgsFeatureRequest().setFilterFid(idx)
-                                featB = prv2.getFeatures(rqst).next()
+                                # featB = prv2.getFeatures(rqst).next()
+                                featB = QgsFeature()
+                                prv2.getFeatures(rqst).nextFeature(featB)
                                 geomB = QgsGeometry(featB.geometry())
 
                                 attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
@@ -1769,7 +1807,7 @@ class VetEpiGIStool:
                                     featD.setGeometry(geomD)
                                     featD.setAttributes(attrs)
                                     vl.addFeature(featD)
-                            self.iface.emit(SIGNAL('featureProcessed()'))
+                            #self.iface.emit(SIGNAL('featureProcessed()'))
 
 
             vl.commitChanges()
@@ -1783,8 +1821,8 @@ class VetEpiGIStool:
 
                 self.loadModel()
 
-            vl.loadSldStyle(zonsty)
-            QgsMapLayerRegistry.instance().addMapLayer(vl)
+            #vl.loadSldStyle(zonsty)
+            QgsProject.instance().addMapLayer(vl)
             QApplication.restoreOverrideCursor()
 
 
@@ -1821,7 +1859,8 @@ class VetEpiGIStool:
             nattrs = []
             for attr in oattrs:
                 # if (vl.fieldNameIndex(attr.name())==-1) and attr.name()!='grouping':
-                if vl.fieldNameIndex(attr.name()) == -1:
+                #if vl.fieldNameIndex(attr.name()) == -1:
+                if vl.fields().indexFromName(attr.name()) == -1:
                     nattrs.append(QgsField(attr.name(),attr.type()))
                     vl.dataProvider().addAttributes(nattrs)
                     vl.updateFields()
@@ -1837,15 +1876,31 @@ class VetEpiGIStool:
                 for feat in provi.getFeatures(QgsFeatureRequest()):
 
                     utm = self.getUTMzone(feat, psrid)
-                    trA = QgsCoordinateTransform(psrid, utm.srsid())
-                    trB = QgsCoordinateTransform(utm.srsid(), psrid)
 
-                    ba = QgsGeometry(feat.geometry())
-                    ba.transform(trA)
-                    bfa = ba.buffer(r, r)
-                    bfa.transform(trB)
+                    crss = QgsCoordinateReferenceSystem()
+                    # crss.createFromId(4326, QgsCoordinateReferenceSystem.EpsgCrsId)
+                    # self.iface.messageBar().pushMessage(' ', "%s" % psrid, level=Qgis.Info)
+
+                    crss.createFromSrsId(psrid)
+                    crsd = QgsCoordinateReferenceSystem()
+                    # crsd.createFromId(23700, QgsCoordinateReferenceSystem.EpsgCrsId)
+
+                    crsd.createFromSrsId(utm.srsid())
+                    trafo = QgsCoordinateTransform(crss, crsd, QgsProject.instance())
+
+                    ba = QgsGeometry(feat.geometry()).asPoint()
+
+                    tba = trafo.transform(ba, QgsCoordinateTransform.ForwardTransform)
+
+                    tbb = QgsGeometry.fromPointXY(tba)
+                    bar = QgsGeometry.asQPolygonF(tbb.buffer(r, r))
+
+                    trafo.transformPolygon(bar, QgsCoordinateTransform.ReverseTransform)
+                    tbar = QgsGeometry.fromPolygonXY(QgsGeometry.createPolygonFromQPolygonF(bar))
+                    # self.iface.messageBar().pushMessage(' ', "%s" % tbar.asWkt(), level=Qgis.Info)
+
                     bf = QgsFeature()
-                    bf.setGeometry(bfa)
+                    bf.setGeometry(tbar)
                     attrs=[]
                     attrs.extend(feat.attributes())
                     # del attrs[-16]
@@ -1855,19 +1910,29 @@ class VetEpiGIStool:
                     vl.addFeature(bf)
             else:
                 feats = lyp.selectedFeatures()
-                self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(feats))
+                #self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(feats))
                 for feat in feats:
 
                     utm = self.getUTMzone(feat, psrid)
-                    trA = QgsCoordinateTransform(psrid, utm.srsid())
-                    trB = QgsCoordinateTransform(utm.srsid(), psrid)
 
-                    ba = QgsGeometry(feat.geometry())
-                    ba.transform(trA)
-                    bfa = ba.buffer(r, r)
-                    bfa.transform(trB)
+                    crss = QgsCoordinateReferenceSystem()
+                    crss.createFromSrsId(psrid)
+                    crsd = QgsCoordinateReferenceSystem()
+                    crsd.createFromSrsId(utm.srsid())
+                    trafo = QgsCoordinateTransform(crss, crsd, QgsProject.instance())
+
+                    ba = QgsGeometry(feat.geometry()).asPoint()
+
+                    tba = trafo.transform(ba, QgsCoordinateTransform.ForwardTransform)
+
+                    tbb = QgsGeometry.fromPointXY(tba)
+                    bar = QgsGeometry.asQPolygonF(tbb.buffer(r, r))
+
+                    trafo.transformPolygon(bar, QgsCoordinateTransform.ReverseTransform)
+                    tbar = QgsGeometry.fromPolygonXY(QgsGeometry.createPolygonFromQPolygonF(bar))
+
                     bf = QgsFeature()
-                    bf.setGeometry(bfa)
+                    bf.setGeometry(tbar)
                     attrs=[]
                     attrs.extend(feat.attributes())
                     # del attrs[-16]
@@ -1875,7 +1940,7 @@ class VetEpiGIStool:
                     most = QDateTime.currentDateTimeUtc()
                     bf.setAttribute(feat.fieldNameIndex('hrid'), self.funcs.hashIDer(most))
                     vl.addFeature(bf)
-                    self.iface.emit(SIGNAL('featureProcessed()'))
+                    #self.iface.emit(SIGNAL('featureProcessed()'))
 
             vl.commitChanges()
             # vl.updateExtents()
@@ -1893,9 +1958,9 @@ class VetEpiGIStool:
                 self.uri.setDataSource('', ln,'geom')
                 vl = QgsVectorLayer(self.uri.uri(), ln, 'spatialite')
 
-            sld = self.sldBuffer
-            vl.loadSldStyle(sld)
-            QgsMapLayerRegistry.instance().addMapLayer(vl)
+            #sld = self.sldBuffer
+            #vl.loadSldStyle(sld)
+            QgsProject.instance().addMapLayer(vl)
 
             QApplication.restoreOverrideCursor()
 
@@ -1964,7 +2029,7 @@ class VetEpiGIStool:
             flst = self.funcs.ofielder(lyr)
 
             if flst != self.obrflds:
-                self.iface.messageBar().pushMessage(' ', 'It is not an OUTBREAK layer!', level=QgsMessageBar.WARNING)
+                self.iface.messageBar().pushMessage(' ', 'It is not an OUTBREAK layer!', level=Qgis.Warning)
                 self.Caser.setChecked(False)
                 return
 
@@ -1985,18 +2050,20 @@ class VetEpiGIStool:
 
             dlg.lstb = self.lstb
 
-            if lyr.geometryType() == QGis.Polygon:
-                lyrs = self.iface.legendInterface().layers()
+            if lyr.geometryType() == QgsWkbTypes.PolygonGeometry:
+                lyrs = [layer for layer in QgsProject.instance().mapLayers().values()]
                 dlg.comboBox.addItem('')
                 for lr in lyrs:
                     if lr.type()==0:
-                        if lr.geometryType() == QGis.Polygon:
+                        if lr.geometryType() == QgsWkbTypes.PolygonGeometry:
                             dlg.comboBox.addItem(lr.name())
             else:
                 dlg.label_4.setVisible(False)
                 dlg.comboBox.setVisible(False)
 
-            psrid = self.iface.mapCanvas().mapRenderer().destinationCrs().srsid()
+            #psrid = self.iface.mapCanvas().mapRenderer().destinationCrs().srsid()
+            psrid = self.iface.mapCanvas().mapSettings().destinationCrs().srsid()
+            self.iface.messageBar().pushMessage(' ', '%s' % psrid, level=Qgis.Warning)
             tool = casePicker(dlg, psrid, self.iface, self.Caser, 'case', lyr)
             self.iface.mapCanvas().setMapTool(tool)
 
@@ -2011,7 +2078,7 @@ class VetEpiGIStool:
         if self.poier.isChecked():
             lyr = self.checklayer()
             if lyr is None:
-                self.iface.messageBar().pushMessage(' ', 'It is not a POI layer!', level=QgsMessageBar.WARNING)
+                self.iface.messageBar().pushMessage(' ', 'It is not a POI layer!', level=Qgis.Warning)
                 self.poier.setChecked(False)
                 return
 
@@ -2021,7 +2088,7 @@ class VetEpiGIStool:
                 flst.append(fld.name())
 
             if flst != self.poiflds:
-                self.iface.messageBar().pushMessage(' ', 'It is not a POI layer!', level=QgsMessageBar.WARNING)
+                self.iface.messageBar().pushMessage(' ', 'It is not a POI layer!', level= Qgis.Warning)
                 self.poier.setChecked(False)
                 return
 
@@ -2038,7 +2105,7 @@ class VetEpiGIStool:
             for it in self.lstpt:
                 dlg.comboBox.addItem(it)
 
-            psrid = self.iface.mapCanvas().mapRenderer().destinationCrs().srsid()
+            psrid = self.iface.mapCanvas().mapSettings().destinationCrs().srsid()
             tool = casePicker(dlg, psrid, self.iface, self.poier, 'poi', lyr)
             self.iface.mapCanvas().setMapTool(tool)
 
@@ -2083,7 +2150,13 @@ class casePicker(QgsMapTool):
 
         # EPSG:4326 = srid:3452
         if self.psrid!=3452:
-            trA = QgsCoordinateTransform(self.psrid, 3452)
+            #trA = QgsCoordinateTransform(self.psrid, 3452)
+            crs1 = QgsCoordinateReferenceSystem()
+            crs1.createFromSrid(self.psrid)
+            crs2 = QgsCoordinateReferenceSystem()
+            crs2.createFromSrid(3452)
+            trA = QgsCoordinateTransform(crs1, crs2, QgsProject.instance())
+
             ptb = trA.transform(pt)
             x = ptb.x()
             y = ptb.y()
@@ -2107,14 +2180,14 @@ class casePicker(QgsMapTool):
 
         if self.lab=='case':
             feat = self.funcs.outattrPrep(self.dlg, self.lyr)
-            pnt = QgsGeometry.fromPoint(QgsPoint(x,y))
+            pnt = QgsGeometry.fromPointXY(QgsPointXY(x,y))
 
-            if self.lyr.geometryType() == QGis.Point:
+            if self.lyr.geometryType() == QgsWkbTypes.PointGeometry:
                 feat.setGeometry(pnt)
 
-            elif self.lyr.geometryType() == QGis.Polygon:
+            elif self.lyr.geometryType() == QgsWkbTypes.PolygonGeometry:
                 lyrB = None
-                for l in QgsMapLayerRegistry.instance().mapLayers().values():
+                for l in QgsProject.instance().mapLayers().values():
                     if l.name() == self.dlg.comboBox.currentText():
                         lyrB = l
 
@@ -2132,7 +2205,9 @@ class casePicker(QgsMapTool):
 
                 req = QgsFeatureRequest()
                 req.setFilterRect(rect)
-                polyfeat = lyrB.getFeatures(req).next()
+                # polyfeat = lyrB.getFeatures(req).next()
+                polyfeat = QgsFeature()
+                lyrB.getFeatures(rqst).nextFeature(polyfeat)
                 polyg = QgsGeometry(polyfeat.geometry())
                 if srid!=3452:
                     tr = QgsCoordinateTransform(srid, 3452)
@@ -2144,7 +2219,7 @@ class casePicker(QgsMapTool):
                 pass
 
         elif self.lab=='poi':
-            if self.lyr.geometryType() == QGis.Point:
+            if self.lyr.geometryType() == QgsWkbTypes.PointGeometry:
                 flds = self.lyr.dataProvider().fields()
                 feat.setFields(flds, True)
                 feat.setAttribute(feat.fieldNameIndex('localid'), self.dlg.lineEdit_3.text())
@@ -2152,10 +2227,10 @@ class casePicker(QgsMapTool):
                 feat.setAttribute(feat.fieldNameIndex('activity'), self.dlg.comboBox.currentText())
                 feat.setAttribute(feat.fieldNameIndex('hrid'), self.funcs.hashIDer(QDateTime.currentDateTimeUtc()))
 
-                pnt = QgsGeometry.fromPoint(QgsPoint(x,y))
+                pnt = QgsGeometry.fromPointXY(QgsPointXY(x,y))
                 feat.setGeometry(pnt)
             else:
-                self.iface.messageBar().pushMessage(' ', 'Point layer must be selected!', level=QgsMessageBar.WARNING)
+                self.iface.messageBar().pushMessage(' ', 'Point layer must be selected!', level=Qgis.Warning)
 
         feat.setValid(True)
         self.lyr.addFeature(feat)
@@ -2222,11 +2297,11 @@ class polyDraw(QgsMapTool):
             self.pn += 1
 
             if self.pn == 1:
-                self.rb.setToGeometry(QgsGeometry.fromPoint(pt), None)
+                self.rb.setToGeometry(QgsGeometry.fromPointXY(pt), None)
             elif self.pn == 2:
-                self.rb.setToGeometry(QgsGeometry.fromPolyline(self.pts), None)
+                self.rb.setToGeometry(QgsGeometry.fromPolylineXY(self.pts), None)
             elif self.pn > 2:
-                self.rb.setToGeometry(QgsGeometry.fromPolygon([self.pts]), None)
+                self.rb.setToGeometry(QgsGeometry.fromPolygonXY([self.pts]), None)
 
         elif (event.button()==Qt.RightButton):
             if self.pn > 2:
@@ -2243,7 +2318,7 @@ class polyDraw(QgsMapTool):
 
                 if self.dlg.exec_() == QDialog.Accepted:
                     QApplication.setOverrideCursor(Qt.WaitCursor)
-                    geom = QgsGeometry.fromPolygon([self.pts])
+                    geom = QgsGeometry.fromPolygonXY([self.pts])
                     self.addFeat(geom)
                     self.tt.setChecked(False)
                     QApplication.restoreOverrideCursor()

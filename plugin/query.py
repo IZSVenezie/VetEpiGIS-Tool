@@ -21,10 +21,10 @@
  ***************************************************************************/
 """
 
-from PyQt4.QtGui import QDialog, QTableWidgetItem
+from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
 
 
-from query_dialog import Ui_Dialog
+from .query_dialog import Ui_Dialog
 
 
 class Dialog(QDialog, Ui_Dialog):         

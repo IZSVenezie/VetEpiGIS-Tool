@@ -2,52 +2,37 @@
 
 # Form implementation generated from reading ui file 'buffer_dialog_base.ui'
 #
-# Created: Sun May 21 07:50:33 2017
-#      by: PyQt4 UI code generator 4.10.4
+# Created by: PyQt5 UI code generator 5.5.1
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
-
-try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
-    def _fromUtf8(s):
-        return s
-
-try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
-except AttributeError:
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
-        Dialog.setObjectName(_fromUtf8("Dialog"))
+        Dialog.setObjectName("Dialog")
         Dialog.resize(450, 115)
-        self.gridLayout_3 = QtGui.QGridLayout(Dialog)
-        self.gridLayout_3.setObjectName(_fromUtf8("gridLayout_3"))
-        self.gridLayout = QtGui.QGridLayout()
-        self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
-        self.label = QtGui.QLabel(Dialog)
-        self.label.setObjectName(_fromUtf8("label"))
+        self.gridLayout_3 = QtWidgets.QGridLayout(Dialog)
+        self.gridLayout_3.setObjectName("gridLayout_3")
+        self.gridLayout = QtWidgets.QGridLayout()
+        self.gridLayout.setObjectName("gridLayout")
+        self.label = QtWidgets.QLabel(Dialog)
+        self.label.setObjectName("label")
         self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
-        self.spinBox = QtGui.QSpinBox(Dialog)
+        self.spinBox = QtWidgets.QSpinBox(Dialog)
         self.spinBox.setMinimumSize(QtCore.QSize(100, 0))
         self.spinBox.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.spinBox.setMinimum(500)
         self.spinBox.setMaximum(30000)
         self.spinBox.setSingleStep(500)
         self.spinBox.setProperty("value", 1000)
-        self.spinBox.setObjectName(_fromUtf8("spinBox"))
+        self.spinBox.setObjectName("spinBox")
         self.gridLayout.addWidget(self.spinBox, 0, 1, 1, 1)
-        self.label_2 = QtGui.QLabel(Dialog)
-        self.label_2.setObjectName(_fromUtf8("label_2"))
+        self.label_2 = QtWidgets.QLabel(Dialog)
+        self.label_2.setObjectName("label_2")
         self.gridLayout.addWidget(self.label_2, 0, 2, 1, 1)
         self.gridLayout_3.addLayout(self.gridLayout, 0, 0, 1, 1)
-        self.checkBox = QtGui.QCheckBox(Dialog)
+        self.checkBox = QtWidgets.QCheckBox(Dialog)
         font = QtGui.QFont()
         font.setBold(False)
         font.setItalic(True)
@@ -55,33 +40,34 @@ class Ui_Dialog(object):
         self.checkBox.setFont(font)
         self.checkBox.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.checkBox.setChecked(True)
-        self.checkBox.setObjectName(_fromUtf8("checkBox"))
+        self.checkBox.setObjectName("checkBox")
         self.gridLayout_3.addWidget(self.checkBox, 0, 1, 1, 1)
-        self.gridLayout_2 = QtGui.QGridLayout()
-        self.gridLayout_2.setObjectName(_fromUtf8("gridLayout_2"))
-        self.label_3 = QtGui.QLabel(Dialog)
-        self.label_3.setObjectName(_fromUtf8("label_3"))
+        self.gridLayout_2 = QtWidgets.QGridLayout()
+        self.gridLayout_2.setObjectName("gridLayout_2")
+        self.label_3 = QtWidgets.QLabel(Dialog)
+        self.label_3.setObjectName("label_3")
         self.gridLayout_2.addWidget(self.label_3, 0, 0, 1, 1)
-        self.lineEdit = QtGui.QLineEdit(Dialog)
+        self.lineEdit = QtWidgets.QLineEdit(Dialog)
         self.lineEdit.setMinimumSize(QtCore.QSize(251, 0))
-        self.lineEdit.setObjectName(_fromUtf8("lineEdit"))
+        self.lineEdit.setObjectName("lineEdit")
         self.gridLayout_2.addWidget(self.lineEdit, 0, 1, 1, 1)
         self.gridLayout_3.addLayout(self.gridLayout_2, 1, 0, 1, 2)
-        self.buttonBox = QtGui.QDialogButtonBox(Dialog)
+        self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
-        self.buttonBox.setObjectName(_fromUtf8("buttonBox"))
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setObjectName("buttonBox")
         self.gridLayout_3.addWidget(self.buttonBox, 2, 1, 1, 1)
 
         self.retranslateUi(Dialog)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), Dialog.accept)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), Dialog.reject)
+        self.buttonBox.accepted.connect(Dialog.accept)
+        self.buttonBox.rejected.connect(Dialog.reject)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog", None))
-        self.label.setText(_translate("Dialog", "Radius:", None))
-        self.label_2.setText(_translate("Dialog", "m", None))
-        self.checkBox.setText(_translate("Dialog", "Save the result into the database", None))
-        self.label_3.setText(_translate("Dialog", "Layer name:", None))
+        _translate = QtCore.QCoreApplication.translate
+        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+        self.label.setText(_translate("Dialog", "Radius:"))
+        self.label_2.setText(_translate("Dialog", "m"))
+        self.checkBox.setText(_translate("Dialog", "Save the result into the database"))
+        self.label_3.setText(_translate("Dialog", "Layer name:"))
 

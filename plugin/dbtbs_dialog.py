@@ -2,41 +2,26 @@
 
 # Form implementation generated from reading ui file 'dbtbs_dialog_base.ui'
 #
-# Created: Sun May 21 07:50:34 2017
-#      by: PyQt4 UI code generator 4.10.4
+# Created by: PyQt5 UI code generator 5.5.1
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
-
-try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
-    def _fromUtf8(s):
-        return s
-
-try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
-except AttributeError:
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_DockWidget(object):
     def setupUi(self, DockWidget):
-        DockWidget.setObjectName(_fromUtf8("DockWidget"))
+        DockWidget.setObjectName("DockWidget")
         DockWidget.resize(225, 377)
-        DockWidget.setFeatures(QtGui.QDockWidget.DockWidgetFloatable|QtGui.QDockWidget.DockWidgetMovable)
-        self.dockWidgetContents = QtGui.QWidget()
-        self.dockWidgetContents.setObjectName(_fromUtf8("dockWidgetContents"))
-        self.gridLayout = QtGui.QGridLayout(self.dockWidgetContents)
-        self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
-        self.tableView = QtGui.QTableView(self.dockWidgetContents)
-        self.tableView.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
-        self.tableView.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-        self.tableView.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.tableView.setObjectName(_fromUtf8("tableView"))
+        DockWidget.setFeatures(QtWidgets.QDockWidget.DockWidgetFloatable|QtWidgets.QDockWidget.DockWidgetMovable)
+        self.dockWidgetContents = QtWidgets.QWidget()
+        self.dockWidgetContents.setObjectName("dockWidgetContents")
+        self.gridLayout = QtWidgets.QGridLayout(self.dockWidgetContents)
+        self.gridLayout.setObjectName("gridLayout")
+        self.tableView = QtWidgets.QTableView(self.dockWidgetContents)
+        self.tableView.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.tableView.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.tableView.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.tableView.setObjectName("tableView")
         self.tableView.horizontalHeader().setVisible(False)
         self.tableView.horizontalHeader().setStretchLastSection(True)
         self.tableView.verticalHeader().setVisible(False)
@@ -47,5 +32,6 @@ class Ui_DockWidget(object):
         QtCore.QMetaObject.connectSlotsByName(DockWidget)
 
     def retranslateUi(self, DockWidget):
-        DockWidget.setWindowTitle(_translate("DockWidget", "Qvet maps", None))
+        _translate = QtCore.QCoreApplication.translate
+        DockWidget.setWindowTitle(_translate("DockWidget", "Qvet maps"))
 

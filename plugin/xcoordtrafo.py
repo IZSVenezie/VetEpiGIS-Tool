@@ -21,11 +21,11 @@
  ***************************************************************************/
 """
 
-from PyQt4.QtCore import QRegExp
-from PyQt4.QtGui import QDialog, QRegExpValidator
+from qgis.PyQt.QtCore import QRegExp
+from qgis.PyQt.QtWidgets import QDialog
+from qgis.PyQt.QtGui import QRegExpValidator
 
-
-from xcoordtrafo_dialog import Ui_Dialog
+from .xcoordtrafo_dialog import Ui_Dialog
 
 class Dialog(QDialog, Ui_Dialog):         
     def __init__(self):

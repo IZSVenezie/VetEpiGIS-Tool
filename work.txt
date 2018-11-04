@@ -1,23 +1,23 @@
 cd /home/sn/dev/QGISplugins/VetEpiGIS/tool
-pyrcc4 resources.qrc -o resources_rc.py
+pyrcc5 resources.qrc -o resources_rc.py
 
 cd plugin/
-pyuic4 select_dialog_base.ui -o select_dialog.py
-pyuic4 buffer_dialog_base.ui -o buffer_dialog.py
-pyuic4 caser_dialog_base.ui -o caser_dialog.py
-pyuic4 xabout_dialog_base.ui -o xabout_dialog.py
-pyuic4 xaffected_dialog_base.ui -o xaffected_dialog.py
-pyuic4 outbreaklayer_dialog_base.ui -o outbreaklayer_dialog.py
-pyuic4 xcoordtrafo_dialog_base.ui -o xcoordtrafo_dialog.py
-pyuic4 poi_dialog_base.ui -o poi_dialog.py
-pyuic4 dbtbs_dialog_base.ui -o dbtbs_dialog.py
-pyuic4 dbmaint_dialog_base.ui -o dbmaint_dialog.py
-pyuic4 xitem_dialog_base.ui -o xitem_dialog.py
-pyuic4 xsettings_dialog_base.ui -o xsettings_dialog.py
-pyuic4 query_dialog_base.ui -o query_dialog.py
-pyuic4 zone_dialog_base.ui -o zone_dialog.py
-pyuic4 export_dialog_base.ui -o export_dialog.py
-pyuic4 xprint_dialog_base.ui -o xprint_dialog.py
+pyuic5 select_dialog_base.ui -o select_dialog.py
+pyuic5 buffer_dialog_base.ui -o buffer_dialog.py
+pyuic5 caser_dialog_base.ui -o caser_dialog.py
+pyuic5 xabout_dialog_base.ui -o xabout_dialog.py
+pyuic5 xaffected_dialog_base.ui -o xaffected_dialog.py
+pyuic5 outbreaklayer_dialog_base.ui -o outbreaklayer_dialog.py
+pyuic5 xcoordtrafo_dialog_base.ui -o xcoordtrafo_dialog.py
+pyuic5 poi_dialog_base.ui -o poi_dialog.py
+pyuic5 dbtbs_dialog_base.ui -o dbtbs_dialog.py
+pyuic5 dbmaint_dialog_base.ui -o dbmaint_dialog.py
+pyuic5 xitem_dialog_base.ui -o xitem_dialog.py
+pyuic5 xsettings_dialog_base.ui -o xsettings_dialog.py
+pyuic5 query_dialog_base.ui -o query_dialog.py
+pyuic5 zone_dialog_base.ui -o zone_dialog.py
+pyuic5 export_dialog_base.ui -o export_dialog.py
+pyuic5 xprint_dialog_base.ui -o xprint_dialog.py
 
 
 rm -rf /home/sn/.qgis2/python/plugins/VetEpiGIS-Tool

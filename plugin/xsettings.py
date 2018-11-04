@@ -21,11 +21,11 @@
  ***************************************************************************/
 """
 
-from PyQt4.QtGui import QDialog, QFileDialog
-from PyQt4.QtCore import QFileInfo
+from qgis.PyQt.QtWidgets import QDialog, QFileDialog
+from qgis.PyQt.QtCore import QFileInfo
 import os, shutil
 
-from xsettings_dialog import Ui_Dialog
+from .xsettings_dialog import Ui_Dialog
 
 
 class Dialog(QDialog, Ui_Dialog):         

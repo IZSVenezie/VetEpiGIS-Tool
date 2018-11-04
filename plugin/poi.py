@@ -21,13 +21,14 @@
  ***************************************************************************/
 """
 
-from PyQt4.QtCore import QRegExp, Qt
-from PyQt4.QtGui import QDialog, QRegExpValidator, QDialogButtonBox, QPalette
+from qgis.PyQt.QtCore import QRegExp, Qt
+from qgis.PyQt.QtGui import QRegExpValidator, QPalette
+from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox
 
-import xcoordtrafo as xtrafo
-from poi_dialog import Ui_Dialog
-import qvfuncs as funcs
+from .xcoordtrafo import Dialog as xtrafodial
+from .qvfuncs import VetEpiGISFuncs as VetEpiGISFuncs
 
+from .poi_dialog import Ui_Dialog
 
 class Dialog(QDialog, Ui_Dialog):         
     def __init__(self):
@@ -55,11 +56,11 @@ class Dialog(QDialog, Ui_Dialog):
         self.lineEdit_5.textChanged.connect(self.saveCtrl)
         self.comboBox.currentIndexChanged.connect(self.saveCtrl)
 
-        self.funcs = funcs.VetEpiGISFuncs()
+        self.funcs = VetEpiGISFuncs()
 
 
     def trafo(self):
-        dlg = xtrafo.Dialog()
+        dlg = xtrafodial()
         x = (self.x()+self.width()/2)-dlg.width()/2
         y = (self.y()+self.height()/2)-dlg.height()/2
         dlg.move(x,y)

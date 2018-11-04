@@ -21,10 +21,11 @@
  ***************************************************************************/
 """
 
-from PyQt4.QtCore import QRegExp
-from PyQt4.QtGui import QDialog, QRegExpValidator
+from qgis.PyQt.QtCore import QRegExp
+from qgis.PyQt.QtGui import QRegExpValidator
+from qgis.PyQt.QtWidgets import QDialog
 
-from xitem_dialog import Ui_Dialog
+from .xitem_dialog import Ui_Dialog
 
 
 class Dialog(QDialog, Ui_Dialog):         

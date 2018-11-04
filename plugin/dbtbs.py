@@ -21,10 +21,10 @@
  ***************************************************************************/
 """
 
-from PyQt4.QtGui import QDockWidget
+from qgis.PyQt.QtWidgets import QDockWidget
 
 
-from dbtbs_dialog import Ui_DockWidget
+from .dbtbs_dialog import Ui_DockWidget
 
 class DockWidget(QDockWidget, Ui_DockWidget):
     def __init__(self):

@@ -21,13 +21,14 @@
  ***************************************************************************/
 """
 
-from PyQt4.QtGui import QDialog, QTableWidgetItem, QRegExpValidator, QPalette, QDialogButtonBox, QFont
-from PyQt4.QtCore import QRegExp, Qt
-from PyQt4.QtSql import *
+from qgis.PyQt.QtGui import QRegExpValidator, QPalette, QFont
+from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QDialogButtonBox
+from qgis.PyQt.QtCore import QRegExp, Qt
+from qgis.PyQt.QtSql import *
 
 
-from zone_dialog import Ui_Dialog
-import xaffected as xaff
+from .zone_dialog import Ui_Dialog
+from .xaffected import Dialog as xaffdlg
 
 
 class Dialog(QDialog, Ui_Dialog):         
@@ -128,7 +129,7 @@ class Dialog(QDialog, Ui_Dialog):
 
         
     def addNew(self):
-        dlg = xaff.Dialog()
+        dlg = xaffdlg()
         x = (self.x()+self.width()/2)-dlg.width()/2
         y = (self.y()+self.height()/2)-dlg.height()/2
         dlg.move(x,y)

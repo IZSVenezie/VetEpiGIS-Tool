@@ -21,11 +21,13 @@
  ***************************************************************************/
 """
 
-from PyQt4.QtGui import QDialog, QRegExpValidator
-from PyQt4.QtCore import QRegExp
-from PyQt4.QtSql import *
+from qgis.PyQt.QtGui import QRegExpValidator
+from qgis.PyQt.QtWidgets import QDialog
+from qgis.PyQt.QtCore import QRegExp
+from qgis.PyQt.QtSql import *
 
-from outbreaklayer_dialog import Ui_Dialog
+
+from .outbreaklayer_dialog import Ui_Dialog
 
 class Dialog(QDialog, Ui_Dialog):
     def __init__(self):

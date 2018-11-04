@@ -22,15 +22,16 @@
 """
 
 # import os
-from PyQt4.QtGui import QDialog, QTableWidgetItem, QRegExpValidator, QPalette, QDialogButtonBox, QFont
-from PyQt4.QtCore import QRegExp, Qt
-from PyQt4.QtSql import *
 
+from qgis.PyQt.QtGui import QRegExpValidator, QPalette, QFont
+from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QDialogButtonBox
+from qgis.PyQt.QtCore import QRegExp, Qt
+from qgis.PyQt.QtSql import *
 
-from caser_dialog import Ui_Dialog
-import xaffected as xaff
-import xcoordtrafo as xtrafo
-import qvfuncs as funcs
+from .caser_dialog import Ui_Dialog
+from .xaffected import Dialog as xaffdial
+from .xcoordtrafo import Dialog as xtrafodial
+from .qvfuncs import VetEpiGISFuncs as VetEpiGISFuncs
 
 
 class Dialog(QDialog, Ui_Dialog):         
@@ -112,7 +113,7 @@ class Dialog(QDialog, Ui_Dialog):
         self.dateEdit_2.setEnabled(False)
         self.dateEdit_3.setEnabled(False)
 
-        self.funcs = funcs.VetEpiGISFuncs()
+        self.funcs = VetEpiGISFuncs()
 
         self.lineEdit_3.textChanged.connect(self.saveCtrl)
         self.lineEdit_4.textChanged.connect(self.saveCtrl)
@@ -157,7 +158,7 @@ class Dialog(QDialog, Ui_Dialog):
 
 
     def addNew(self):
-        dlg = xaff.Dialog()
+        dlg = xaffdial()
         x = (self.x()+self.width()/2)-dlg.width()/2
         y = (self.y()+self.height()/2)-dlg.height()/2
         dlg.move(x,y)
@@ -193,7 +194,7 @@ class Dialog(QDialog, Ui_Dialog):
         if r<0:
             return
 
-        dlg = xaff.Dialog()
+        dlg = xaffdial()
         x = (self.x()+self.width()/2)-dlg.width()/2
         y = (self.y()+self.height()/2)-dlg.height()/2
         dlg.move(x,y)
@@ -225,7 +226,7 @@ class Dialog(QDialog, Ui_Dialog):
 
 
     def trafo(self):
-        dlg = xtrafo.Dialog()
+        dlg = xtrafodial()
         x = (self.x()+self.width()/2)-dlg.width()/2
         y = (self.y()+self.height()/2)-dlg.height()/2
         dlg.move(x,y)
