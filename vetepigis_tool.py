@@ -1189,7 +1189,7 @@ class VetEpiGIStool:
 
         dlg.lstb = self.lstb
 
-        lyrs = [layer for layer in QgsProject.instance().mapLayers().values()]        
+        lyrs = [layer for layer in QgsProject.instance().mapLayers().values()]
         lrs = []
         tlrs = []
         n = 0
@@ -1838,6 +1838,28 @@ class VetEpiGIStool:
         dlg.nameCtrl()
         lyr = self.checklayer()
         if lyr is None:
+            return
+
+        #add check about selected layer
+        flds = lyr.dataProvider().fields()
+        flst = []
+        for fld in flds:
+            flst.append(fld.name())
+        tn = ''
+
+        #check type of geometry: point
+        geom = lyr.geometryType()
+        if geom != QgsWkbTypes.PointGeometry:
+           msgBox = QMessageBox.information(dlg, "Warning", "Select a point layer")
+           return
+
+        #Check if layer selected is outbreak or poi
+        if flst == self.poiflds:
+            tn = 'poi'
+        if flst == self.obrflds:
+            tn = 'outbreak'
+        if tn=='':
+            msgBox = QMessageBox.information(dlg, "Warning", "Select Outbreak or POI layer")
             return
 
         if dlg.exec_() == QDialog.Accepted:
