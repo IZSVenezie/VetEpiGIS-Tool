@@ -2174,9 +2174,9 @@ class casePicker(QgsMapTool):
         if self.psrid!=3452:
             #trA = QgsCoordinateTransform(self.psrid, 3452)
             crs1 = QgsCoordinateReferenceSystem()
-            crs1.createFromSrid(self.psrid)
+            crs1.createFromSrsId(self.psrid)
             crs2 = QgsCoordinateReferenceSystem()
-            crs2.createFromSrid(3452)
+            crs2.createFromSrsId(3452)
             trA = QgsCoordinateTransform(crs1, crs2, QgsProject.instance())
 
             ptb = trA.transform(pt)
@@ -2352,9 +2352,22 @@ class polyDraw(QgsMapTool):
 
     def addFeat(self, geom):
         self.lyr = self.iface.activeLayer()
+        provider = self.lyr.dataProvider()
+        provider.reloadData()
+        psrid = QgsProject.instance().crs().srsid()
+
         self.lyr.startEditing()
 
         self.feat = self.funcs.outattrPrep(self.dlg, self.lyr)
+
+        if psrid != 3452:
+            QgsCoordinateReferenceSystem.invalidateCache()
+            crssource = QgsCoordinateReferenceSystem()
+            crssource.createFromSrsId(psrid)
+            crsdest = QgsCoordinateReferenceSystem()
+            crsdest.createFromSrsId(3452)
+            tr = QgsCoordinateTransform(crssource, crsdest, QgsProject.instance())
+            geom.transform(tr)
 
         self.feat.setGeometry(geom)
         self.feat.setValid(True)
