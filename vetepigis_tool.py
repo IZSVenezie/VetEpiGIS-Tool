@@ -32,7 +32,8 @@ from qgis.PyQt.QtWidgets import *
 from qgis.core import QgsField, QgsSpatialIndex, QgsMessageLog, QgsProject, \
     QgsCoordinateTransform, Qgis, QgsVectorFileWriter, QgsFeature, \
     QgsGeometry, QgsFeatureRequest, QgsPoint, QgsVectorLayer, QgsCoordinateReferenceSystem, \
-    QgsRectangle, QgsDataSourceUri, QgsDataProvider, QgsWkbTypes, QgsPointXY
+    QgsRectangle, QgsDataSourceUri, QgsDataProvider, QgsWkbTypes, QgsPointXY, QgsLayout, \
+    QgsReadWriteContext, QgsLayoutExporter
 
 #Composer
 #All composer related methods have been removed from the public API and Python bindings. These classes have been replaced with the new layouts engine, based on QgsLayout, QgsLayoutItem, and the other related classes.
@@ -404,7 +405,7 @@ class VetEpiGIStool:
                 shutil.copy(dlg.logopath, logopath)
 
             canv = self.iface.mapCanvas()
-            rend = canv.mapRenderer()
+            #rend = canv.mapRenderer()
             rect = QgsRectangle(self.iface.mapCanvas().extent())
 
             qpt = os.path.join(self.plugin_dir, 'templates/qvet_h_template.qpt')
@@ -438,15 +439,19 @@ class VetEpiGIStool:
             doc = QDomDocument()
             doc.setContent(tmplt)
 
-            comp = QgsComposition(rend)
-            comp.loadFromTemplate(doc)
+            project = QgsProject.instance()
+            l = QgsLayout(project)
+            l.initializeDefaults()
+
+            items, ok = l.loadFromTemplate(doc, QgsReadWriteContext(), False)
 
             pdfpath = dlg.lineEdit_3.text()
             xt = os.path.splitext(pdfpath)[-1].lower()
             if xt!='.pdf':
                 pdfpath = '%s.pdf' % pdfpath
 
-            out = comp.exportAsPDF(pdfpath)
+            exporter = QgsLayoutExporter(l)
+            exporter.exportToPdf(pdfpath, QgsLayoutExporter.PdfExportSettings())
             QApplication.restoreOverrideCursor()
 
 
