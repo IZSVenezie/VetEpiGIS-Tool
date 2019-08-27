@@ -1246,6 +1246,8 @@ class VetEpiGIStool:
             prvdst = dst.dataProvider()
 
             sfeats = src.selectedFeatures()
+            destType = dst.geometryType()
+            destIsMulti = QgsWkbTypes.isMultiType(dst.wkbType())
             sg = QgsGeometry()
             if prvsrc.crs().toWkt()!=prvdst.crs().toWkt():
                 trafo = QgsCoordinateTransform(prvsrc.crs().toWkt(), prvdst.crs().toWkt())
@@ -1260,10 +1262,19 @@ class VetEpiGIStool:
                     sg = sf.geometry()
                     #self.iface.emit(SIGNAL('featureProcessed()'))
 
-            dst.startEditing()
+            # Reference used for writing the follow code rows derived from plugin AppendFeaturesToLayer:
+            # https://github.com/gacarrillor/AppendFeaturesToLayer
+            if destType != QgsWkbTypes.UnknownGeometry:
+                newGeometry = sg.convertToType(destType, destIsMulti)
+                sg = newGeometry
+
+            sg.avoidIntersections(QgsProject.instance().avoidIntersectionsLayers())
+
             feat = self.funcs.outattrPrep(dlg, dst)
             feat.setGeometry(QgsGeometry(sg))
             feat.setValid(True)
+
+            dst.startEditing()
             dst.addFeature(feat)
             dst.commitChanges()
             dst.updateExtents()
