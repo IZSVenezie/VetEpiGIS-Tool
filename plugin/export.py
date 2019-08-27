@@ -27,14 +27,14 @@ from qgis.PyQt.QtWidgets import QDialog, QFileDialog
 from .export_dialog import Ui_Dialog
 
 
-class Dialog(QDialog, Ui_Dialog):         
+class Dialog(QDialog, Ui_Dialog):
     def __init__(self):
         """Constructor for the dialog.
-        
+
         """
 
-        QDialog.__init__(self)                               
-                        
+        QDialog.__init__(self)
+
         self.setupUi(self)
 
         self.comboBox.addItem('ESRI shape file')
@@ -72,7 +72,7 @@ class Dialog(QDialog, Ui_Dialog):
             a = 'Copy complete database'
             sf = QFileDialog.getSaveFileName(self, a, QDir.homePath())
 
-        self.lineEdit.setText(sf)
+        self.lineEdit.setText(sf[0])
 
 
     def seler(self):
