@@ -1414,7 +1414,9 @@ class VetEpiGIStool:
             else:
                 trA = QgsCoordinateTransform(prv2.crs(), prv1.crs(), QgsProject.instance())
                 for ft in ftbs:
-                    ft.geometry().transform(trA)
+                    sg = ft.geometry()
+                    sg.transform(trA)
+                    ft.setGeometry(sg)
                     index.insertFeature(ft)
 
             feat = QgsFeature()
@@ -1430,6 +1432,7 @@ class VetEpiGIStool:
                         featB = QgsFeature()
                         prv2.getFeatures(rqst).nextFeature(featB)
                         geomB = QgsGeometry(featB.geometry())
+                        geomB.transform(trA)
                         attrs=[]
                         attrs.extend(featB.attributes())
                         attrs.extend(feat.attributes())
@@ -1450,6 +1453,7 @@ class VetEpiGIStool:
                         featB = QgsFeature()
                         prv2.getFeatures(rqst).nextFeature(featB)
                         geomB = QgsGeometry(featB.geometry())
+                        geomB.transform(trA)
                         attrs=[]
                         attrs.extend(featB.attributes())
                         attrs.extend(feat.attributes())
