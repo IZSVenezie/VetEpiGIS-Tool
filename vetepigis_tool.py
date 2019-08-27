@@ -1700,11 +1700,12 @@ class VetEpiGIStool:
                             attrs[19] = self.funcs.hashIDer(most)
 
                             if geom.intersects(geomB):
-                                geomB = self.checkMultiType(l2, vl, geomB) #check if geometries are Multi
-                                featC = QgsFeature()
-                                featC.setGeometry(geomB)
-                                featC.setAttributes(attrs)
-                                vl.addFeature(featC)
+                                gwkt = ogr.CreateGeometryFromWkt(geomB.asWkt())
+                                if gwkt.GetGeometryName() == 'MULTIPOLYGON':
+                                    for geom_part in gwkt:
+                                        vl.addFeature(self.fromMultiPolygonToSinglePolygon(geom_part,attrs))
+                                else:
+                                    vl.addFeature(self.fromMultiPolygonToSinglePolygon(gwkt_tmp,attrs))
                 else:
                     feats = l1.selectedFeatures()
 
@@ -1726,11 +1727,12 @@ class VetEpiGIStool:
                             attrs[19] = self.funcs.hashIDer(most)
 
                             if geom.intersects(geomB):
-                                geomB = self.checkMultiType(l2, vl, geomB) #check if geometries are Multi
-                                featC = QgsFeature()
-                                featC.setGeometry(geomB)
-                                featC.setAttributes(attrs)
-                                vl.addFeature(featC)
+                                gwkt = ogr.CreateGeometryFromWkt(geomB.asWkt())
+                                if gwkt.GetGeometryName() == 'MULTIPOLYGON':
+                                    for geom_part in gwkt:
+                                        vl.addFeature(self.fromMultiPolygonToSinglePolygon(geom_part,attrs))
+                                else:
+                                    vl.addFeature(self.fromMultiPolygonToSinglePolygon(gwkt_tmp,attrs))
 
                         #self.iface.emit(SIGNAL('featureProcessed()'))
 
