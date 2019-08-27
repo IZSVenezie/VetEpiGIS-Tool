@@ -500,8 +500,8 @@ class VetEpiGIStool:
                 dlg.tableWidget_2.setItem(nr, 0, item)
 
 
-            dlg.tableWidget.selectAll();
-            dlg.tableWidget_2.selectAll();
+            dlg.tableWidget.selectAll()
+            dlg.tableWidget_2.selectAll()
 
         if dlg.exec_() == QDialog.Accepted:
             QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -514,7 +514,7 @@ class VetEpiGIStool:
                     wrt = QgsVectorFileWriter.writeAsVectorFormat(lyr,
                         os.path.join(dlg.lineEdit.text(), '%s.shp' % ln ),
                         'system',
-                        QgsCoordinateReferenceSystem(prv.crs().srsid()),
+                        QgsCoordinateReferenceSystem(prv.crs().srsid(), QgsCoordinateReferenceSystem.InternalCrsId),
                         'ESRI Shapefile')
 
                 elif dlg.comboBox.currentText()=='Comma separated value (CSV)':
@@ -532,7 +532,7 @@ class VetEpiGIStool:
                     wrt = QgsVectorFileWriter.writeAsVectorFormat(lyr,
                         os.path.join(dlg.lineEdit.text(), '%s.csv' % ln ),
                         'system',
-                        None,
+                        QgsCoordinateReferenceSystem(prv.crs().srsid(), QgsCoordinateReferenceSystem.InternalCrsId),
                         'CSV', layerOptions=lops)
 
                 elif dlg.comboBox.currentText()=='SQLite database':
@@ -545,7 +545,7 @@ class VetEpiGIStool:
                     for it in dlg.tableWidget_2.selectedItems():
                         lstb.append(str(it.text()))
 
-                    uri = QgsDataSourceURI()
+                    uri = QgsDataSourceUri()
                     uri.setDatabase(dlg.lineEdit.text())
                     edb = QSqlDatabase.addDatabase('QSPATIALITE')
                     edb.setDatabaseName(uri.database())
