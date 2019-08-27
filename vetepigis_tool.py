@@ -1251,7 +1251,7 @@ class VetEpiGIStool:
             destIsMulti = QgsWkbTypes.isMultiType(dst.wkbType())
             sg = QgsGeometry()
             if prvsrc.crs().toWkt()!=prvdst.crs().toWkt():
-                trafo = QgsCoordinateTransform(prvsrc.crs().toWkt(), prvdst.crs().toWkt())
+                trafo = QgsCoordinateTransform(prvsrc.crs(), prvdst.crs(),QgsProject.instance())
                 #self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(sfeats))
                 for sf in sfeats:
                     sg = sf.geometry()
@@ -1412,7 +1412,7 @@ class VetEpiGIStool:
                 for ft in ftbs:
                     index.insertFeature(ft)
             else:
-                trA = QgsCoordinateTransform(prv2.crs().toWkt(), prv1.crs().toWkt())
+                trA = QgsCoordinateTransform(prv2.crs(), prv1.crs(), QgsProject.instance())
                 for ft in ftbs:
                     ft.geometry().transform(trA)
                     index.insertFeature(ft)
