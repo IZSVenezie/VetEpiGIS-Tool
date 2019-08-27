@@ -28,14 +28,14 @@ from qgis.PyQt.QtCore import QFileInfo, QDir
 from .xprint_dialog import Ui_Dialog
 import os, shutil
 
-class Dialog(QDialog, Ui_Dialog):         
+class Dialog(QDialog, Ui_Dialog):
     def __init__(self):
         """Constructor for the dialog.
-        
+
         """
-        
-        QDialog.__init__(self)                               
-                        
+
+        QDialog.__init__(self)
+
         self.setupUi(self)
         self.logopath = ''
         self.pdfpath = ''
@@ -44,7 +44,7 @@ class Dialog(QDialog, Ui_Dialog):
 
 
     def selFile(self):
-        sf = QFileInfo(QFileDialog.getOpenFileName(self, 'Open logo file', QDir.homePath(), 'Image files (*.png)'))
+        sf = QFileInfo(QFileDialog.getOpenFileName(self, 'Open logo file', QDir.homePath(), 'Image files (*.png)')[0])
         f = sf.fileName()
         if f!='':
             self.logopath = sf.absoluteFilePath()
@@ -53,7 +53,7 @@ class Dialog(QDialog, Ui_Dialog):
 
 
     def outFile(self):
-        of = QFileInfo(QFileDialog.getSaveFileName(self, 'Output map file', QDir.homePath(), 'PDF files (*.pdf)'))
+        of = QFileInfo(QFileDialog.getSaveFileName(self, 'Output map file', QDir.homePath(), 'PDF files (*.pdf)')[0])
         f = of.fileName()
         if f!='':
             self.lineEdit_3.setText(of.absoluteFilePath())

@@ -32,7 +32,8 @@ from qgis.PyQt.QtWidgets import *
 from qgis.core import QgsField, QgsSpatialIndex, QgsMessageLog, QgsProject, \
     QgsCoordinateTransform, Qgis, QgsVectorFileWriter, QgsFeature, \
     QgsGeometry, QgsFeatureRequest, QgsPoint, QgsVectorLayer, QgsCoordinateReferenceSystem, \
-    QgsRectangle, QgsDataSourceUri, QgsDataProvider, QgsWkbTypes, QgsPointXY
+    QgsRectangle, QgsDataSourceUri, QgsDataProvider, QgsWkbTypes, QgsPointXY, QgsLayout, \
+    QgsReadWriteContext, QgsLayoutExporter
 
 #Composer
 #All composer related methods have been removed from the public API and Python bindings. These classes have been replaced with the new layouts engine, based on QgsLayout, QgsLayoutItem, and the other related classes.
@@ -404,7 +405,7 @@ class VetEpiGIStool:
                 shutil.copy(dlg.logopath, logopath)
 
             canv = self.iface.mapCanvas()
-            rend = canv.mapRenderer()
+            #rend = canv.mapRenderer()
             rect = QgsRectangle(self.iface.mapCanvas().extent())
 
             qpt = os.path.join(self.plugin_dir, 'templates/qvet_h_template.qpt')
@@ -438,15 +439,19 @@ class VetEpiGIStool:
             doc = QDomDocument()
             doc.setContent(tmplt)
 
-            comp = QgsComposition(rend)
-            comp.loadFromTemplate(doc)
+            project = QgsProject.instance()
+            l = QgsLayout(project)
+            l.initializeDefaults()
+
+            items, ok = l.loadFromTemplate(doc, QgsReadWriteContext(), False)
 
             pdfpath = dlg.lineEdit_3.text()
             xt = os.path.splitext(pdfpath)[-1].lower()
             if xt!='.pdf':
                 pdfpath = '%s.pdf' % pdfpath
 
-            out = comp.exportAsPDF(pdfpath)
+            exporter = QgsLayoutExporter(l)
+            exporter.exportToPdf(pdfpath, QgsLayoutExporter.PdfExportSettings())
             QApplication.restoreOverrideCursor()
 
 
@@ -2174,9 +2179,9 @@ class casePicker(QgsMapTool):
         if self.psrid!=3452:
             #trA = QgsCoordinateTransform(self.psrid, 3452)
             crs1 = QgsCoordinateReferenceSystem()
-            crs1.createFromSrid(self.psrid)
+            crs1.createFromSrsId(self.psrid)
             crs2 = QgsCoordinateReferenceSystem()
-            crs2.createFromSrid(3452)
+            crs2.createFromSrsId(3452)
             trA = QgsCoordinateTransform(crs1, crs2, QgsProject.instance())
 
             ptb = trA.transform(pt)
@@ -2352,9 +2357,22 @@ class polyDraw(QgsMapTool):
 
     def addFeat(self, geom):
         self.lyr = self.iface.activeLayer()
+        provider = self.lyr.dataProvider()
+        provider.reloadData()
+        psrid = QgsProject.instance().crs().srsid()
+
         self.lyr.startEditing()
 
         self.feat = self.funcs.outattrPrep(self.dlg, self.lyr)
+
+        if psrid != 3452:
+            QgsCoordinateReferenceSystem.invalidateCache()
+            crssource = QgsCoordinateReferenceSystem()
+            crssource.createFromSrsId(psrid)
+            crsdest = QgsCoordinateReferenceSystem()
+            crsdest.createFromSrsId(3452)
+            tr = QgsCoordinateTransform(crssource, crsdest, QgsProject.instance())
+            geom.transform(tr)
 
         self.feat.setGeometry(geom)
         self.feat.setValid(True)
