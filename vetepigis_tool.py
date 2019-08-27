@@ -22,6 +22,7 @@
 """
 
 import os, shutil, math
+from osgeo import ogr
 from qgis.PyQt.QtGui import *
 from qgis.PyQt.QtCore import Qt, QSettings, QCoreApplication, QFile, QFileInfo, QDate, QVariant, \
     pyqtSignal, QRegExp, QDateTime, QTranslator, QSize
@@ -1473,6 +1474,84 @@ class VetEpiGIStool:
             QgsProject.instance().addMapLayer(vl)
             QApplication.restoreOverrideCursor()
 
+    def transformLayerToWGS84(self,vecLayer): #PB tutta la funzione
+        """
+        Return the vector layer in the reference system EPSG: 4326.
+
+        Parameters:
+            vectLayer(QgsVectorLayer): input layer which convert coordinate reference system.
+
+        Return:
+            new_vec(QgsVectorLayer): vector layer in EPSG: 4326.
+
+        """
+
+        prv1 = vecLayer.dataProvider()
+
+        crs1 = vecLayer.sourceCrs()
+
+        crs_out = QgsCoordinateReferenceSystem()
+        crs_out.createFromSrsId(3452)
+
+        #create new layer
+        fn1 = 'lay_test_1'
+        uri1 = QgsVectorLayer('Polygon?crs=' + crs_out.toWkt(), fn1, 'memory')
+
+        #add attribute to new layer
+        pruri1 = uri1.dataProvider()
+        pruri1.addAttributes(prv1.fields())
+
+        #set crs transformation
+        trA = QgsCoordinateTransform()
+        if crs1.srsid() != 3452:
+            trA = QgsCoordinateTransform(crs1, crs_out, QgsProject.instance())
+
+        #Add features to new layer
+        feats = []
+        for f in prv1.getFeatures():
+            g = f.geometry()
+            g.transform(trA)
+            f.setGeometry(g)
+            f.setAttributes(f.attributes())
+            f.setValid(True)
+            feats.append(f)
+
+        #update layer with new features
+        uri1.dataProvider().addFeatures(feats)
+        uri1.updateFields()
+
+        # Check if there are selected features
+        # TODO: The only method I found to add the selected feature in the new layer is comparing the geometries,
+        # by id() it doesn't work. Check if there are other solutions.
+        # https://gis.stackexchange.com/questions/256569/select-features-from-another-layer-based-on-a-selection-in-pyqgis/256646
+        if vecLayer.selectedFeatureCount()!=0:
+            for selected_feat in vecLayer.selectedFeatures():
+                to_select = []
+                for feat_to_select in uri1.getFeatures():
+                    if feat_to_select.geometry().equals(selected_feat.geometry()):
+                        to_select.append(feat_to_select.id())
+                uri1.modifySelection(to_select,[])
+        return uri1
+
+    def checkMultiType(self,layerIn, layerOut, geometryOut):
+        destType = layerIn.geometryType()
+        destIsMulti = QgsWkbTypes.isMultiType(layerOut.wkbType())
+
+        if destType != QgsWkbTypes.UnknownGeometry:
+            newGeometry = geometryOut.convertToType(destType, destIsMulti)
+            geometryOut = newGeometry
+
+        return geometryOut
+
+    # Followed this code https://gis.stackexchange.com/questions/112095/converting-huge-multipolygon-to-polygons
+    def fromMultiPolygonToSinglePolygon(self, geom, attrs):
+        gw = geom.ExportToWkt()
+        gg = QgsGeometry.fromWkt(gw)
+        new_feat = QgsFeature()
+        new_feat.setAttributes(attrs)
+        new_feat.setGeometry(gg)
+
+        return new_feat
 
     def selectROIs(self):
         self.grp3.setDefaultAction(self.Zoner)
@@ -1504,9 +1583,11 @@ class VetEpiGIStool:
             for lyr in lyrs:
                 if lyr.name()==dlg.comboBox.currentText():
                     l1 = lyr
+                    l1 = self.transformLayerToWGS84(l1) #convert layer CRS if not in EPSG:4326
                     prv1 = l1.dataProvider()
                 if lyr.name()==dlg.comboBox_2.currentText():
                     l2 = lyr
+                    l2 = self.transformLayerToWGS84(l2) #convert layer CRS if not in EPSG:4326
                     prv2 = l2.dataProvider()
 
             fn = str('zones_') + dlg.lineEdit.text()
@@ -1596,235 +1677,126 @@ class VetEpiGIStool:
 
             feat = QgsFeature()
 
-
             if dlg.comboBox_4.currentText()=='Overlapped ROIs':
                 zonsty = self.sldZoneA
                 if l1.selectedFeatureCount()==0:
                     feats = prv1.getFeatures()
-                    if prv1.crs().toWkt()!=prv2.crs().toWkt():
-                        trA = QgsCoordinateTransform(prv1.crs().toWkt(), prv2.crs().toWkt())
-                        trB = QgsCoordinateTransform(prv2.crs().toWkt(), prv1.crs().toWkt())
-                        while feats.nextFeature(feat):
-                            # geom = feat.constGeometry()
-                            geom = feat.geometry()
-                            geom.transform(trA)
-                            idxs = index.intersects(geom.boundingBox())
-                            for idx in idxs:
-                                rqst = QgsFeatureRequest().setFilterFid(idx)
-                                # featB = prv2.getFeatures(rqst).next()
-                                featB = QgsFeature()
-                                prv2.getFeatures(rqst).nextFeature(featB)
-                                geomB = QgsGeometry(featB.geometry())
 
-                                attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
-                                attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
-                                attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
-                                most = QDateTime.currentDateTimeUtc()
-                                attrs[19] = self.funcs.hashIDer(most)
+                    while feats.nextFeature(feat):
+                        # geom = feat.constGeometry()
+                        geom = feat.geometry()
+                        idxs = index.intersects(geom.boundingBox())
+                        for idx in idxs:
+                            rqst = QgsFeatureRequest().setFilterFid(idx)
+                            # featB = prv2.getFeatures(rqst).next()
+                            featB = QgsFeature()
+                            prv2.getFeatures(rqst).nextFeature(featB)
+                            geomB = QgsGeometry(featB.geometry())
 
-                                if geom.intersects(geomB):
-                                    featC = QgsFeature()
-                                    geomBa = QgsGeometry(geomB)
-                                    geomBa.transform(trB)
-                                    featC.setGeometry(geomBa)
-                                    featC.setAttributes(attrs)
-                                    vl.addFeature(featC)
-                    else:
-                        while feats.nextFeature(feat):
-                            # geom = feat.constGeometry()
-                            geom = feat.geometry()
-                            idxs = index.intersects(geom.boundingBox())
-                            for idx in idxs:
-                                rqst = QgsFeatureRequest().setFilterFid(idx)
-                                # featB = prv2.getFeatures(rqst).next()
-                                featB = QgsFeature()
-                                prv2.getFeatures(rqst).nextFeature(featB)
-                                geomB = QgsGeometry(featB.geometry())
+                            attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
+                            attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
+                            attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
+                            most = QDateTime.currentDateTimeUtc()
+                            attrs[19] = self.funcs.hashIDer(most)
 
-                                attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
-                                attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
-                                attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
-                                most = QDateTime.currentDateTimeUtc()
-                                attrs[19] = self.funcs.hashIDer(most)
-
-                                if geom.intersects(geomB):
-                                    featC = QgsFeature()
-                                    featC.setGeometry(geomB)
-                                    featC.setAttributes(attrs)
-                                    vl.addFeature(featC)
+                            if geom.intersects(geomB):
+                                geomB = self.checkMultiType(l2, vl, geomB) #check if geometries are Multi
+                                featC = QgsFeature()
+                                featC.setGeometry(geomB)
+                                featC.setAttributes(attrs)
+                                vl.addFeature(featC)
                 else:
                     feats = l1.selectedFeatures()
-                    #self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(feats))
-                    if prv1.crs().toWkt()!=prv2.crs().toWkt():
-                        trA = QgsCoordinateTransform(prv1.crs().toWkt(), prv2.crs().toWkt())
-                        trB = QgsCoordinateTransform(prv2.crs().toWkt(), prv1.crs().toWkt())
-                        for feat in feats:
-                            # geom = feat.constGeometry()
-                            geom = feat.geometry()
-                            geom.transform(trA)
-                            idxs = index.intersects(geom.boundingBox())
-                            for idx in idxs:
-                                rqst = QgsFeatureRequest().setFilterFid(idx)
-                                # featB = prv2.getFeatures(rqst).next()
-                                featB = QgsFeature()
-                                prv2.getFeatures(rqst).nextFeature(featB)
-                                geomB = QgsGeometry(featB.geometry())
 
-                                attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
-                                attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
-                                attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
-                                most = QDateTime.currentDateTimeUtc()
-                                attrs[19] = self.funcs.hashIDer(most)
+                    for feat in feats:
+                        # geom = feat.constGeometry()
+                        geom = feat.geometry()
+                        idxs = index.intersects(geom.boundingBox())
+                        for idx in idxs:
+                            rqst = QgsFeatureRequest().setFilterFid(idx)
+                            # featB = prv2.getFeatures(rqst).next()
+                            featB = QgsFeature()
+                            prv2.getFeatures(rqst).nextFeature(featB)
+                            geomB = QgsGeometry(featB.geometry())
 
-                                if geom.intersects(geomB):
-                                    featC = QgsFeature()
-                                    geomBa = QgsGeometry(geomB)
-                                    geomBa.transform(trB)
-                                    featC.setGeometry(geomBa)
-                                    featC.setAttributes(attrs)
-                                    vl.addFeature(featC)
+                            attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
+                            attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
+                            attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
+                            most = QDateTime.currentDateTimeUtc()
+                            attrs[19] = self.funcs.hashIDer(most)
 
-                            #self.iface.emit(SIGNAL('featureProcessed()'))
-                    else:
-                        for feat in feats:
-                            # geom = feat.constGeometry()
-                            geom = feat.geometry()
-                            idxs = index.intersects(geom.boundingBox())
-                            for idx in idxs:
-                                rqst = QgsFeatureRequest().setFilterFid(idx)
-                                # featB = prv2.getFeatures(rqst).next()
-                                featB = QgsFeature()
-                                prv2.getFeatures(rqst).nextFeature(featB)
-                                geomB = QgsGeometry(featB.geometry())
+                            if geom.intersects(geomB):
+                                geomB = self.checkMultiType(l2, vl, geomB) #check if geometries are Multi
+                                featC = QgsFeature()
+                                featC.setGeometry(geomB)
+                                featC.setAttributes(attrs)
+                                vl.addFeature(featC)
 
-                                attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
-                                attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
-                                attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
-                                most = QDateTime.currentDateTimeUtc()
-                                attrs[19] = self.funcs.hashIDer(most)
-
-                                if geom.intersects(geomB):
-                                    featC = QgsFeature()
-                                    featC.setGeometry(geomB)
-                                    featC.setAttributes(attrs)
-                                    vl.addFeature(featC)
-
-                            #self.iface.emit(SIGNAL('featureProcessed()'))
+                        #self.iface.emit(SIGNAL('featureProcessed()'))
 
             elif dlg.comboBox_4.currentText()=='Intersections only':
                 #zonsty = self.sldZoneB
                 if l1.selectedFeatureCount()==0:
                     feats = prv1.getFeatures()
-                    if prv1.crs().toWkt()!=prv2.crs().toWkt():
-                        trA = QgsCoordinateTransform(prv1.crs().toWkt(), prv2.crs().toWkt())
-                        trB = QgsCoordinateTransform(prv2.crs().toWkt(), prv1.crs().toWkt())
-                        while feats.nextFeature(feat):
-                            # geom = feat.constGeometry()
-                            geom = feat.geometry()
-                            geom.transform(trA)
-                            idxs = index.intersects(geom.boundingBox())
-                            for idx in idxs:
-                                rqst = QgsFeatureRequest().setFilterFid(idx)
-                                # featB = prv2.getFeatures(rqst).next()
-                                featB = QgsFeature()
-                                prv2.getFeatures(rqst).nextFeature(featB)
-                                geomB = QgsGeometry(featB.geometry())
 
-                                attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
-                                attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
-                                attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
-                                most = QDateTime.currentDateTimeUtc()
-                                attrs[19] = self.funcs.hashIDer(most)
+                    while feats.nextFeature(feat):
+                        # geom = feat.constGeometry()
+                        geom = feat.geometry()
+                        idxs = index.intersects(geom.boundingBox())
+                        for idx in idxs:
+                            rqst = QgsFeatureRequest().setFilterFid(idx)
+                            # featB = prv2.getFeatures(rqst).next()
+                            featB = QgsFeature()
+                            prv2.getFeatures(rqst).nextFeature(featB)
+                            geomB = QgsGeometry(featB.geometry())
 
-                                if geom.intersects(geomB):
-                                    geomD = QgsGeometry(geom.intersection(geomB))
-                                    geomD.transform(trB)
-                                    featD = QgsFeature()
-                                    featD.setGeometry(geomD)
-                                    featD.setAttributes(attrs)
-                                    vl.addFeature(featD)
-                    else:
-                        while feats.nextFeature(feat):
-                            # geom = feat.constGeometry()
-                            geom = feat.geometry()
-                            idxs = index.intersects(geom.boundingBox())
-                            for idx in idxs:
-                                rqst = QgsFeatureRequest().setFilterFid(idx)
-                                # featB = prv2.getFeatures(rqst).next()
-                                featB = QgsFeature()
-                                prv2.getFeatures(rqst).nextFeature(featB)
-                                geomB = QgsGeometry(featB.geometry())
+                            attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
+                            attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
+                            attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
+                            most = QDateTime.currentDateTimeUtc()
+                            attrs[19] = self.funcs.hashIDer(most)
 
-                                attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
-                                attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
-                                attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
-                                most = QDateTime.currentDateTimeUtc()
-                                attrs[19] = self.funcs.hashIDer(most)
-
-                                if geom.intersects(geomB):
-                                    geomD = QgsGeometry(geom.intersection(geomB))
-                                    featD = QgsFeature()
-                                    featD.setGeometry(geomD)
-                                    featD.setAttributes(attrs)
-                                    vl.addFeature(featD)
+                            if geom.intersects(geomB):
+                                g1wkt = ogr.CreateGeometryFromWkt(geom.asWkt())
+                                g2wkt = ogr.CreateGeometryFromWkt(geomB.asWkt())
+                                g_tmp = g1wkt.Intersection(g2wkt)
+                                if g_tmp.GetGeometryName() == 'MULTIPOLYGON':
+                                    for geom_part in g_tmp:
+                                        vl.addFeature(self.fromMultiPolygonToSinglePolygon(geom_part,attrs))
+                                else:
+                                    vl.addFeature(self.fromMultiPolygonToSinglePolygon(g_tmp,attrs))
                 else:
                     feats = l1.selectedFeatures()
-                    #self.iface.emit(SIGNAL('rangeCalculated( PyQt_PyObject)'), len(feats))
-                    if prv1.crs().toWkt()!=prv2.crs().toWkt():
-                        trA = QgsCoordinateTransform(prv1.crs().toWkt(), prv2.crs().toWkt())
-                        trB = QgsCoordinateTransform(prv2.crs().toWkt(), prv1.crs().toWkt())
-                        for feat in feats:
-                            # geom = feat.constGeometry()
-                            geom = feat.geometry()
-                            geom.transform(trA)
-                            idxs = index.intersects(geom.boundingBox())
-                            for idx in idxs:
-                                rqst = QgsFeatureRequest().setFilterFid(idx)
-                                # featB = prv2.getFeatures(rqst).next()
-                                featB = QgsFeature()
-                                prv2.getFeatures(rqst).nextFeature(featB)
-                                geomB = QgsGeometry(featB.geometry())
 
-                                attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
-                                attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
-                                attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
-                                most = QDateTime.currentDateTimeUtc()
-                                attrs[19] = self.funcs.hashIDer(most)
+                    for feat in feats:
+                        # geom = feat.constGeometry()
+                        geom = feat.geometry()
+                        idxs = index.intersects(geom.boundingBox())
+                        for idx in idxs:
+                            rqst = QgsFeatureRequest().setFilterFid(idx)
+                            # featB = prv2.getFeatures(rqst).next()
+                            featB = QgsFeature()
+                            prv2.getFeatures(rqst).nextFeature(featB)
+                            geomB = QgsGeometry(featB.geometry())
 
-                                if geom.intersects(geomB):
-                                    geomD = QgsGeometry(geom.intersection(geomB))
-                                    geomD.transform(trB)
-                                    featD = QgsFeature()
-                                    featD.setGeometry(geomD)
-                                    featD.setAttributes(attrs)
-                                    vl.addFeature(featD)
-                            #self.iface.emit(SIGNAL('featureProcessed()'))
-                    else:
-                        for feat in feats:
-                            # geom = feat.constGeometry()
-                            geom = feat.geometry()
-                            idxs = index.intersects(geom.boundingBox())
-                            for idx in idxs:
-                                rqst = QgsFeatureRequest().setFilterFid(idx)
-                                # featB = prv2.getFeatures(rqst).next()
-                                featB = QgsFeature()
-                                prv2.getFeatures(rqst).nextFeature(featB)
-                                geomB = QgsGeometry(featB.geometry())
+                            attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
+                            attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
+                            attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
+                            most = QDateTime.currentDateTimeUtc()
+                            attrs[19] = self.funcs.hashIDer(most)
 
-                                attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
-                                attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
-                                attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
-                                most = QDateTime.currentDateTimeUtc()
-                                attrs[19] = self.funcs.hashIDer(most)
+                            if geom.intersects(geomB):
+                                g1wkt = ogr.CreateGeometryFromWkt(geom.asWkt())
+                                g2wkt = ogr.CreateGeometryFromWkt(geomB.asWkt())
+                                g_tmp = g1wkt.Intersection(g2wkt)
 
-                                if geom.intersects(geomB):
-                                    geomD = QgsGeometry(geom.intersection(geomB))
-                                    featD = QgsFeature()
-                                    featD.setGeometry(geomD)
-                                    featD.setAttributes(attrs)
-                                    vl.addFeature(featD)
-                            #self.iface.emit(SIGNAL('featureProcessed()'))
+                                if g_tmp.GetGeometryName() == 'MULTIPOLYGON':
+                                    for geom_part in g_tmp:
+                                        vl.addFeature(self.fromMultiPolygonToSinglePolygon(geom_part,attrs))
+                                else:
+                                    vl.addFeature(self.fromMultiPolygonToSinglePolygon(g_tmp,attrs))
 
+                        #self.iface.emit(SIGNAL('featureProcessed()'))
 
             vl.commitChanges()
             vl.updateExtents()
