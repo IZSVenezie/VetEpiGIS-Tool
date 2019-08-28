@@ -34,7 +34,7 @@ from qgis.core import QgsField, QgsSpatialIndex, QgsMessageLog, QgsProject, \
     QgsCoordinateTransform, Qgis, QgsVectorFileWriter, QgsFeature, \
     QgsGeometry, QgsFeatureRequest, QgsPoint, QgsVectorLayer, QgsCoordinateReferenceSystem, \
     QgsRectangle, QgsDataSourceUri, QgsDataProvider, QgsWkbTypes, QgsPointXY, QgsLayout, \
-    QgsReadWriteContext, QgsLayoutExporter
+    QgsReadWriteContext, QgsLayoutExporter, QgsLayoutItemPage
 
 #Composer
 #All composer related methods have been removed from the public API and Python bindings. These classes have been replaced with the new layouts engine, based on QgsLayout, QgsLayoutItem, and the other related classes.
@@ -409,9 +409,9 @@ class VetEpiGIStool:
             #rend = canv.mapRenderer()
             rect = QgsRectangle(self.iface.mapCanvas().extent())
 
-            qpt = os.path.join(self.plugin_dir, 'templates/qvet_h_template.qpt')
+            qpt = os.path.join(self.plugin_dir, 'templates/qvet_h_template_vqgis3.qpt')
             if dlg.radioButton_2.isChecked():
-                qpt = os.path.join(self.plugin_dir, 'templates/qvet_v_template.qpt')
+                qpt = os.path.join(self.plugin_dir, 'templates/qvet_v_template_vqgis3.qpt')
 
             # with open(qpt, 'r') as f:
             #     tree = etree.parse(f)
@@ -451,10 +451,21 @@ class VetEpiGIStool:
             if xt!='.pdf':
                 pdfpath = '%s.pdf' % pdfpath
 
-            exporter = QgsLayoutExporter(l)
-            exporter.exportToPdf(pdfpath, QgsLayoutExporter.PdfExportSettings())
-            QApplication.restoreOverrideCursor()
+            if dlg.radioButton_2.isChecked():
+                pc = l.pageCollection()
+                pc.page(0).setPageSize('A4', QgsLayoutItemPage.Orientation.Portrait)
 
+            exporter = QgsLayoutExporter(l)
+            res = exporter.exportToPdf(pdfpath, QgsLayoutExporter.PdfExportSettings())
+            if res == 0:
+                self.iface.messageBar().pushMessage(' ', 'Layout exported', level=Qgis.Info)
+                self.handy.setChecked(False)
+                QApplication.restoreOverrideCursor()
+            else:
+                self.iface.messageBar().pushMessage(' ', 'Error exporting layout', level=Qgis.Warning)
+                self.handy.setChecked(False)
+                QApplication.restoreOverrideCursor()
+                return
 
     def expLayer(self):
         self.grp4.setDefaultAction(self.xprt)
