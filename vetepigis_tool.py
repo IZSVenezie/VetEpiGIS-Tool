@@ -1976,9 +1976,10 @@ class VetEpiGIStool:
             vl.commitChanges()
             # vl.updateExtents()
 
-            dfl = list()
-            dfl.append(16)
-            vl.dataProvider().deleteAttributes(dfl)
+            if tn is 'outbreak':
+                dfl = list()
+                dfl.append(16)
+                vl.dataProvider().deleteAttributes(dfl)
 
             vl.commitChanges()
             vl.updateExtents()
