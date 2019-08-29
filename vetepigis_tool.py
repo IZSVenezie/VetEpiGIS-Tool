@@ -1321,8 +1321,8 @@ class VetEpiGIStool:
             self.db.close()
             self.uri.setDataSource('', s,'geom')
             vl = QgsVectorLayer(self.uri.uri(), s, 'spatialite')
-            sld = self.sldPOI
-            vl.loadSldStyle(sld)
+            #sld = self.sldPOI
+            #vl.loadSldStyle(sld)
             QgsProject.instance().addMapLayer(vl)
             self.poier.activate(0)
 
@@ -1349,16 +1349,16 @@ class VetEpiGIStool:
             self.db.open()
             q = self.db.exec_("create table %s (gid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, localid text, code text, largescale text, disease text, animalno numeric, species text, production text, year numeric, status text, suspect text, confirmation text, expiration text, notes text, hrid text, timestamp text, grouping text)" % s)
             if dlg.comboBox.currentText()=='Point':
-                sld = self.sldOutbreakPoint
+                #sld = self.sldOutbreakPoint
                 q = self.db.exec_("SELECT AddGeometryColumn('%s', 'geom', 4326, 'POINT', 'XY')" % s)
             else:
-                sld = self.sldOutbreakArea
+                #sld = self.sldOutbreakArea
                 q = self.db.exec_("SELECT AddGeometryColumn('%s', 'geom', 4326, 'POLYGON', 'XY')" % s)
             self.db.commit()
             self.db.close()
             self.uri.setDataSource('', s,'geom')
             vl = QgsVectorLayer(self.uri.uri(), s, 'spatialite')
-            vl.loadSldStyle(sld)
+            #vl.loadSldStyle(sld)
 
             QgsProject.instance().addMapLayer(vl)
             self.loadModel()
@@ -1756,7 +1756,7 @@ class VetEpiGIStool:
                         #self.iface.emit(SIGNAL('featureProcessed()'))
 
             elif dlg.comboBox_4.currentText()=='Intersections only':
-                zonsty = self.sldZoneB
+                #zonsty = self.sldZoneB
                 if l1.selectedFeatureCount()==0:
                     feats = prv1.getFeatures()
 
@@ -1830,7 +1830,7 @@ class VetEpiGIStool:
 
                 self.loadModel()
 
-            vl.loadSldStyle(zonsty)
+            #vl.loadSldStyle(zonsty)
             QgsProject.instance().addMapLayer(vl)
             QApplication.restoreOverrideCursor()
 
@@ -1989,8 +1989,8 @@ class VetEpiGIStool:
                 self.uri.setDataSource('', ln,'geom')
                 vl = QgsVectorLayer(self.uri.uri(), ln, 'spatialite')
 
-            sld = self.sldBuffer
-            vl.loadSldStyle(sld)
+            #sld = self.sldBuffer
+            #vl.loadSldStyle(sld)
             QgsProject.instance().addMapLayer(vl)
 
             QApplication.restoreOverrideCursor()

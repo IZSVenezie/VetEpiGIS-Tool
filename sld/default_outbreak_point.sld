@@ -12,14 +12,33 @@
               <se:Mark>
                 <se:WellKnownName>cross</se:WellKnownName>
                 <se:Fill>
-                  <se:SvgParameter name="fill">#d40003</se:SvgParameter>
+                  <se:SvgParameter name="fill">#000000</se:SvgParameter>
+                </se:Fill>
+                <se:Stroke>
+                  <se:SvgParameter name="stroke">#000000</se:SvgParameter>
+                  <se:SvgParameter name="stroke-width">5</se:SvgParameter>
+                </se:Stroke>
+              </se:Mark>
+              <se:Size>8</se:Size>
+              <se:Displacement>
+                <se:DisplacementX>0</se:DisplacementX>
+                <se:DisplacementY>0</se:DisplacementY>
+              </se:Displacement>
+            </se:Graphic>
+          </se:PointSymbolizer>
+          <se:PointSymbolizer>
+            <se:Graphic>
+              <se:Mark>
+                <se:WellKnownName>cross</se:WellKnownName>
+                <se:Fill>
+                  <se:SvgParameter name="fill">#ff0000</se:SvgParameter>
                 </se:Fill>
                 <se:Stroke>
                   <se:SvgParameter name="stroke">#d40003</se:SvgParameter>
-                  <se:SvgParameter name="stroke-width">1</se:SvgParameter>
+                  <se:SvgParameter name="stroke-width">4</se:SvgParameter>
                 </se:Stroke>
               </se:Mark>
-              <se:Size>2.2</se:Size>
+              <se:Size>8</se:Size>
             </se:Graphic>
           </se:PointSymbolizer>
         </se:Rule>
