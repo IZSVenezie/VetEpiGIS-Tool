@@ -28,15 +28,15 @@ import os, shutil
 from .xsettings_dialog import Ui_Dialog
 
 
-class Dialog(QDialog, Ui_Dialog):         
+class Dialog(QDialog, Ui_Dialog):
     def __init__(self):
         """Constructor for the dialog.
-        
+
         """
-        
+
         QDialog.__init__(self)
         self.plugin_dir = ''
-                        
+
         self.setupUi(self)
 
         self.toolButton.clicked.connect(self.namer1)
@@ -96,9 +96,10 @@ class Dialog(QDialog, Ui_Dialog):
 
 
     def selFile(self):
-        sf = QFileInfo(QFileDialog.getOpenFileName(self, 'Select SLD file', '', 'SLD files (*.sld)'))
+        sf = QFileInfo(QFileDialog.getOpenFileName(self, 'Select SLD file', '', 'SLD files (*.sld)')[0])
         f = sf.fileName()
         if f!='':
             df = os.path.join(os.path.join(self.plugin_dir, 'sld'), f)
-            shutil.copy(sf.absoluteFilePath(), df)
+            if not (os.path.samefile(sf, df)):
+                shutil.copy(sf.absoluteFilePath(), df)
         return f
