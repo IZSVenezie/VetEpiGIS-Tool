@@ -18,7 +18,7 @@
                   <se:SvgParameter name="stroke">#000000</se:SvgParameter>
                 </se:Stroke>
               </se:Mark>
-              <se:Size>2</se:Size>
+              <se:Size>7</se:Size>
             </se:Graphic>
           </se:PointSymbolizer>
         </se:Rule>
