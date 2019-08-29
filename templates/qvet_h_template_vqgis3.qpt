@@ -112,7 +112,7 @@
    </dataDefinedProperties>
    <customproperties/>
   </LayoutObject>
-  <Extent ymax="5123100.37508220225572586" ymin="5015676.55654395278543234" xmax="1853600.21487018140032887" xmin="1740954.39582865359261632"/>
+    <Extent xmax="ixmax" xmin="ixmin" ymin="iymin" ymax="iymax"/>
   <LayerSet/>
   <AtlasMap margin="0.10000000000000001" scalingMode="2" atlasDriven="0"/>
  </LayoutItem>

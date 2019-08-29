@@ -462,11 +462,11 @@ class VetEpiGIStool:
             exporter = QgsLayoutExporter(l)
             res = exporter.exportToPdf(pdfpath, QgsLayoutExporter.PdfExportSettings())
             if res == 0:
-                self.iface.messageBar().pushMessage(' ', 'Layout exported', level=Qgis.Info)
+                self.iface.messageBar().pushMessage('Print map', 'Layout exported', level=Qgis.Info)
                 self.handy.setChecked(False)
                 QApplication.restoreOverrideCursor()
             else:
-                self.iface.messageBar().pushMessage(' ', 'Error exporting layout', level=Qgis.Warning)
+                self.iface.messageBar().pushMessage('Print map', 'Error exporting layout', level=Qgis.Warning)
                 self.handy.setChecked(False)
                 QApplication.restoreOverrideCursor()
                 return
