@@ -445,12 +445,16 @@ class VetEpiGIStool:
             l.initializeDefaults()
 
             items, ok = l.loadFromTemplate(doc, QgsReadWriteContext(), False)
+            #Add in legend only visible layers
+            llegend = l.itemById("legend")
+            llegend.setLegendFilterByMapEnabled(True)
 
             pdfpath = dlg.lineEdit_3.text()
             xt = os.path.splitext(pdfpath)[-1].lower()
             if xt!='.pdf':
                 pdfpath = '%s.pdf' % pdfpath
 
+            #Set portait page size if "Portrait" is checked
             if dlg.radioButton_2.isChecked():
                 pc = l.pageCollection()
                 pc.page(0).setPageSize('A4', QgsLayoutItemPage.Orientation.Portrait)

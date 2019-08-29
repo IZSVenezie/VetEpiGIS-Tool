@@ -62,7 +62,7 @@
   <fillColor2 red="255" blue="255" alpha="255" green="255"/>
   <strokeColor red="0" blue="0" alpha="255" green="0"/>
  </LayoutItem>
- <LayoutItem excludeFromExports="0" columnSpace="2" background="true" positionOnPage="227.417,66.4207,mm" position="227.417,66.4207,mm" resizeToContents="0" visibility="1" size="65.9789,103.152,mm" symbolWidth="7" wmsLegendHeight="25" columnCount="1" map_uuid="{e61bf775-659b-45b9-a3af-5ca0af775b06}" positionLock="false" referencePoint="0" blendMode="0" opacity="1" splitLayer="0" uuid="{017edb4b-78ed-4e71-b8da-3668b9c03658}" frame="false" frameJoinStyle="miter" rasterBorderColor="0,0,0,255" legendFilterByAtlas="0" fontColor="#000000" equalColumnWidth="0" itemRotation="0" rasterBorderWidth="0" templateUuid="{017edb4b-78ed-4e71-b8da-3668b9c03658}" wrapChar="" title="Legend" wmsLegendWidth="50" outlineWidthM="0.3,mm" titleAlignment="1" boxSpace="2" rasterBorder="1" type="65642" symbolHeight="4" groupUuid="" zValue="6" lineSpacing="1" id="">
+ <LayoutItem excludeFromExports="0" columnSpace="2" background="true" positionOnPage="227.417,66.4207,mm" position="227.417,66.4207,mm" resizeToContents="0" visibility="1" size="65.9789,103.152,mm" symbolWidth="7" wmsLegendHeight="25" columnCount="1" map_uuid="{e61bf775-659b-45b9-a3af-5ca0af775b06}" positionLock="false" referencePoint="0" blendMode="0" opacity="1" splitLayer="0" uuid="{017edb4b-78ed-4e71-b8da-3668b9c03658}" frame="false" frameJoinStyle="miter" rasterBorderColor="0,0,0,255" legendFilterByAtlas="0" fontColor="#000000" equalColumnWidth="0" itemRotation="0" rasterBorderWidth="0" templateUuid="{017edb4b-78ed-4e71-b8da-3668b9c03658}" wrapChar="" title="Legend" wmsLegendWidth="50" outlineWidthM="0.3,mm" titleAlignment="1" boxSpace="2" rasterBorder="1" type="65642" symbolHeight="4" groupUuid="" zValue="6" lineSpacing="1" id="legend">
   <FrameColor red="0" blue="0" alpha="255" green="0"/>
   <BackgroundColor red="255" blue="255" alpha="255" green="255"/>
   <LayoutObject>
@@ -148,7 +148,7 @@
   <LabelFont description="MS Shell Dlg 2,7,-1,5,50,0,0,0,0,0,Normale" style="Normale"/>
   <FontColor red="92" blue="92" alpha="255" green="92"/>
  </LayoutItem>
- <LayoutItem marginY="1" halign="8" background="false" id="" labelText="TTITLE&#xa;Subtitle" positionLock="false" outlineWidthM="0.3,mm" valign="32" excludeFromExports="0" size="60.7146,15.9683,mm" referencePoint="0" templateUuid="{d52cfffa-39e3-464f-a788-d8db743b9c03}" frameJoinStyle="miter" blendMode="0" opacity="1" marginX="1" visibility="1" uuid="{d52cfffa-39e3-464f-a788-d8db743b9c03}" positionOnPage="227.417,42.2359,mm" htmlState="0" position="227.417,42.2359,mm" itemRotation="0" frame="false" zValue="2" type="65641" groupUuid="">
+ <LayoutItem marginY="1" halign="8" background="false" id="" labelText="TITLE&#xa;Subtitle" positionLock="false" outlineWidthM="0.3,mm" valign="32" excludeFromExports="0" size="60.7146,15.9683,mm" referencePoint="0" templateUuid="{d52cfffa-39e3-464f-a788-d8db743b9c03}" frameJoinStyle="miter" blendMode="0" opacity="1" marginX="1" visibility="1" uuid="{d52cfffa-39e3-464f-a788-d8db743b9c03}" positionOnPage="227.417,42.2359,mm" htmlState="0" position="227.417,42.2359,mm" itemRotation="0" frame="false" zValue="2" type="65641" groupUuid="">
   <FrameColor red="0" blue="0" alpha="255" green="0"/>
   <BackgroundColor red="255" blue="255" alpha="255" green="255"/>
   <LayoutObject>
