@@ -198,7 +198,7 @@ class VetEpiGIStool:
         self.copyselected.triggered.connect(self.copySel)
 
         self.sep = QAction(self.iface.mainWindow())
-        self.sep.setSeparator(True);
+        self.sep.setSeparator(True)
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.sep)
 
         self.newpoilayer = QAction(
@@ -217,7 +217,7 @@ class VetEpiGIStool:
         self.poier.triggered.connect(self.addPOI)
 
         self.sep2 = QAction(self.iface.mainWindow())
-        self.sep2.setSeparator(True);
+        self.sep2.setSeparator(True)
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.sep2)
 
         self.Bufferer = QAction(
@@ -242,7 +242,7 @@ class VetEpiGIStool:
         self.Zoner.triggered.connect(self.selectROIs)
 
         self.sep3 = QAction(self.iface.mainWindow())
-        self.sep3.setSeparator(True);
+        self.sep3.setSeparator(True)
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.sep3)
 
         self.dbtabs = QAction(
@@ -296,7 +296,7 @@ class VetEpiGIStool:
         self.xprnt.triggered.connect(self.printMap)
 
         self.sep4 = QAction(self.iface.mainWindow())
-        self.sep4.setSeparator(True);
+        self.sep4.setSeparator(True)
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.sep4)
 
         self.prop = QAction(
@@ -321,7 +321,7 @@ class VetEpiGIStool:
         # self.pluginupdate.triggered.connect(self.fpluginupdate)
 
         self.sep5 = QAction(self.iface.mainWindow())
-        self.sep5.setSeparator(True);
+        self.sep5.setSeparator(True)
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.sep5)
 
         self.actAbout = QAction(
@@ -2037,11 +2037,12 @@ class VetEpiGIStool:
         dlg.textEdit.setFontWeight(QFont.Bold)
         dlg.textEdit.append('Developers:')
         dlg.textEdit.setFontWeight(ow)
+        dlg.textEdit.append('Paola Bonato *;\nMatteo Mazzucato *;\n* from Istituto Zooprofilattico Sperimentale delle Venezie.\n'')
         dlg.textEdit.append('Norbert Solymosi *;\n* from University of Veterinary Medicine, Budapest.\n')
         dlg.textEdit.setFontWeight(QFont.Bold)
         dlg.textEdit.append('Contributors:')
         dlg.textEdit.setFontWeight(ow)
-        dlg.textEdit.append(u'Nicola Ferrè *;\nMatteo Mazzucato *;\n* from Istituto Zooprofilattico Sperimentale delle Venezie.\n')
+        dlg.textEdit.append(u'Nicola Ferrè *;\nPaolo Mulati *;\n* from Istituto Zooprofilattico Sperimentale delle Venezie.\n')
         dlg.textEdit.setFontWeight(QFont.Bold)
         dlg.textEdit.append('Contacts:')
         dlg.textEdit.setFontWeight(ow)
@@ -2153,7 +2154,7 @@ class VetEpiGIStool:
 
 
 class casePicker(QgsMapTool):
-# http://gis.stackexchange.com/questions/45094/how-to-programatically-check-for-a-mouse-click-in-qgis
+    # http://gis.stackexchange.com/questions/45094/how-to-programatically-check-for-a-mouse-click-in-qgis
     afterClick = pyqtSignal()
 
     def __init__(self, dlg, psrid, iface, tt, lab, lyr):
