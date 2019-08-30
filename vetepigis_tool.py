@@ -321,7 +321,7 @@ class VetEpiGIStool:
         # self.pluginupdate.triggered.connect(self.fpluginupdate)
 
         self.sep5 = QAction(self.iface.mainWindow())
-        self.sep5.setSeparator(True);
+        self.sep5.setSeparator(True)
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.sep5)
 
         self.actAbout = QAction(
@@ -2032,11 +2032,12 @@ class VetEpiGIStool:
         dlg.textEdit.setFontWeight(QFont.Bold)
         dlg.textEdit.append('Developers:')
         dlg.textEdit.setFontWeight(ow)
+        dlg.textEdit.append('Paola Bonato *;\nMatteo Mazzucato *;\n* from Istituto Zooprofilattico Sperimentale delle Venezie.\n'')
         dlg.textEdit.append('Norbert Solymosi *;\n* from University of Veterinary Medicine, Budapest.\n')
         dlg.textEdit.setFontWeight(QFont.Bold)
         dlg.textEdit.append('Contributors:')
         dlg.textEdit.setFontWeight(ow)
-        dlg.textEdit.append(u'Nicola Ferrè *;\nMatteo Mazzucato *;\n* from Istituto Zooprofilattico Sperimentale delle Venezie.\n')
+        dlg.textEdit.append(u'Nicola Ferrè *;\nPaolo Mulati *;\n* from Istituto Zooprofilattico Sperimentale delle Venezie.\n')
         dlg.textEdit.setFontWeight(QFont.Bold)
         dlg.textEdit.append('Contacts:')
         dlg.textEdit.setFontWeight(ow)
@@ -2148,7 +2149,7 @@ class VetEpiGIStool:
 
 
 class casePicker(QgsMapTool):
-# http://gis.stackexchange.com/questions/45094/how-to-programatically-check-for-a-mouse-click-in-qgis
+    # http://gis.stackexchange.com/questions/45094/how-to-programatically-check-for-a-mouse-click-in-qgis
     afterClick = pyqtSignal()
 
     def __init__(self, dlg, psrid, iface, tt, lab, lyr):
