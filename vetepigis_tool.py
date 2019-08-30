@@ -34,7 +34,7 @@ from qgis.core import QgsField, QgsSpatialIndex, QgsMessageLog, QgsProject, \
     QgsCoordinateTransform, Qgis, QgsVectorFileWriter, QgsFeature, \
     QgsGeometry, QgsFeatureRequest, QgsPoint, QgsVectorLayer, QgsCoordinateReferenceSystem, \
     QgsRectangle, QgsDataSourceUri, QgsDataProvider, QgsWkbTypes, QgsPointXY, QgsLayout, \
-    QgsReadWriteContext, QgsLayoutExporter, QgsLayoutItemPage
+    QgsReadWriteContext, QgsLayoutExporter, QgsLayoutItemPage, QgsVectorDataProvider
 
 #Composer
 #All composer related methods have been removed from the public API and Python bindings. These classes have been replaced with the new layouts engine, based on QgsLayout, QgsLayoutItem, and the other related classes.
@@ -1388,17 +1388,25 @@ class VetEpiGIStool:
             QApplication.setOverrideCursor(Qt.WaitCursor)
 
             l1 = l2 = QgsVectorLayer
+            prv1 = prv2 = QgsVectorDataProvider
 
             for lyr in lyrs:
                 if lyr.name()==dlg.comboBox.currentText():
                     l1 = lyr
+                    if l1.dataProvider().crs().srsid() != 3452:
+                        l1 = self.transformLayerToWGS84(l1)
                     prv1 = l1.dataProvider()
                 if lyr.name()==dlg.comboBox_2.currentText():
                     l2 = lyr
+                    if l2.dataProvider().crs().srsid() != 3452:
+                        l2 = self.transformLayerToWGS84(l2)
                     prv2 = l2.dataProvider()
 
             ln = dlg.lineEdit.text()
-            vl = QgsVectorLayer('Point?crs=' + prv1.crs().toWkt(), ln, 'memory')
+            #The output layer will be in epsg 4326 (crs 3452)
+            crs_out = QgsCoordinateReferenceSystem()
+            crs_out.createFromSrsId(3452)
+            vl = QgsVectorLayer('Point?crs=' + crs_out.toWkt(), ln, 'memory')
 
             oattrs = prv2.fields().toList()
             nattrs = []
@@ -1423,16 +1431,8 @@ class VetEpiGIStool:
 
             index = QgsSpatialIndex()
             ftbs = l2.getFeatures()
-            if prv1.crs().toWkt()==prv2.crs().toWkt():
-                for ft in ftbs:
-                    index.insertFeature(ft)
-            else:
-                trA = QgsCoordinateTransform(prv2.crs(), prv1.crs(), QgsProject.instance())
-                for ft in ftbs:
-                    sg = ft.geometry()
-                    sg.transform(trA)
-                    ft.setGeometry(sg)
-                    index.insertFeature(ft)
+            for ft in ftbs:
+                index.insertFeature(ft)
 
             feat = QgsFeature()
 
@@ -1447,7 +1447,7 @@ class VetEpiGIStool:
                         featB = QgsFeature()
                         prv2.getFeatures(rqst).nextFeature(featB)
                         geomB = QgsGeometry(featB.geometry())
-                        geomB.transform(trA)
+                        #geomB.transform(trA)
                         attrs=[]
                         attrs.extend(featB.attributes())
                         attrs.extend(feat.attributes())
@@ -1468,7 +1468,7 @@ class VetEpiGIStool:
                         featB = QgsFeature()
                         prv2.getFeatures(rqst).nextFeature(featB)
                         geomB = QgsGeometry(featB.geometry())
-                        geomB.transform(trA)
+                        #geomB.transform(trA)
                         attrs=[]
                         attrs.extend(featB.attributes())
                         attrs.extend(feat.attributes())
@@ -1493,7 +1493,7 @@ class VetEpiGIStool:
             QgsProject.instance().addMapLayer(vl)
             QApplication.restoreOverrideCursor()
 
-    def transformLayerToWGS84(self,vecLayer): #PB tutta la funzione
+    def transformLayerToWGS84(self,vecLayer): #PB
         """
         Return the vector layer in the reference system EPSG: 4326.
 
@@ -1514,7 +1514,12 @@ class VetEpiGIStool:
 
         #create new layer
         fn1 = 'lay_test_1'
-        uri1 = QgsVectorLayer('Polygon?crs=' + crs_out.toWkt(), fn1, 'memory')
+        if vecLayer.geometryType() == QgsWkbTypes.PointGeometry:
+            uri1 = QgsVectorLayer('Point?crs=' + crs_out.toWkt(), fn1, 'memory')
+        elif vecLayer.geometryType() == QgsWkbTypes.LineGeometry:
+            uri1 = QgsVectorLayer('LineString?crs=' + crs_out.toWkt(), fn1, 'memory')
+        elif vecLayer.geometryType() == QgsWkbTypes.PolygonGeometry:
+            uri1 = QgsVectorLayer('Polygon?crs=' + crs_out.toWkt(), fn1, 'memory')
 
         #add attribute to new layer
         pruri1 = uri1.dataProvider()
@@ -1976,9 +1981,10 @@ class VetEpiGIStool:
             vl.commitChanges()
             # vl.updateExtents()
 
-            dfl = list()
-            dfl.append(16)
-            vl.dataProvider().deleteAttributes(dfl)
+            if tn is 'outbreak':
+                dfl = list()
+                dfl.append(16)
+                vl.dataProvider().deleteAttributes(dfl)
 
             vl.commitChanges()
             vl.updateExtents()
