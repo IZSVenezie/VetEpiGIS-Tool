@@ -7,8 +7,8 @@
                               -------------------
         begin                : 2015-11-10
         git sha              : $Format:%H$
-        copyright            : (C) 2015 by Norbert Solymosi
-        email                : solymosi.norbert@gmail.com
+        copyright            : (C) 2019 by Paola Bonato, Matteo Mazzucato, Norbert Solymosi
+        email                : pbonato@izsvenezie.it, mmazzucato@izsvenezie.it, solymosi.norbert@gmail.com
  ***************************************************************************/
 
 /***************************************************************************

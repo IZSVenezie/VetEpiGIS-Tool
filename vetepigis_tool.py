@@ -198,7 +198,7 @@ class VetEpiGIStool:
         self.copyselected.triggered.connect(self.copySel)
 
         self.sep = QAction(self.iface.mainWindow())
-        self.sep.setSeparator(True);
+        self.sep.setSeparator(True)
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.sep)
 
         self.newpoilayer = QAction(
@@ -217,7 +217,7 @@ class VetEpiGIStool:
         self.poier.triggered.connect(self.addPOI)
 
         self.sep2 = QAction(self.iface.mainWindow())
-        self.sep2.setSeparator(True);
+        self.sep2.setSeparator(True)
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.sep2)
 
         self.Bufferer = QAction(
@@ -242,7 +242,7 @@ class VetEpiGIStool:
         self.Zoner.triggered.connect(self.selectROIs)
 
         self.sep3 = QAction(self.iface.mainWindow())
-        self.sep3.setSeparator(True);
+        self.sep3.setSeparator(True)
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.sep3)
 
         self.dbtabs = QAction(
@@ -296,7 +296,7 @@ class VetEpiGIStool:
         self.xprnt.triggered.connect(self.printMap)
 
         self.sep4 = QAction(self.iface.mainWindow())
-        self.sep4.setSeparator(True);
+        self.sep4.setSeparator(True)
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.sep4)
 
         self.prop = QAction(
