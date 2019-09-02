@@ -2037,7 +2037,7 @@ class VetEpiGIStool:
         dlg.textEdit.setFontWeight(QFont.Bold)
         dlg.textEdit.append('Developers:')
         dlg.textEdit.setFontWeight(ow)
-        dlg.textEdit.append('Paola Bonato *;\nMatteo Mazzucato *;\n* from Istituto Zooprofilattico Sperimentale delle Venezie.\n'')
+        dlg.textEdit.append('Paola Bonato *;\nMatteo Mazzucato *;\n* from Istituto Zooprofilattico Sperimentale delle Venezie.\n')
         dlg.textEdit.append('Norbert Solymosi *;\n* from University of Veterinary Medicine, Budapest.\n')
         dlg.textEdit.setFontWeight(QFont.Bold)
         dlg.textEdit.append('Contributors:')
