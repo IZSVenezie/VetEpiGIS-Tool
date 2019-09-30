@@ -255,10 +255,17 @@ class VetEpiGIStool:
 
         self.recedit = QAction(
             QIcon(':/plugins/VetEpiGIStool/images/pencil148.png'),
-            QCoreApplication.translate('VetEpiGIS-Tool', "Edit data (case and POI)"),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Edit case data"),
             self.iface.mainWindow())
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.recedit)
         self.recedit.triggered.connect(self.featEdit)
+
+        self.receditPOI = QAction(
+            QIcon(':/plugins/VetEpiGIStool/images/pencil148.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Edit POI data"),
+            self.iface.mainWindow())
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.receditPOI)
+        self.receditPOI.triggered.connect(self.featEditPOI)
 
         # self.grouping = QAction(
         #     QIcon(':/plugins/VetEpiGIStool/images/filter11.png'),
@@ -366,15 +373,18 @@ class VetEpiGIStool:
         # # self.toolbar.addAction(self.sep5)
         # # self.toolbar.addAction(self.prop)
 
+        self.sep10 = QAction(self.iface.mainWindow())
+        self.sep10.setSeparator(True)
+
         self.grp1 = QToolButton(self.toolbar)
         self.grp1.setPopupMode(QToolButton.MenuButtonPopup)
-        self.grp1.addActions([self.newoutbreak, self.Caser, self.handy, self.copyselected])
+        self.grp1.addActions([self.newoutbreak, self.Caser, self.handy, self.copyselected, self.sep10, self.recedit])
         self.grp1.setDefaultAction(self.newoutbreak)
         self.toolbar.addWidget(self.grp1)
 
         self.grp2 = QToolButton(self.toolbar)
         self.grp2.setPopupMode(QToolButton.MenuButtonPopup)
-        self.grp2.addActions([self.newpoilayer, self.poier])
+        self.grp2.addActions([self.newpoilayer, self.poier, self.sep10, self.receditPOI])
         self.grp2.setDefaultAction(self.newpoilayer)
         self.toolbar.addWidget(self.grp2)
 
@@ -386,7 +396,7 @@ class VetEpiGIStool:
 
         self.grp4 = QToolButton(self.toolbar)
         self.grp4.setPopupMode(QToolButton.MenuButtonPopup)
-        self.grp4.addActions([self.dbtabs, self.recedit, self.Saver, self.dbmaintain, self.xprt, self.xprtDB, self.xprnt])
+        self.grp4.addActions([self.dbtabs, self.Saver, self.dbmaintain, self.xprt, self.xprtDB, self.xprnt])
         self.grp4.setDefaultAction(self.xprnt)
         self.toolbar.addWidget(self.grp4)
 
@@ -624,18 +634,18 @@ class VetEpiGIStool:
         x = (self.iface.mainWindow().x()+self.iface.mainWindow().width()/2)-dlg.width()/2
         y = (self.iface.mainWindow().y()+self.iface.mainWindow().height()/2)-dlg.height()/2
         dlg.move(x,y)
-        dlg.setWindowTitle('Copy complete database')
+        dlg.setWindowTitle('Export complete database')
         if dlg.exec_() == QDialog.Accepted:
             QApplication.setOverrideCursor(Qt.WaitCursor)
             if dlg.lineEdit_file.text()!='':
                 ret = shutil.copy(self.dbuidpath, dlg.lineEdit_file.text())
                 #TODO: check how better verify if the database is exported
                 if 'ret' in locals():
-                    self.iface.messageBar().pushMessage('Copy complete database', 'Database exported', level=Qgis.Info)
+                    self.iface.messageBar().pushMessage('Export complete database', 'Database exported', level=Qgis.Info)
                 else:
-                    self.iface.messageBar().pushMessage('Copy complete database', 'Error whilw exporting database', level=Qgis.Warning)
+                    self.iface.messageBar().pushMessage('Export complete database', 'Error whilw exporting database', level=Qgis.Warning)
             else:
-                self.iface.messageBar().pushMessage('Copy complete database', 'Select the output path of sqlite database!', level=Qgis.Warning)
+                self.iface.messageBar().pushMessage('Export complete database', 'Select the output path of sqlite database!', level=Qgis.Warning)
 
         QApplication.restoreOverrideCursor()
 
@@ -866,13 +876,141 @@ class VetEpiGIStool:
 
 
     def featEdit(self):
-        self.grp4.setDefaultAction(self.recedit)
+        self.grp1.setDefaultAction(self.recedit)
         lyr = self.checklayer()
         if lyr is None:
             return
 
         if lyr.selectedFeatureCount()!=1:
             # only one object selection allowed
+            self.iface.messageBar().pushMessage('Edit case data ', 'Select ONE object from outbreak layer', level=Qgis.Warning)
+            return
+
+        flds = lyr.dataProvider().fields()
+        flst = []
+        for fld in flds:
+            flst.append(fld.name())
+
+        tn = ''
+
+        if flst == self.obrflds:
+            tn = 'outbreak'
+
+        if (tn=='' or tn != 'outbreak'):
+            self.iface.messageBar().pushMessage('Edit case data ', 'Select ONE object from outbreak layer', level=Qgis.Warning)
+            return
+
+        feat = lyr.selectedFeatures()[0]
+        attr = feat.attributes()
+        fid = feat.id()
+
+
+        dlg = caser.Dialog()
+        x = (self.iface.mainWindow().x()+self.iface.mainWindow().width()/2)-dlg.width()/2
+        y = (self.iface.mainWindow().y()+self.iface.mainWindow().height()/2)-dlg.height()/2
+        dlg.move(x,y)
+        dlg.setWindowTitle('Create new case')
+        dlg.label_10.setVisible(False)
+        dlg.comboBox_5.setVisible(False)
+        dlg.label.setVisible(False)
+        dlg.lineEdit.setVisible(False)
+        dlg.toolButton_3.setVisible(False)
+        dlg.label_2.setVisible(False)
+        dlg.lineEdit_2.setVisible(False)
+        dlg.label_4.setVisible(False)
+        dlg.comboBox.setVisible(False)
+
+        dlg.comboBox_2.addItem('')
+        for it in self.lsta:
+            dlg.comboBox_2.addItem(it)
+
+        dlg.lstb = self.lstb
+
+        dlg.lineEdit_3.setText(str(attr[1]))
+        dlg.lineEdit_5.setText(str(attr[2]))
+        dlg.comboBox_4.setCurrentIndex(dlg.comboBox_4.findText(attr[3], Qt.MatchExactly))
+        dlg.comboBox_2.setCurrentIndex(dlg.comboBox_2.findText(attr[4], Qt.MatchExactly))
+        dlg.lineEdit_6.setText(str(attr[5]))
+
+        slst = str(attr[6]).split(' | ')
+        plst = str(attr[7]).split(' | ')
+        for i in range(len(slst)):
+            dlg.tableWidget.insertRow(dlg.tableWidget.rowCount())
+            nr = dlg.tableWidget.rowCount() - 1
+            item = QTableWidgetItem(slst[i])
+            dlg.tableWidget.setItem(nr, 0, item)
+            item = QTableWidgetItem(str(plst[i]))
+            dlg.tableWidget.setItem(nr, 1, item)
+
+        dlg.lineEdit_4.setText(str(attr[8]))
+        dlg.comboBox_3.setCurrentIndex(dlg.comboBox_3.findText(attr[9], Qt.MatchExactly))
+        k = '01/01/2000'
+        f = 'dd/MM/yyyy'
+        s = k
+        if attr[10]!='':
+            s = attr[10]
+            dlg.dateEdit.setEnabled(True)
+            dlg.checkBox.setChecked(True)
+        qd = QDate.fromString(s, f)
+        dlg.dateEdit.setDate(qd)
+        s = k
+        if attr[11]!='':
+            s = attr[11]
+            dlg.dateEdit_2.setEnabled(True)
+            dlg.checkBox_2.setChecked(True)
+        qd = QDate.fromString(s, f)
+        dlg.dateEdit_2.setDate(qd)
+        s = k
+        if attr[12]!='':
+            s = attr[12]
+            dlg.dateEdit_3.setEnabled(True)
+            dlg.checkBox_3.setChecked(True)
+        qd = QDate.fromString(s, f)
+        dlg.dateEdit_3.setDate(qd)
+
+        dlg.textEdit.setText(attr[13])
+        if dlg.exec_() == QDialog.Accepted:
+            QApplication.setOverrideCursor(Qt.WaitCursor)
+
+            lyr.startEditing()
+            species = ''
+            production = ''
+            rn = dlg.tableWidget.rowCount()
+            for i in range(rn):
+                if i==0:
+                    species = dlg.tableWidget.item(i, 0).text()
+                    production = dlg.tableWidget.item(i, 1).text()
+                else:
+                    species = species + ' | ' + dlg.tableWidget.item(i, 0).text()
+                    production = production + ' | ' + dlg.tableWidget.item(i, 1).text()
+
+            lyr.changeAttributeValue(fid, 1, dlg.lineEdit_3.text())
+            lyr.changeAttributeValue(fid, 2, dlg.lineEdit_5.text())
+            lyr.changeAttributeValue(fid, 3, dlg.comboBox_4.currentText())
+            lyr.changeAttributeValue(fid, 4, dlg.comboBox_2.currentText())
+            lyr.changeAttributeValue(fid, 5, dlg.lineEdit_6.text())
+            lyr.changeAttributeValue(fid, 6, species)
+            lyr.changeAttributeValue(fid, 7, production)
+            lyr.changeAttributeValue(fid, 8, dlg.lineEdit_4.text())
+            lyr.changeAttributeValue(fid, 9, dlg.comboBox_3.currentText())
+            lyr.changeAttributeValue(fid, 10, self.funcs.dateCheck(dlg.dateEdit.date()))
+            lyr.changeAttributeValue(fid, 11, self.funcs.dateCheck(dlg.dateEdit_2.date()))
+            lyr.changeAttributeValue(fid, 12, self.funcs.dateCheck(dlg.dateEdit_3.date()))
+            lyr.changeAttributeValue(fid, 13, dlg.textEdit.toPlainText())
+            lyr.changeAttributeValue(fid, 15, QDateTime.currentDateTimeUtc().toString('dd/MM/yyyy hh:mm:ss'))
+            lyr.commitChanges()
+
+            QApplication.restoreOverrideCursor()
+
+    def featEditPOI(self):
+        self.grp2.setDefaultAction(self.receditPOI)
+        lyr = self.checklayer()
+        if lyr is None:
+            return
+
+        if lyr.selectedFeatureCount()!=1:
+            # only one object selection allowed
+            self.iface.messageBar().pushMessage('Edit poi data ', 'Select ONE object from poi layer', level=Qgis.Warning)
             return
 
         flds = lyr.dataProvider().fields()
@@ -883,147 +1021,46 @@ class VetEpiGIStool:
         tn = ''
         if flst == self.poiflds:
             tn = 'poi'
-        if flst == self.obrflds:
-            tn = 'outbreak'
 
-        if tn=='':
+        if tn=='' or tn != 'poi':
+            self.iface.messageBar().pushMessage('Edit poi data ', 'Select ONE object from poi layer', level=Qgis.Warning)
             return
 
         feat = lyr.selectedFeatures()[0]
         attr = feat.attributes()
         fid = feat.id()
 
-        if tn == 'poi':
-            dlg = poi.Dialog()
-            x = (self.iface.mainWindow().x()+self.iface.mainWindow().width()/2)-dlg.width()/2
-            y = (self.iface.mainWindow().y()+self.iface.mainWindow().height()/2)-dlg.height()/2
-            dlg.move(x,y)
-            dlg.setWindowTitle('Point of Interest')
+        dlg = poi.Dialog()
+        x = (self.iface.mainWindow().x()+self.iface.mainWindow().width()/2)-dlg.width()/2
+        y = (self.iface.mainWindow().y()+self.iface.mainWindow().height()/2)-dlg.height()/2
+        dlg.move(x,y)
+        dlg.setWindowTitle('Point of Interest')
 
-            dlg.comboBox.addItem('')
-            for it in self.lstpt:
-                dlg.comboBox.addItem(it)
+        dlg.comboBox.addItem('')
+        for it in self.lstpt:
+            dlg.comboBox.addItem(it)
 
-            dlg.label.setVisible(False)
-            dlg.lineEdit.setVisible(False)
-            dlg.toolButton.setVisible(False)
-            dlg.label_2.setVisible(False)
-            dlg.lineEdit_2.setVisible(False)
-            dlg.setMaximumHeight(150)
+        dlg.label.setVisible(False)
+        dlg.lineEdit.setVisible(False)
+        dlg.toolButton.setVisible(False)
+        dlg.label_2.setVisible(False)
+        dlg.lineEdit_2.setVisible(False)
+        dlg.setMaximumHeight(150)
 
-            dlg.lineEdit_3.setText(attr[1])
-            dlg.lineEdit_5.setText(attr[2])
-            dlg.comboBox.setCurrentIndex(dlg.comboBox.findText(attr[3], Qt.MatchExactly))
+        dlg.lineEdit_3.setText(attr[1])
+        dlg.lineEdit_5.setText(attr[2])
+        dlg.comboBox.setCurrentIndex(dlg.comboBox.findText(attr[3], Qt.MatchExactly))
 
-            if dlg.exec_() == QDialog.Accepted:
-                QApplication.setOverrideCursor(Qt.WaitCursor)
+        if dlg.exec_() == QDialog.Accepted:
+            QApplication.setOverrideCursor(Qt.WaitCursor)
 
-                lyr.startEditing()
-                lyr.changeAttributeValue(fid, 1, dlg.lineEdit_3.text())
-                lyr.changeAttributeValue(fid, 2, dlg.lineEdit_5.text())
-                lyr.changeAttributeValue(fid, 3, dlg.comboBox.currentText())
-                lyr.commitChanges()
+            lyr.startEditing()
+            lyr.changeAttributeValue(fid, 1, dlg.lineEdit_3.text())
+            lyr.changeAttributeValue(fid, 2, dlg.lineEdit_5.text())
+            lyr.changeAttributeValue(fid, 3, dlg.comboBox.currentText())
+            lyr.commitChanges()
 
-                QApplication.restoreOverrideCursor()
-
-
-        elif tn == 'outbreak':
-            dlg = caser.Dialog()
-            x = (self.iface.mainWindow().x()+self.iface.mainWindow().width()/2)-dlg.width()/2
-            y = (self.iface.mainWindow().y()+self.iface.mainWindow().height()/2)-dlg.height()/2
-            dlg.move(x,y)
-            dlg.setWindowTitle('Create new case')
-            dlg.label_10.setVisible(False)
-            dlg.comboBox_5.setVisible(False)
-            dlg.label.setVisible(False)
-            dlg.lineEdit.setVisible(False)
-            dlg.toolButton_3.setVisible(False)
-            dlg.label_2.setVisible(False)
-            dlg.lineEdit_2.setVisible(False)
-            dlg.label_4.setVisible(False)
-            dlg.comboBox.setVisible(False)
-
-            dlg.comboBox_2.addItem('')
-            for it in self.lsta:
-                dlg.comboBox_2.addItem(it)
-
-            dlg.lstb = self.lstb
-
-            dlg.lineEdit_3.setText(str(attr[1]))
-            dlg.lineEdit_5.setText(str(attr[2]))
-            dlg.comboBox_4.setCurrentIndex(dlg.comboBox_4.findText(attr[3], Qt.MatchExactly))
-            dlg.comboBox_2.setCurrentIndex(dlg.comboBox_2.findText(attr[4], Qt.MatchExactly))
-            dlg.lineEdit_6.setText(str(attr[5]))
-
-            slst = str(attr[6]).split(' | ')
-            plst = str(attr[7]).split(' | ')
-            for i in range(len(slst)):
-                dlg.tableWidget.insertRow(dlg.tableWidget.rowCount())
-                nr = dlg.tableWidget.rowCount() - 1
-                item = QTableWidgetItem(slst[i])
-                dlg.tableWidget.setItem(nr, 0, item)
-                item = QTableWidgetItem(str(plst[i]))
-                dlg.tableWidget.setItem(nr, 1, item)
-
-            dlg.lineEdit_4.setText(str(attr[8]))
-            dlg.comboBox_3.setCurrentIndex(dlg.comboBox_3.findText(attr[9], Qt.MatchExactly))
-            k = '01/01/2000'
-            f = 'dd/MM/yyyy'
-            s = k
-            if attr[10]!='':
-                s = attr[10]
-                dlg.dateEdit.setEnabled(True)
-                dlg.checkBox.setChecked(True)
-            qd = QDate.fromString(s, f)
-            dlg.dateEdit.setDate(qd)
-            s = k
-            if attr[11]!='':
-                s = attr[11]
-                dlg.dateEdit_2.setEnabled(True)
-                dlg.checkBox_2.setChecked(True)
-            qd = QDate.fromString(s, f)
-            dlg.dateEdit_2.setDate(qd)
-            s = k
-            if attr[12]!='':
-                s = attr[12]
-                dlg.dateEdit_3.setEnabled(True)
-                dlg.checkBox_3.setChecked(True)
-            qd = QDate.fromString(s, f)
-            dlg.dateEdit_3.setDate(qd)
-
-            dlg.textEdit.setText(attr[13])
-            if dlg.exec_() == QDialog.Accepted:
-                QApplication.setOverrideCursor(Qt.WaitCursor)
-
-                lyr.startEditing()
-                species = ''
-                production = ''
-                rn = dlg.tableWidget.rowCount()
-                for i in range(rn):
-                    if i==0:
-                        species = dlg.tableWidget.item(i, 0).text()
-                        production = dlg.tableWidget.item(i, 1).text()
-                    else:
-                        species = species + ' | ' + dlg.tableWidget.item(i, 0).text()
-                        production = production + ' | ' + dlg.tableWidget.item(i, 1).text()
-
-                lyr.changeAttributeValue(fid, 1, dlg.lineEdit_3.text())
-                lyr.changeAttributeValue(fid, 2, dlg.lineEdit_5.text())
-                lyr.changeAttributeValue(fid, 3, dlg.comboBox_4.currentText())
-                lyr.changeAttributeValue(fid, 4, dlg.comboBox_2.currentText())
-                lyr.changeAttributeValue(fid, 5, dlg.lineEdit_6.text())
-                lyr.changeAttributeValue(fid, 6, species)
-                lyr.changeAttributeValue(fid, 7, production)
-                lyr.changeAttributeValue(fid, 8, dlg.lineEdit_4.text())
-                lyr.changeAttributeValue(fid, 9, dlg.comboBox_3.currentText())
-                lyr.changeAttributeValue(fid, 10, self.funcs.dateCheck(dlg.dateEdit.date()))
-                lyr.changeAttributeValue(fid, 11, self.funcs.dateCheck(dlg.dateEdit_2.date()))
-                lyr.changeAttributeValue(fid, 12, self.funcs.dateCheck(dlg.dateEdit_3.date()))
-                lyr.changeAttributeValue(fid, 13, dlg.textEdit.toPlainText())
-                lyr.changeAttributeValue(fid, 15, QDateTime.currentDateTimeUtc().toString('dd/MM/yyyy hh:mm:ss'))
-                lyr.commitChanges()
-
-                QApplication.restoreOverrideCursor()
+            QApplication.restoreOverrideCursor()
 
 
     def checklayer(self):
