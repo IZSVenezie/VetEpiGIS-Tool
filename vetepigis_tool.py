@@ -1236,11 +1236,11 @@ class VetEpiGIStool:
                         dlg.comboBox.addItem(lyr.name())
                         n += 1
         if n==0:
-            self.iface.messageBar().pushMessage(' ', 'There is no selected object to copy!', level=Qgis.Warning)
+            self.iface.messageBar().pushMessage('Copy an element to outbreak layer', ' Select ONE object to copy!', level=Qgis.Warning)
             return
 
         if fldn==0:
-            self.iface.messageBar().pushMessage(' ', 'There is no OUTBREAK layer!', level=Qgis.Warning)
+            self.iface.messageBar().pushMessage('Copy an element to outbreak layer', 'There is no OUTBREAK layer!', level=Qgis.Warning)
             return
 
         dlg.lrs = lrs
