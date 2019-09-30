@@ -522,6 +522,11 @@ class VetEpiGIStool:
         if dlg.exec_() == QDialog.Accepted:
             QApplication.setOverrideCursor(Qt.WaitCursor)
 
+            if dlg.lineEdit.text()=='':
+                self.iface.messageBar().pushMessage('Export selected layer','Set the output path', level=Qgis.Warning)
+                QApplication.restoreOverrideCursor()
+                return
+
             if dlg.comboBox.currentText()=='Copy complete database':
                 if dlg.lineEdit.text()!='':
                     shutil.copy(self.dbuidpath, dlg.lineEdit.text())

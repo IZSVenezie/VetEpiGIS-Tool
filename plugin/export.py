@@ -68,11 +68,16 @@ class Dialog(QDialog, Ui_Dialog):
         elif self.comboBox.currentText()=='SQLite database':
             a = 'SQLite database'
             sf = QFileDialog.getOpenFileName(self, a, QDir.homePath())
+            sf = sf[0]
         elif self.comboBox.currentText()=='Copy complete database':
             a = 'Copy complete database'
             sf = QFileDialog.getSaveFileName(self, a, QDir.homePath())
+            sf = sf[0]
 
-        self.lineEdit.setText(sf[0])
+        if not sf or sf =='':
+            self.lineEdit.setText('')
+        else:
+            self.lineEdit.setText(sf)
 
 
     def seler(self):
