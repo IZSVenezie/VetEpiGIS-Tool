@@ -197,6 +197,13 @@ class VetEpiGIStool:
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.copyselected)
         self.copyselected.triggered.connect(self.copySel)
 
+        self.recedit = QAction(
+            QIcon(':/plugins/VetEpiGIStool/images/pencil148.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Edit case data"),
+            self.iface.mainWindow())
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.recedit)
+        self.recedit.triggered.connect(self.featEdit)
+
         self.sep = QAction(self.iface.mainWindow())
         self.sep.setSeparator(True)
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.sep)
@@ -215,6 +222,13 @@ class VetEpiGIStool:
         self.poier.setCheckable(True)
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.poier)
         self.poier.triggered.connect(self.addPOI)
+
+        self.receditPOI = QAction(
+            QIcon(':/plugins/VetEpiGIStool/images/pencil148.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Edit POI data"),
+            self.iface.mainWindow())
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.receditPOI)
+        self.receditPOI.triggered.connect(self.featEditPOI)
 
         self.sep2 = QAction(self.iface.mainWindow())
         self.sep2.setSeparator(True)
@@ -253,19 +267,6 @@ class VetEpiGIStool:
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.dbtabs)
         self.dbtabs.triggered.connect(self.layersinDB)
 
-        self.recedit = QAction(
-            QIcon(':/plugins/VetEpiGIStool/images/pencil148.png'),
-            QCoreApplication.translate('VetEpiGIS-Tool', "Edit case data"),
-            self.iface.mainWindow())
-        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.recedit)
-        self.recedit.triggered.connect(self.featEdit)
-
-        self.receditPOI = QAction(
-            QIcon(':/plugins/VetEpiGIStool/images/pencil148.png'),
-            QCoreApplication.translate('VetEpiGIS-Tool', "Edit POI data"),
-            self.iface.mainWindow())
-        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.receditPOI)
-        self.receditPOI.triggered.connect(self.featEditPOI)
 
         # self.grouping = QAction(
         #     QIcon(':/plugins/VetEpiGIStool/images/filter11.png'),
