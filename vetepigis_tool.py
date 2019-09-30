@@ -43,7 +43,7 @@ from qgis.core import QgsField, QgsSpatialIndex, QgsMessageLog, QgsProject, \
 from qgis.gui import QgsMapTool, QgsMapToolEmitPoint, QgsMessageBar, QgsRubberBand
 
 from .plugin import buffer, caser, select, outbreaklayer, xabout, poi, dbtbs, dbmaint, xsettings, \
-    qvfuncs, xcoordtrafo, query, zone, export, xprint
+    qvfuncs, xcoordtrafo, query, zone, export, xprint, exportDB
 
 from .resources_rc import *
 # import lxml.etree as etree
@@ -283,10 +283,17 @@ class VetEpiGIStool:
 
         self.xprt = QAction(
             QIcon(':/plugins/VetEpiGIStool/images/arrows.png'),
-            QCoreApplication.translate('VetEpiGIS-Tool', "Export"),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Export selected layer"),
             self.iface.mainWindow())
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.xprt)
         self.xprt.triggered.connect(self.expLayer)
+
+        self.xprtDB = QAction(
+            QIcon(':/plugins/VetEpiGIStool/images/arrows.png'),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Copy complete database"),
+            self.iface.mainWindow())
+        self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.xprtDB)
+        self.xprtDB.triggered.connect(self.expDB)
 
         self.xprnt = QAction(
             QIcon(':/plugins/VetEpiGIStool/images/tool-1.png'),
@@ -379,7 +386,7 @@ class VetEpiGIStool:
 
         self.grp4 = QToolButton(self.toolbar)
         self.grp4.setPopupMode(QToolButton.MenuButtonPopup)
-        self.grp4.addActions([self.dbtabs, self.recedit, self.Saver, self.dbmaintain, self.xprt, self.xprnt])
+        self.grp4.addActions([self.dbtabs, self.recedit, self.Saver, self.dbmaintain, self.xprt, self.xprtDB, self.xprnt])
         self.grp4.setDefaultAction(self.xprnt)
         self.toolbar.addWidget(self.grp4)
 
@@ -527,92 +534,110 @@ class VetEpiGIStool:
                 QApplication.restoreOverrideCursor()
                 return
 
-            if dlg.comboBox.currentText()=='Copy complete database':
-                if dlg.lineEdit.text()!='':
-                    shutil.copy(self.dbuidpath, dlg.lineEdit.text())
-            else:
-                if dlg.comboBox.currentText()=='ESRI shape file':
-                    wrt = QgsVectorFileWriter.writeAsVectorFormat(lyr,
-                        os.path.join(dlg.lineEdit.text(), '%s.shp' % ln ),
-                        'system',
-                        QgsCoordinateReferenceSystem(prv.crs().srsid(), QgsCoordinateReferenceSystem.InternalCrsId),
-                        'ESRI Shapefile')
+            if dlg.comboBox.currentText()=='ESRI shape file':
+                #TODO: is it useful to check if the layer selected is a buffer, poi, outbreak...?
+                wrt = QgsVectorFileWriter.writeAsVectorFormat(lyr,
+                    os.path.join(dlg.lineEdit.text(), '%s.shp' % ln ),
+                    'system',
+                    QgsCoordinateReferenceSystem(prv.crs().srsid(), QgsCoordinateReferenceSystem.InternalCrsId),
+                    'ESRI Shapefile')
 
-                elif dlg.comboBox.currentText()=='Comma separated value (CSV)':
-                    lops = []
-                    if dlg.comboBox_2.currentText()==';':
-                        lops.append('SEPARATOR=SEMICOLON')
-                    elif dlg.comboBox_2.currentText()==',':
-                        lops.append('SEPARATOR=COMMA')
-                    elif dlg.comboBox_2.currentText()=='tab':
-                        lops.append('SEPARATOR=TAB')
+            elif dlg.comboBox.currentText()=='Comma separated value (CSV)':
+                lops = []
+                if dlg.comboBox_2.currentText()==';':
+                    lops.append('SEPARATOR=SEMICOLON')
+                elif dlg.comboBox_2.currentText()==',':
+                    lops.append('SEPARATOR=COMMA')
+                elif dlg.comboBox_2.currentText()=='tab':
+                    lops.append('SEPARATOR=TAB')
 
-                    if dlg.checkBox.isChecked():
-                        lops.append('GEOMETRY=AS_WKT')
+                if dlg.checkBox.isChecked():
+                    lops.append('GEOMETRY=AS_WKT')
 
-                    wrt = QgsVectorFileWriter.writeAsVectorFormat(lyr,
-                        os.path.join(dlg.lineEdit.text(), '%s.csv' % ln ),
-                        'system',
-                        QgsCoordinateReferenceSystem(prv.crs().srsid(), QgsCoordinateReferenceSystem.InternalCrsId),
-                        'CSV', layerOptions=lops)
+                wrt = QgsVectorFileWriter.writeAsVectorFormat(lyr,
+                    os.path.join(dlg.lineEdit.text(), '%s.csv' % ln ),
+                    'system',
+                    QgsCoordinateReferenceSystem(prv.crs().srsid(), QgsCoordinateReferenceSystem.InternalCrsId),
+                    'CSV', layerOptions=lops)
 
-                elif dlg.comboBox.currentText()=='SQLite database':
-                    lsta = []
-                    lstb = []
-                    for it in dlg.tableWidget.selectedItems():
-                        lsta.append(it.text())
-                        # self.iface.messageBar().pushMessage('Information', '%s' % it.text(), level=Qgis.Info)
+            elif dlg.comboBox.currentText()=='SQLite database':
+                lsta = []
+                lstb = []
+                for it in dlg.tableWidget.selectedItems():
+                    lsta.append(it.text())
+                    # self.iface.messageBar().pushMessage('Information', '%s' % it.text(), level=Qgis.Info)
 
-                    for it in dlg.tableWidget_2.selectedItems():
-                        lstb.append(str(it.text()))
+                for it in dlg.tableWidget_2.selectedItems():
+                    lstb.append(str(it.text()))
 
-                    uri = QgsDataSourceUri()
-                    uri.setDatabase(dlg.lineEdit.text())
-                    edb = QSqlDatabase.addDatabase('QSPATIALITE')
-                    edb.setDatabaseName(uri.database())
+                uri = QgsDataSourceUri()
+                uri.setDatabase(dlg.lineEdit.text())
+                edb = QSqlDatabase.addDatabase('QSPATIALITE')
+                edb.setDatabaseName(uri.database())
 
-                    lgt = lyr.geometryType()
-                    if lgt == 1:
-                        return
+                lgt = lyr.geometryType()
+                if lgt == 1:
+                    return
 
-                    ntlst = self.fieldCheck(nslst)
-                    sql = 'create table %s (' % ln
-                    for i in range(len(ntlst)):
-                        t = 'text'
-                        if tlst[i] == 2:
-                            t = 'numeric'
+                ntlst = self.fieldCheck(nslst)
+                sql = 'create table %s (' % ln
+                for i in range(len(ntlst)):
+                    t = 'text'
+                    if tlst[i] == 2:
+                        t = 'numeric'
 
-                        sql += '%s %s, ' % (ntlst[i], t)
+                    sql += '%s %s, ' % (ntlst[i], t)
 
-                    sql += ')'
-                    sql = sql.replace(', )', ')')
+                sql += ')'
+                sql = sql.replace(', )', ')')
 
-                    edb.open()
-                    q = edb.exec_(sql)
-                    if lgt == 0:
-                        sql = "SELECT AddGeometryColumn('%s', 'geom', 4326, 'POINT', 'XY')" % ln
-                    elif lgt == 2:
-                        sql = "SELECT AddGeometryColumn('%s', 'geom', 4326, 'MULTIPOLYGON', 'XY')" % ln
-                    q = edb.exec_(sql)
-                    edb.commit()
-                    edb.close()
+                edb.open()
+                q = edb.exec_(sql)
+                if lgt == 0:
+                    sql = "SELECT AddGeometryColumn('%s', 'geom', 4326, 'POINT', 'XY')" % ln
+                elif lgt == 2:
+                    sql = "SELECT AddGeometryColumn('%s', 'geom', 4326, 'MULTIPOLYGON', 'XY')" % ln
+                q = edb.exec_(sql)
+                edb.commit()
+                edb.close()
 
-                    uri.setDataSource('', ln, 'geom')
-                    vl = QgsVectorLayer(uri.uri(), ln, 'spatialite')
-                    vl.startEditing()
+                uri.setDataSource('', ln, 'geom')
+                vl = QgsVectorLayer(uri.uri(), ln, 'spatialite')
+                vl.startEditing()
 
-                    prv = lyr.dataProvider()
-                    feats = prv.getFeatures()
-                    feat = QgsFeature()
-                    while feats.nextFeature(feat):
-                        # self.iface.messageBar().pushMessage('Information', '%s %s' % (feat.attributes()[didx], feat.attributes()[yidx]), level=Qgis.Info)
-                        if (feat.attributes()[didx] in lsta) and (str(feat.attributes()[yidx]) in lstb):
-                            vl.addFeature(feat)
+                prv = lyr.dataProvider()
+                feats = prv.getFeatures()
+                feat = QgsFeature()
+                while feats.nextFeature(feat):
+                    # self.iface.messageBar().pushMessage('Information', '%s %s' % (feat.attributes()[didx], feat.attributes()[yidx]), level=Qgis.Info)
+                    if (feat.attributes()[didx] in lsta) and (str(feat.attributes()[yidx]) in lstb):
+                        vl.addFeature(feat)
 
-                    vl.commitChanges()
-                    vl.updateExtents()
+                vl.commitChanges()
+                vl.updateExtents()
 
             QApplication.restoreOverrideCursor()
+
+    def expDB(self):
+        self.grp4.setDefaultAction(self.xprtDB)
+        dlg = exportDB.Dialog()
+        x = (self.iface.mainWindow().x()+self.iface.mainWindow().width()/2)-dlg.width()/2
+        y = (self.iface.mainWindow().y()+self.iface.mainWindow().height()/2)-dlg.height()/2
+        dlg.move(x,y)
+        dlg.setWindowTitle('Copy complete database')
+        if dlg.exec_() == QDialog.Accepted:
+            QApplication.setOverrideCursor(Qt.WaitCursor)
+            if dlg.lineEdit_file.text()!='':
+                ret = shutil.copy(self.dbuidpath, dlg.lineEdit_file.text())
+                #TODO: check how better verify if the database is exported
+                if 'ret' in locals():
+                    self.iface.messageBar().pushMessage('Copy complete database', 'Database exported', level=Qgis.Info)
+                else:
+                    self.iface.messageBar().pushMessage('Copy complete database', 'Error whilw exporting database', level=Qgis.Warning)
+            else:
+                self.iface.messageBar().pushMessage('Copy complete database', 'Select the output path of sqlite database!', level=Qgis.Warning)
+
+        QApplication.restoreOverrideCursor()
 
 
     def sldLoader(self):

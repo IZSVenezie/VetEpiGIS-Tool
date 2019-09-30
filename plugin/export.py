@@ -40,7 +40,6 @@ class Dialog(QDialog, Ui_Dialog):
         self.comboBox.addItem('ESRI shape file')
         self.comboBox.addItem('Comma separated value (CSV)')
         self.comboBox.addItem('SQLite database')
-        self.comboBox.addItem('Copy complete database')
         # self.comboBox.addItem('INSPIRE')
         self.comboBox.currentIndexChanged.connect(self.seler)
 
@@ -68,10 +67,6 @@ class Dialog(QDialog, Ui_Dialog):
         elif self.comboBox.currentText()=='SQLite database':
             a = 'SQLite database'
             sf = QFileDialog.getOpenFileName(self, a, QDir.homePath())
-            sf = sf[0]
-        elif self.comboBox.currentText()=='Copy complete database':
-            a = 'Copy complete database'
-            sf = QFileDialog.getSaveFileName(self, a, QDir.homePath())
             sf = sf[0]
 
         if not sf or sf =='':
@@ -102,15 +97,3 @@ class Dialog(QDialog, Ui_Dialog):
             # self.comboBox_2.setEnabled(False)
             # self.checkBox.setEnabled(False)
             self.setWindowTitle('Export selected layer')
-        elif self.comboBox.currentText()=='Copy complete database':
-            # self.comboBox_2.setEnabled(False)
-            # self.checkBox.setEnabled(False)
-            self.tabWidget.setTabEnabled(0, False)
-            self.tabWidget.setTabEnabled(1, False)
-            self.setWindowTitle('Copy complete database')
-        # elif self.comboBox.currentText()=='INSPIRE':
-        #     self.comboBox_2.setEnabled(False)
-        #     self.checkBox.setEnabled(False)
-        #     self.buttonBox.setEnabled(False)
-
-
