@@ -66,7 +66,8 @@ class Dialog(QDialog, Ui_Dialog):
             # b = 'CSV files (*.csv)'
         elif self.comboBox.currentText()=='SQLite database':
             a = 'SQLite database'
-            sf = QFileDialog.getOpenFileName(self, a, QDir.homePath())
+            #TODO: check if there are other extension
+            sf = QFileDialog.getOpenFileName(self, a, QDir.homePath(),"SQlite (*.sqlite)")
             sf = sf[0]
 
         if not sf or sf =='':
