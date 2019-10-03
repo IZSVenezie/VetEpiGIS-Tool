@@ -298,7 +298,7 @@ class VetEpiGIStool:
 
         self.xprtDB = QAction(
             QIcon(':/plugins/VetEpiGIStool/images/arrows.png'),
-            QCoreApplication.translate('VetEpiGIS-Tool', "Copy complete database"),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Export complete database"),
             self.iface.mainWindow())
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.xprtDB)
         self.xprtDB.triggered.connect(self.expDB)
@@ -498,6 +498,9 @@ class VetEpiGIStool:
         dlg.setWindowTitle('Export selected layer')
 
         lyr = self.checklayer()
+        if lyr is None:
+            return
+
         ln = str(lyr.name()).lower()
         prv = lyr.dataProvider()
         didx = lyr.fields().indexFromName('disease')
@@ -522,67 +525,77 @@ class VetEpiGIStool:
             lst2 = sorted(set(lst2))
 
             for it in lst1:
-                dlg.tableWidget.insertRow(dlg.tableWidget.rowCount())
-                nr = dlg.tableWidget.rowCount() - 1
+                dlg.tableWidget_disease.insertRow(dlg.tableWidget_disease.rowCount())
+                nr = dlg.tableWidget_disease.rowCount() - 1
                 item = QTableWidgetItem(it)
-                dlg.tableWidget.setItem(nr, 0, item)
+                dlg.tableWidget_disease.setItem(nr, 0, item)
 
             for it in lst2:
-                dlg.tableWidget_2.insertRow(dlg.tableWidget_2.rowCount())
-                nr = dlg.tableWidget_2.rowCount() - 1
+                dlg.tableWidget_year.insertRow(dlg.tableWidget_year.rowCount())
+                nr = dlg.tableWidget_year.rowCount() - 1
                 item = QTableWidgetItem(str(it))
-                dlg.tableWidget_2.setItem(nr, 0, item)
+                dlg.tableWidget_year.setItem(nr, 0, item)
 
-
-            dlg.tableWidget.selectAll()
-            dlg.tableWidget_2.selectAll()
+            dlg.tableWidget_disease.selectAll()
+            dlg.tableWidget_year.selectAll()
 
         if dlg.exec_() == QDialog.Accepted:
             QApplication.setOverrideCursor(Qt.WaitCursor)
 
-            if dlg.lineEdit.text()=='':
+            if dlg.lineEdit_output.text()=='':
                 self.iface.messageBar().pushMessage('Export selected layer','Set the output path', level=Qgis.Warning)
                 QApplication.restoreOverrideCursor()
                 return
 
-            if dlg.comboBox.currentText()=='ESRI shape file':
+            if dlg.comboBox_format.currentText()=='ESRI shape file':
                 #TODO: is it useful to check if the layer selected is a buffer, poi, outbreak...?
                 wrt = QgsVectorFileWriter.writeAsVectorFormat(lyr,
-                    os.path.join(dlg.lineEdit.text(), '%s.shp' % ln ),
+                    os.path.join(dlg.lineEdit_output.text(), '%s.shp' % ln ),
                     'system',
                     QgsCoordinateReferenceSystem(prv.crs().srsid(), QgsCoordinateReferenceSystem.InternalCrsId),
                     'ESRI Shapefile')
 
-            elif dlg.comboBox.currentText()=='Comma separated value (CSV)':
+            elif dlg.comboBox_format.currentText()=='Comma separated value (CSV)':
                 lops = []
-                if dlg.comboBox_2.currentText()==';':
+                if dlg.comboBox_separator.currentText()==';':
                     lops.append('SEPARATOR=SEMICOLON')
-                elif dlg.comboBox_2.currentText()==',':
+                elif dlg.comboBox_separator.currentText()==',':
                     lops.append('SEPARATOR=COMMA')
-                elif dlg.comboBox_2.currentText()=='tab':
+                elif dlg.comboBox_separator.currentText()=='tab':
                     lops.append('SEPARATOR=TAB')
 
-                if dlg.checkBox.isChecked():
+                if dlg.checkBox_wkt.isChecked():
                     lops.append('GEOMETRY=AS_WKT')
 
                 wrt = QgsVectorFileWriter.writeAsVectorFormat(lyr,
-                    os.path.join(dlg.lineEdit.text(), '%s.csv' % ln ),
+                    os.path.join(dlg.lineEdit_output.text(), '%s.csv' % ln ),
                     'system',
                     QgsCoordinateReferenceSystem(prv.crs().srsid(), QgsCoordinateReferenceSystem.InternalCrsId),
                     'CSV', layerOptions=lops)
 
-            elif dlg.comboBox.currentText()=='SQLite database':
+            elif dlg.comboBox_format.currentText()=='SQLite database':
                 lsta = []
                 lstb = []
-                for it in dlg.tableWidget.selectedItems():
+                for it in dlg.tableWidget_disease.selectedItems():
                     lsta.append(it.text())
                     # self.iface.messageBar().pushMessage('Information', '%s' % it.text(), level=Qgis.Info)
 
-                for it in dlg.tableWidget_2.selectedItems():
+                for it in dlg.tableWidget_year.selectedItems():
                     lstb.append(str(it.text()))
 
+                outputDBName = dlg.lineEdit_output.text()
+                dbfold = os.path.join(self.plugin_dir, 'db')
+
+                #Ckeck if "create database" is checked
+                if dlg.checkBox_newdb.isChecked():
+
+                    dbpath = QFileInfo(outputDBName).absoluteFilePath()
+
+                    if not os.path.isfile(outputDBName):
+                        shutil.copy(os.path.join(dbfold, 'base.sqlite'), dbpath)
+
                 uri = QgsDataSourceUri()
-                uri.setDatabase(dlg.lineEdit.text())
+                uri.setDatabase(outputDBName)
                 edb = QSqlDatabase.addDatabase('QSPATIALITE')
                 edb.setDatabaseName(uri.database())
 
@@ -629,6 +642,7 @@ class VetEpiGIStool:
 
             QApplication.restoreOverrideCursor()
 
+
     def expDB(self):
         self.grp4.setDefaultAction(self.xprtDB)
         dlg = exportDB.Dialog()
@@ -644,7 +658,7 @@ class VetEpiGIStool:
                 if 'ret' in locals():
                     self.iface.messageBar().pushMessage('Export complete database', 'Database exported', level=Qgis.Info)
                 else:
-                    self.iface.messageBar().pushMessage('Export complete database', 'Error whilw exporting database', level=Qgis.Warning)
+                    self.iface.messageBar().pushMessage('Export complete database', 'Error exporting database', level=Qgis.Warning)
             else:
                 self.iface.messageBar().pushMessage('Export complete database', 'Select the output path of sqlite database!', level=Qgis.Warning)
 

@@ -37,64 +37,77 @@ class Dialog(QDialog, Ui_Dialog):
 
         self.setupUi(self)
 
-        self.comboBox.addItem('ESRI shape file')
-        self.comboBox.addItem('Comma separated value (CSV)')
-        self.comboBox.addItem('SQLite database')
+        self.comboBox_format.addItem('ESRI shape file')
+        self.comboBox_format.addItem('Comma separated value (CSV)')
+        self.comboBox_format.addItem('SQLite database')
         # self.comboBox.addItem('INSPIRE')
-        self.comboBox.currentIndexChanged.connect(self.seler)
+        self.comboBox_format.currentIndexChanged.connect(self.seler)
 
-        self.comboBox_2.addItem(';')
-        self.comboBox_2.addItem(',')
-        self.comboBox_2.addItem('tab')
+        self.comboBox_separator.addItem(';')
+        self.comboBox_separator.addItem(',')
+        self.comboBox_separator.addItem('tab')
 
         self.tabWidget.setTabEnabled(0, False)
         self.tabWidget.setTabEnabled(1, False)
 
         self.seler()
 
-        self.toolButton.clicked.connect(self.filer)
+        self.toolButton_fileDialog.clicked.connect(self.filer)
+        self.checkBox_selection.clicked.connect(self.selItems)
 
 
     def filer(self):
-        if self.comboBox.currentText()=='ESRI shape file':
+        if self.comboBox_format.currentText()=='ESRI shape file':
             a = 'Save as ESRI shape file'
             sf = QFileDialog.getExistingDirectory(self, a, QDir.homePath())
             # b = 'ESRI shape files (*.shp)'
-        elif self.comboBox.currentText()=='Comma separated value (CSV)':
+        elif self.comboBox_format.currentText()=='Comma separated value (CSV)':
             a = 'Save as comma separated value (CSV)'
             sf = QFileDialog.getExistingDirectory(self, a, QDir.homePath())
             # b = 'CSV files (*.csv)'
-        elif self.comboBox.currentText()=='SQLite database':
+        elif self.comboBox_format.currentText()=='SQLite database':
             a = 'SQLite database'
-            #TODO: check if there are other extension
-            sf = QFileDialog.getOpenFileName(self, a, QDir.homePath(),"SQlite (*.sqlite)")
-            sf = sf[0]
+            if self.checkBox_newdb.isChecked():
+               sf = QFileDialog.getSaveFileName(self, 'Create ' + a, QDir.homePath(),"SQlite (*.sqlite)")
+               sf = sf[0]
+            else:
+                #TODO: check if there are other extension
+                sf = QFileDialog.getOpenFileName(self, a, QDir.homePath(),"SQlite (*.sqlite)")
+                sf = sf[0]
 
         if not sf or sf =='':
-            self.lineEdit.setText('')
+            self.lineEdit_output.setText('')
         else:
-            self.lineEdit.setText(sf)
+            self.lineEdit_output.setText(sf)
 
 
     def seler(self):
         # self.buttonBox.setEnabled(True)
-        if self.comboBox.currentText()=='ESRI shape file':
+        if self.comboBox_format.currentText()=='ESRI shape file':
             self.tabWidget.setTabEnabled(0, False)
             self.tabWidget.setTabEnabled(1, False)
             # self.comboBox_2.setEnabled(False)
             # self.checkBox.setEnabled(False)
             self.setWindowTitle('Export selected layer')
-        elif self.comboBox.currentText()=='Comma separated value (CSV)':
+        elif self.comboBox_format.currentText()=='Comma separated value (CSV)':
             # self.comboBox_2.setEnabled(True)
             # self.checkBox.setEnabled(True)
             self.tabWidget.setTabEnabled(0, True)
             self.tabWidget.setTabEnabled(1, False)
             self.tabWidget.setCurrentIndex(0)
             self.setWindowTitle('Export selected layer')
-        if self.comboBox.currentText()=='SQLite database':
+        if self.comboBox_format.currentText()=='SQLite database':
             self.tabWidget.setTabEnabled(0, False)
             self.tabWidget.setTabEnabled(1, True)
             self.tabWidget.setCurrentIndex(1)
             # self.comboBox_2.setEnabled(False)
             # self.checkBox.setEnabled(False)
             self.setWindowTitle('Export selected layer')
+
+    def selItems(self):
+        if self.checkBox_selection.isChecked():
+            self.tableWidget_disease.selectAll()
+            self.tableWidget_year.selectAll()
+        else:
+            self.tableWidget_disease.clearSelection()
+            self.tableWidget_year.clearSelection()
