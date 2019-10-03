@@ -19,7 +19,7 @@ class Ui_DockWidget(object):
         self.gridLayout.setObjectName("gridLayout")
 
         self.label_name = QtWidgets.QLabel(DockWidget)
-        self.label_name.setText('DB_name')
+        self.label_name.setText('DB name')
         self.label_name.setObjectName('label_name')
         self.label_name.setScaledContents(False)
         self.label_name.setMaximumWidth(50)
@@ -32,7 +32,7 @@ class Ui_DockWidget(object):
         self.gridLayout.addWidget(self.label_db_name,0,1,1,1)
 
         self.label_path = QtWidgets.QLabel(DockWidget)
-        self.label_path.setText('DB_path:')
+        self.label_path.setText('DB path:')
         self.label_path.setObjectName('label_path')
         self.label_path.setScaledContents(False)
         self.label_path.setMaximumWidth(50)
