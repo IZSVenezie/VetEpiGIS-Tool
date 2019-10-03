@@ -7,6 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import *
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -125,6 +126,7 @@ class Ui_Dialog(object):
 
         self.label_output = QtWidgets.QLabel(Dialog)
         self.label_output.setObjectName("label_output")
+        self.label_output.setText("Output file:")
         self.gridLayout_2.addWidget(self.label_output, 2, 0, 1, 1)
 
         self.lineEdit_output = QtWidgets.QLineEdit(Dialog)
@@ -135,6 +137,7 @@ class Ui_Dialog(object):
 
         self.toolButton_fileDialog = QtWidgets.QToolButton(Dialog)
         self.toolButton_fileDialog.setObjectName("toolButton_fileDialog")
+        #self.toolButton_fileDialog.setIcon(QIcon(':/plugins/VetEpiGIStool/images/folder_16.png'))
         self.gridLayout_2.addWidget(self.toolButton_fileDialog, 2, 2, 1, 1)
 
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
@@ -152,8 +155,8 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
-        self.label_format.setText(_translate("Dialog", "Output:"))
-        self.label_output.setText(_translate("Dialog", "File:"))
+        self.label_format.setText(_translate("Dialog", "Format:"))
+        self.label_output.setText(_translate("Dialog", "Outut file:"))
         self.toolButton_fileDialog.setText(_translate("Dialog", "..."))
         self.label_separator.setText(_translate("Dialog", "Separator:"))
         self.checkBox_wkt.setText(_translate("Dialog", "Export geometry as WKT"))
@@ -167,4 +170,5 @@ class Ui_Dialog(object):
         item = self.tableWidget_year.horizontalHeaderItem(0)
         item.setText(_translate("Dialog", "Year"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_sqlite), _translate("Dialog", "SQLite filter"))
-
+        self.checkBox_selection.setText(_translate("Dialog", 'Select all elements'))
+        self.checkBox_newdb.setText(_translate("Dialog", 'Create new database'))

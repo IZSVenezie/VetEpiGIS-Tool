@@ -550,7 +550,7 @@ class VetEpiGIStool:
             if dlg.comboBox_format.currentText()=='ESRI shape file':
                 #TODO: is it useful to check if the layer selected is a buffer, poi, outbreak...?
                 wrt = QgsVectorFileWriter.writeAsVectorFormat(lyr,
-                    os.path.join(dlg.lineEdit_output.text(), '%s.shp' % ln ),
+                    dlg.lineEdit_output.text(),
                     'system',
                     QgsCoordinateReferenceSystem(prv.crs().srsid(), QgsCoordinateReferenceSystem.InternalCrsId),
                     'ESRI Shapefile')
@@ -568,7 +568,7 @@ class VetEpiGIStool:
                     lops.append('GEOMETRY=AS_WKT')
 
                 wrt = QgsVectorFileWriter.writeAsVectorFormat(lyr,
-                    os.path.join(dlg.lineEdit_output.text(), '%s.csv' % ln ),
+                    dlg.lineEdit_output.text(),
                     'system',
                     QgsCoordinateReferenceSystem(prv.crs().srsid(), QgsCoordinateReferenceSystem.InternalCrsId),
                     'CSV', layerOptions=lops)

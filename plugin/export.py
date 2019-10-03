@@ -59,22 +59,21 @@ class Dialog(QDialog, Ui_Dialog):
     def filer(self):
         if self.comboBox_format.currentText()=='ESRI shape file':
             a = 'Save as ESRI shape file'
-            sf = QFileDialog.getExistingDirectory(self, a, QDir.homePath())
+            sf = QFileDialog.getSaveFileName(self, a, QDir.homePath(), "ESRI shape file (*.shp)")
             # b = 'ESRI shape files (*.shp)'
         elif self.comboBox_format.currentText()=='Comma separated value (CSV)':
             a = 'Save as comma separated value (CSV)'
-            sf = QFileDialog.getExistingDirectory(self, a, QDir.homePath())
+            sf = QFileDialog.getSaveFileName(self, a, QDir.homePath(), "Comma Separated Value (*.csv)")
             # b = 'CSV files (*.csv)'
         elif self.comboBox_format.currentText()=='SQLite database':
             a = 'SQLite database'
             if self.checkBox_newdb.isChecked():
                sf = QFileDialog.getSaveFileName(self, 'Create ' + a, QDir.homePath(),"SQlite (*.sqlite)")
-               sf = sf[0]
             else:
                 #TODO: check if there are other extension
                 sf = QFileDialog.getOpenFileName(self, a, QDir.homePath(),"SQlite (*.sqlite)")
-                sf = sf[0]
 
+        sf = sf[0]
         if not sf or sf =='':
             self.lineEdit_output.setText('')
         else:
