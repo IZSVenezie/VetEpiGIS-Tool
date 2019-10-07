@@ -32,28 +32,35 @@ from .outbreaklayer_dialog import Ui_Dialog
 class Dialog(QDialog, Ui_Dialog):
     def __init__(self):
         """Constructor for the dialog.
-        
+
         """
-        
-        QDialog.__init__(self)                               
-                        
+
+        QDialog.__init__(self)
+
         self.setupUi(self)
 
         # self.model = QSqlQueryModel()
         self.tablst = []
         re = QRegExp('[a-z0-9\_]+')
         val = QRegExpValidator(re)
-        self.lineEdit.setValidator(val)
 
+        self.lineEdit.setValidator(val)
         self.lineEdit.textChanged.connect(self.nameCtrl)
         # self.lineEdit.editingFinished.connect(self.nameCtrl)
 
 
     def nameCtrl(self):
+
         if self.lineEdit.text() in self.tablst:
             self.buttonBox.setEnabled(False)
         else:
-            self.buttonBox.setEnabled(True)
+            if ' ' not in self.lineEdit.text():
+                self.buttonBox.setEnabled(True)
+            else:
+                self.buttonBox.setEnabled(False)
+
+
+
 
         # n = 0
         # for row in range(0, self.model.rowCount()):

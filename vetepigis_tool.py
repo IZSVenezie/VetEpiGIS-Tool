@@ -1210,6 +1210,8 @@ class VetEpiGIStool:
         dlg.lineEdit.setText(ln)
         dlg.tablst = self.tablst
         dlg.nameCtrl()
+        self.iface.messageBar().pushMessage('Information', "Layer name must not be already exists in the database and the name must not contains withespace", level=Qgis.Info)
+
         if dlg.exec_() == QDialog.Accepted:
             QApplication.setOverrideCursor(Qt.WaitCursor)
 
