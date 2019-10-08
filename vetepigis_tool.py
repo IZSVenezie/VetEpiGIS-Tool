@@ -840,8 +840,8 @@ class VetEpiGIStool:
 
     def dbMaintain(self):
         self.grp4.setDefaultAction(self.dbmaintain)
-        self.iface.messageBar().pushMessage('Information', 'For editing the VetEpiGIS database all layers are removed from the workspace.', level=Qgis.Info)
-        QgsProject.instance().removeAllMapLayers()
+        self.iface.messageBar().pushMessage('Information', 'Layers modified by the tool will be removed from the workspace.', level=Qgis.Info)
+        #QgsProject.instance().removeAllMapLayers()
 
         dlg = dbmaint.Dialog()
         x = (self.iface.mainWindow().x()+self.iface.mainWindow().width()/2)-dlg.width()/2
@@ -849,15 +849,15 @@ class VetEpiGIStool:
         dlg.move(x,y)
 
         dlg.setWindowTitle('Database maintenance')
-        dlg.toolButton.setIcon(QIcon(':/plugins/VetEpiGIStool/images/verify8.png'))
+        dlg.toolButton_translation.setIcon(QIcon(':/plugins/VetEpiGIStool/images/verify8.png'))
 
-        dlg.comboBox.addItem('')
-        dlg.comboBox.addItem('Diseases')
-        dlg.comboBox.addItem('POI types')
-        dlg.comboBox.addItem('Species')
+        dlg.comboBox_lists.addItem('')
+        dlg.comboBox_lists.addItem('Diseases')
+        dlg.comboBox_lists.addItem('POI types')
+        dlg.comboBox_lists.addItem('Species')
 
-        dlg.comboBox_2.addItem('en')
-        dlg.comboBox_2.addItem('it')
+        dlg.comboBox_translation.addItem('en')
+        dlg.comboBox_translation.addItem('it')
 
         dlg.db = self.db
         dlg.loadLayers()
@@ -888,6 +888,36 @@ class VetEpiGIStool:
             self.lstpt.append(query.value(0))
 
         self.db.close()
+
+
+    def dbMaintain2(self):
+        self.grp4.setDefaultAction(self.dbmaintain)
+        self.iface.messageBar().pushMessage('Information', 'Layers modified by the tool will be removed from the workspace.', level=Qgis.Info)
+        #QgsProject.instance().removeAllMapLayers()
+
+        dlg = dbmaint2.Dialog()
+        x = (self.iface.mainWindow().x()+self.iface.mainWindow().width()/2)-dlg.width()/2
+        y = (self.iface.mainWindow().y()+self.iface.mainWindow().height()/2)-dlg.height()/2
+        dlg.move(x,y)
+
+        dlg.setWindowTitle('Database maintenance')
+        dlg.toolButton_translation.setIcon(QIcon(':/plugins/VetEpiGIStool/images/verify8.png'))
+
+        dlg.comboBox_lists.addItem('')
+        dlg.comboBox_lists.addItem('Diseases')
+        dlg.comboBox_lists.addItem('POI types')
+        dlg.comboBox_lists.addItem('Species')
+
+        dlg.comboBox_translation.addItem('en')
+        dlg.comboBox_translation.addItem('it')
+
+        dlg.db = self.db
+        dlg.loadLayers()
+
+        if dlg.exec_() == QDialog.Accepted:
+            self.loadModel()
+
+        self.iface.messageBar().clearWidgets()
 
 
     def featEdit(self):
