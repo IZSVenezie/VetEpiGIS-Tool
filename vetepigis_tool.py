@@ -1114,9 +1114,32 @@ class VetEpiGIStool:
         if self.dbtabs.isChecked():
             self.iface.addDockWidget( Qt.LeftDockWidgetArea, self.dockw)
             self.dockw.setWindowTitle('VetEpiGIS layers')
+            css="""
+                QDockWidget::title {
+                    text-align: left; /* align the text to the left */
+                    font-size:12px;
+                    font-weight:bold;
+                    background-color: lightgray;
+                    padding-left: 5px;
+                }
+                """
+            self.dockw.setStyleSheet(css)
+
+            dbname = os.path.basename(self.dbuidpath)
+            dbpath = os.path.dirname(self.dbuidpath)
+            #https://stackoverflow.com/questions/32831754/how-to-embed-url-link-to-qlabel
+            pathlink = '<a href="' + dbpath + '"> Click here to open the folder </a>'
+            self.dockw.label_db_name.setText(dbname)
+            self.dockw.label_db_path.setText(pathlink)
+            self.dockw.label_db_path.mousePressEvent = self.clickLink
+            self.dockw.label_db_path.setOpenExternalLinks(True)
+
         elif not self.dbtabs.isChecked():
             self.iface.removeDockWidget(self.dockw)
 
+    # https://stackoverflow.com/questions/23859613/pyqt-how-to-open-a-directory-folder
+    def clickLink(self,eve):
+        os.startfile(os.path.dirname(self.dbuidpath))
 
     def layersinDBLoad(self):
         QApplication.setOverrideCursor(Qt.WaitCursor)
