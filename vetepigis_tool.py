@@ -298,7 +298,7 @@ class VetEpiGIStool:
 
         self.xprtDB = QAction(
             QIcon(':/plugins/VetEpiGIStool/images/arrows.png'),
-            QCoreApplication.translate('VetEpiGIS-Tool', "Copy complete database"),
+            QCoreApplication.translate('VetEpiGIS-Tool', "Export complete database"),
             self.iface.mainWindow())
         self.iface.addPluginToMenu('&VetEpiGIS-Tool', self.xprtDB)
         self.xprtDB.triggered.connect(self.expDB)
@@ -498,6 +498,9 @@ class VetEpiGIStool:
         dlg.setWindowTitle('Export selected layer')
 
         lyr = self.checklayer()
+        if lyr is None:
+            return
+
         ln = str(lyr.name()).lower()
         prv = lyr.dataProvider()
         didx = lyr.fields().indexFromName('disease')
@@ -522,67 +525,77 @@ class VetEpiGIStool:
             lst2 = sorted(set(lst2))
 
             for it in lst1:
-                dlg.tableWidget.insertRow(dlg.tableWidget.rowCount())
-                nr = dlg.tableWidget.rowCount() - 1
+                dlg.tableWidget_disease.insertRow(dlg.tableWidget_disease.rowCount())
+                nr = dlg.tableWidget_disease.rowCount() - 1
                 item = QTableWidgetItem(it)
-                dlg.tableWidget.setItem(nr, 0, item)
+                dlg.tableWidget_disease.setItem(nr, 0, item)
 
             for it in lst2:
-                dlg.tableWidget_2.insertRow(dlg.tableWidget_2.rowCount())
-                nr = dlg.tableWidget_2.rowCount() - 1
+                dlg.tableWidget_year.insertRow(dlg.tableWidget_year.rowCount())
+                nr = dlg.tableWidget_year.rowCount() - 1
                 item = QTableWidgetItem(str(it))
-                dlg.tableWidget_2.setItem(nr, 0, item)
+                dlg.tableWidget_year.setItem(nr, 0, item)
 
-
-            dlg.tableWidget.selectAll()
-            dlg.tableWidget_2.selectAll()
+            dlg.tableWidget_disease.selectAll()
+            dlg.tableWidget_year.selectAll()
 
         if dlg.exec_() == QDialog.Accepted:
             QApplication.setOverrideCursor(Qt.WaitCursor)
 
-            if dlg.lineEdit.text()=='':
+            if dlg.lineEdit_output.text()=='':
                 self.iface.messageBar().pushMessage('Export selected layer','Set the output path', level=Qgis.Warning)
                 QApplication.restoreOverrideCursor()
                 return
 
-            if dlg.comboBox.currentText()=='ESRI shape file':
+            if dlg.comboBox_format.currentText()=='ESRI shape file':
                 #TODO: is it useful to check if the layer selected is a buffer, poi, outbreak...?
                 wrt = QgsVectorFileWriter.writeAsVectorFormat(lyr,
-                    os.path.join(dlg.lineEdit.text(), '%s.shp' % ln ),
+                    dlg.lineEdit_output.text(),
                     'system',
                     QgsCoordinateReferenceSystem(prv.crs().srsid(), QgsCoordinateReferenceSystem.InternalCrsId),
                     'ESRI Shapefile')
 
-            elif dlg.comboBox.currentText()=='Comma separated value (CSV)':
+            elif dlg.comboBox_format.currentText()=='Comma separated value (CSV)':
                 lops = []
-                if dlg.comboBox_2.currentText()==';':
+                if dlg.comboBox_separator.currentText()==';':
                     lops.append('SEPARATOR=SEMICOLON')
-                elif dlg.comboBox_2.currentText()==',':
+                elif dlg.comboBox_separator.currentText()==',':
                     lops.append('SEPARATOR=COMMA')
-                elif dlg.comboBox_2.currentText()=='tab':
+                elif dlg.comboBox_separator.currentText()=='tab':
                     lops.append('SEPARATOR=TAB')
 
-                if dlg.checkBox.isChecked():
+                if dlg.checkBox_wkt.isChecked():
                     lops.append('GEOMETRY=AS_WKT')
 
                 wrt = QgsVectorFileWriter.writeAsVectorFormat(lyr,
-                    os.path.join(dlg.lineEdit.text(), '%s.csv' % ln ),
+                    dlg.lineEdit_output.text(),
                     'system',
                     QgsCoordinateReferenceSystem(prv.crs().srsid(), QgsCoordinateReferenceSystem.InternalCrsId),
                     'CSV', layerOptions=lops)
 
-            elif dlg.comboBox.currentText()=='SQLite database':
+            elif dlg.comboBox_format.currentText()=='SQLite database':
                 lsta = []
                 lstb = []
-                for it in dlg.tableWidget.selectedItems():
+                for it in dlg.tableWidget_disease.selectedItems():
                     lsta.append(it.text())
                     # self.iface.messageBar().pushMessage('Information', '%s' % it.text(), level=Qgis.Info)
 
-                for it in dlg.tableWidget_2.selectedItems():
+                for it in dlg.tableWidget_year.selectedItems():
                     lstb.append(str(it.text()))
 
+                outputDBName = dlg.lineEdit_output.text()
+                dbfold = os.path.join(self.plugin_dir, 'db')
+
+                #Ckeck if "create database" is checked
+                if dlg.checkBox_newdb.isChecked():
+
+                    dbpath = QFileInfo(outputDBName).absoluteFilePath()
+
+                    if not os.path.isfile(outputDBName):
+                        shutil.copy(os.path.join(dbfold, 'base.sqlite'), dbpath)
+
                 uri = QgsDataSourceUri()
-                uri.setDatabase(dlg.lineEdit.text())
+                uri.setDatabase(outputDBName)
                 edb = QSqlDatabase.addDatabase('QSPATIALITE')
                 edb.setDatabaseName(uri.database())
 
@@ -629,6 +642,7 @@ class VetEpiGIStool:
 
             QApplication.restoreOverrideCursor()
 
+
     def expDB(self):
         self.grp4.setDefaultAction(self.xprtDB)
         dlg = exportDB.Dialog()
@@ -644,7 +658,7 @@ class VetEpiGIStool:
                 if 'ret' in locals():
                     self.iface.messageBar().pushMessage('Export complete database', 'Database exported', level=Qgis.Info)
                 else:
-                    self.iface.messageBar().pushMessage('Export complete database', 'Error whilw exporting database', level=Qgis.Warning)
+                    self.iface.messageBar().pushMessage('Export complete database', 'Error exporting database', level=Qgis.Warning)
             else:
                 self.iface.messageBar().pushMessage('Export complete database', 'Select the output path of sqlite database!', level=Qgis.Warning)
 
@@ -826,8 +840,8 @@ class VetEpiGIStool:
 
     def dbMaintain(self):
         self.grp4.setDefaultAction(self.dbmaintain)
-        self.iface.messageBar().pushMessage('Information', 'For editing the VetEpiGIS database all layers are removed from the workspace.', level=Qgis.Info)
-        QgsProject.instance().removeAllMapLayers()
+        self.iface.messageBar().pushMessage('Information', 'Layers modified by the tool will be removed from the workspace.', level=Qgis.Info)
+        #QgsProject.instance().removeAllMapLayers()
 
         dlg = dbmaint.Dialog()
         x = (self.iface.mainWindow().x()+self.iface.mainWindow().width()/2)-dlg.width()/2
@@ -835,15 +849,15 @@ class VetEpiGIStool:
         dlg.move(x,y)
 
         dlg.setWindowTitle('Database maintenance')
-        dlg.toolButton.setIcon(QIcon(':/plugins/VetEpiGIStool/images/verify8.png'))
+        dlg.toolButton_translation.setIcon(QIcon(':/plugins/VetEpiGIStool/images/verify8.png'))
 
-        dlg.comboBox.addItem('')
-        dlg.comboBox.addItem('Diseases')
-        dlg.comboBox.addItem('POI types')
-        dlg.comboBox.addItem('Species')
+        dlg.comboBox_lists.addItem('')
+        dlg.comboBox_lists.addItem('Diseases')
+        dlg.comboBox_lists.addItem('POI types')
+        dlg.comboBox_lists.addItem('Species')
 
-        dlg.comboBox_2.addItem('en')
-        dlg.comboBox_2.addItem('it')
+        dlg.comboBox_translation.addItem('en')
+        dlg.comboBox_translation.addItem('it')
 
         dlg.db = self.db
         dlg.loadLayers()
@@ -874,6 +888,36 @@ class VetEpiGIStool:
             self.lstpt.append(query.value(0))
 
         self.db.close()
+
+
+    def dbMaintain2(self):
+        self.grp4.setDefaultAction(self.dbmaintain)
+        self.iface.messageBar().pushMessage('Information', 'Layers modified by the tool will be removed from the workspace.', level=Qgis.Info)
+        #QgsProject.instance().removeAllMapLayers()
+
+        dlg = dbmaint2.Dialog()
+        x = (self.iface.mainWindow().x()+self.iface.mainWindow().width()/2)-dlg.width()/2
+        y = (self.iface.mainWindow().y()+self.iface.mainWindow().height()/2)-dlg.height()/2
+        dlg.move(x,y)
+
+        dlg.setWindowTitle('Database maintenance')
+        dlg.toolButton_translation.setIcon(QIcon(':/plugins/VetEpiGIStool/images/verify8.png'))
+
+        dlg.comboBox_lists.addItem('')
+        dlg.comboBox_lists.addItem('Diseases')
+        dlg.comboBox_lists.addItem('POI types')
+        dlg.comboBox_lists.addItem('Species')
+
+        dlg.comboBox_translation.addItem('en')
+        dlg.comboBox_translation.addItem('it')
+
+        dlg.db = self.db
+        dlg.loadLayers()
+
+        if dlg.exec_() == QDialog.Accepted:
+            self.loadModel()
+
+        self.iface.messageBar().clearWidgets()
 
 
     def featEdit(self):
@@ -1114,9 +1158,32 @@ class VetEpiGIStool:
         if self.dbtabs.isChecked():
             self.iface.addDockWidget( Qt.LeftDockWidgetArea, self.dockw)
             self.dockw.setWindowTitle('VetEpiGIS layers')
+            css="""
+                QDockWidget::title {
+                    text-align: left; /* align the text to the left */
+                    font-size:12px;
+                    font-weight:bold;
+                    background-color: lightgray;
+                    padding-left: 5px;
+                }
+                """
+            self.dockw.setStyleSheet(css)
+
+            dbname = os.path.basename(self.dbuidpath)
+            dbpath = os.path.dirname(self.dbuidpath)
+            #https://stackoverflow.com/questions/32831754/how-to-embed-url-link-to-qlabel
+            pathlink = '<a href="' + dbpath + '"> Click here to open the folder </a>'
+            self.dockw.label_db_name.setText(dbname)
+            self.dockw.label_db_path.setText(pathlink)
+            self.dockw.label_db_path.mousePressEvent = self.clickLink
+            self.dockw.label_db_path.setOpenExternalLinks(True)
+
         elif not self.dbtabs.isChecked():
             self.iface.removeDockWidget(self.dockw)
 
+    # https://stackoverflow.com/questions/23859613/pyqt-how-to-open-a-directory-folder
+    def clickLink(self,eve):
+        os.startfile(os.path.dirname(self.dbuidpath))
 
     def layersinDBLoad(self):
         QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -1143,6 +1210,8 @@ class VetEpiGIStool:
         dlg.lineEdit.setText(ln)
         dlg.tablst = self.tablst
         dlg.nameCtrl()
+        self.iface.messageBar().pushMessage('Information', "Layer name must not be already exists in the database and the name must not contains withespace", level=Qgis.Info)
+
         if dlg.exec_() == QDialog.Accepted:
             QApplication.setOverrideCursor(Qt.WaitCursor)
 

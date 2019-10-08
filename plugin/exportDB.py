@@ -40,7 +40,7 @@ class Dialog(QDialog, Ui_Dialog):
 
 
     def filer(self):
-        sf = QFileDialog.getSaveFileName(self, 'Copy complete database', QDir.homePath(),"SQlite (*.sqlite)")
+        sf = QFileDialog.getSaveFileName(self, 'Export complete database', QDir.homePath(),"SQlite (*.sqlite)")
         sf = sf[0]
 
         if not sf or sf =='':
