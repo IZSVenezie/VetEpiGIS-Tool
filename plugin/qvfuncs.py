@@ -2,7 +2,7 @@
 """
 /***************************************************************************
  VetEpiGIS-Tool
-   A QGIS plugin 
+   A QGIS plugin
    Spatial functions for vet epidemiology
                               -------------------
         begin                : 2015-11-10
@@ -39,12 +39,20 @@ class VetEpiGISFuncs:
         """Constructor for the class.
 
         """
-    def hashIDer(self, most):
+    #deprecated, when more features are create they have the same timestamp and
+    #are not possibile to differentiate the hrid
+    # def hashIDer(self, most):
+    #     mac = '_'.join(("%012X" % get_mac())[i:i+2] for i in range(0, 12, 2))
+    #     uid = '%s %s' % (mac, most.toString('dd/MM/yyyy hh:mm:ss.z'))
+    #     hrid = hashlib.sha256(uid.encode('utf-8')).hexdigest()
+    #     return hrid
+
+
+    def hashIDer(self, most, counter):
         mac = '_'.join(("%012X" % get_mac())[i:i+2] for i in range(0, 12, 2))
-        uid = '%s %s' % (mac, most.toString('dd/MM/yyyy hh:mm:ss.z'))
+        uid = '%s %s %d' % (mac, most.toString('dd/MM/yyyy hh:mm:ss.z'), counter)
         hrid = hashlib.sha256(uid.encode('utf-8')).hexdigest()
         return hrid
-
 
     def outattrPrep(self, dlg, lyr):
         feat = QgsFeature()
@@ -77,7 +85,7 @@ class VetEpiGISFuncs:
         feat.setAttribute(feat.fieldNameIndex('confirmation'), self.dateCheck(dlg.dateEdit_2.date()))
         feat.setAttribute(feat.fieldNameIndex('expiration'), self.dateCheck(dlg.dateEdit_3.date()))
         feat.setAttribute(feat.fieldNameIndex('notes'), dlg.textEdit.toPlainText())
-        feat.setAttribute(feat.fieldNameIndex('hrid'), self.hashIDer(most))
+        feat.setAttribute(feat.fieldNameIndex('hrid'), self.hashIDer(most,0))
         feat.setAttribute(feat.fieldNameIndex('timestamp'), most.toString('dd/MM/yyyy hh:mm:ss'))
         return feat
 

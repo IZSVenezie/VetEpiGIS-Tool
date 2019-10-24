@@ -890,34 +890,34 @@ class VetEpiGIStool:
         self.db.close()
 
 
-    def dbMaintain2(self):
-        self.grp4.setDefaultAction(self.dbmaintain)
-        self.iface.messageBar().pushMessage('Information', 'Layers modified by the tool will be removed from the workspace.', level=Qgis.Info)
-        #QgsProject.instance().removeAllMapLayers()
+    # def dbMaintain2(self):
+    #     self.grp4.setDefaultAction(self.dbmaintain)
+    #     self.iface.messageBar().pushMessage('Information', 'Layers modified by the tool will be removed from the workspace.', level=Qgis.Info)
+    #     #QgsProject.instance().removeAllMapLayers()
 
-        dlg = dbmaint2.Dialog()
-        x = (self.iface.mainWindow().x()+self.iface.mainWindow().width()/2)-dlg.width()/2
-        y = (self.iface.mainWindow().y()+self.iface.mainWindow().height()/2)-dlg.height()/2
-        dlg.move(x,y)
+    #     dlg = dbmaint2.Dialog()
+    #     x = (self.iface.mainWindow().x()+self.iface.mainWindow().width()/2)-dlg.width()/2
+    #     y = (self.iface.mainWindow().y()+self.iface.mainWindow().height()/2)-dlg.height()/2
+    #     dlg.move(x,y)
 
-        dlg.setWindowTitle('Database maintenance')
-        dlg.toolButton_translation.setIcon(QIcon(':/plugins/VetEpiGIStool/images/verify8.png'))
+    #     dlg.setWindowTitle('Database maintenance')
+    #     dlg.toolButton_translation.setIcon(QIcon(':/plugins/VetEpiGIStool/images/verify8.png'))
 
-        dlg.comboBox_lists.addItem('')
-        dlg.comboBox_lists.addItem('Diseases')
-        dlg.comboBox_lists.addItem('POI types')
-        dlg.comboBox_lists.addItem('Species')
+    #     dlg.comboBox_lists.addItem('')
+    #     dlg.comboBox_lists.addItem('Diseases')
+    #     dlg.comboBox_lists.addItem('POI types')
+    #     dlg.comboBox_lists.addItem('Species')
 
-        dlg.comboBox_translation.addItem('en')
-        dlg.comboBox_translation.addItem('it')
+    #     dlg.comboBox_translation.addItem('en')
+    #     dlg.comboBox_translation.addItem('it')
 
-        dlg.db = self.db
-        dlg.loadLayers()
+    #     dlg.db = self.db
+    #     dlg.loadLayers()
 
-        if dlg.exec_() == QDialog.Accepted:
-            self.loadModel()
+    #     if dlg.exec_() == QDialog.Accepted:
+    #         self.loadModel()
 
-        self.iface.messageBar().clearWidgets()
+    #     self.iface.messageBar().clearWidgets()
 
 
     def featEdit(self):
@@ -1735,6 +1735,7 @@ class VetEpiGIStool:
         dlg.lineEdit.setText('zone_selected_by_')
 
         if dlg.exec_() == QDialog.Accepted:
+            count_hrid = 1
             if dlg.comboBox.currentText()==dlg.comboBox_2.currentText():
                 return False
 
@@ -1857,15 +1858,19 @@ class VetEpiGIStool:
                             attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
                             attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
                             attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
-                            most = QDateTime.currentDateTimeUtc()
-                            attrs[19] = self.funcs.hashIDer(most)
 
                             if geom.intersects(geomB):
                                 gwkt = ogr.CreateGeometryFromWkt(geomB.asWkt())
                                 if gwkt.GetGeometryName() == 'MULTIPOLYGON':
                                     for geom_part in gwkt:
+                                        most = QDateTime.currentDateTimeUtc()
+                                        attrs[19] = self.funcs.hashIDer(most, count_hrid)
+                                        count_hrid += 1
                                         vl.addFeature(self.fromMultiPolygonToSinglePolygon(geom_part,attrs))
                                 else:
+                                    most = QDateTime.currentDateTimeUtc()
+                                    attrs[19] = self.funcs.hashIDer(most, count_hrid)
+                                    count_hrid += 1
                                     vl.addFeature(self.fromMultiPolygonToSinglePolygon(gwkt_tmp,attrs))
                 else:
                     feats = l1.selectedFeatures()
@@ -1884,15 +1889,20 @@ class VetEpiGIStool:
                             attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
                             attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
                             attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
-                            most = QDateTime.currentDateTimeUtc()
-                            attrs[19] = self.funcs.hashIDer(most)
+
 
                             if geom.intersects(geomB):
                                 gwkt = ogr.CreateGeometryFromWkt(geomB.asWkt())
                                 if gwkt.GetGeometryName() == 'MULTIPOLYGON':
                                     for geom_part in gwkt:
+                                        most = QDateTime.currentDateTimeUtc()
+                                        attrs[19] = self.funcs.hashIDer(most, count_hrid)
+                                        count_hrid += 1
                                         vl.addFeature(self.fromMultiPolygonToSinglePolygon(geom_part,attrs))
                                 else:
+                                    most = QDateTime.currentDateTimeUtc()
+                                    attrs[19] = self.funcs.hashIDer(most, count_hrid)
+                                    count_hrid += 1
                                     vl.addFeature(self.fromMultiPolygonToSinglePolygon(gwkt_tmp,attrs))
 
                         #self.iface.emit(SIGNAL('featureProcessed()'))
@@ -1916,8 +1926,6 @@ class VetEpiGIStool:
                             attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
                             attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
                             attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
-                            most = QDateTime.currentDateTimeUtc()
-                            attrs[19] = self.funcs.hashIDer(most)
 
                             if geom.intersects(geomB):
                                 g1wkt = ogr.CreateGeometryFromWkt(geom.asWkt())
@@ -1925,8 +1933,14 @@ class VetEpiGIStool:
                                 g_tmp = g1wkt.Intersection(g2wkt)
                                 if g_tmp.GetGeometryName() == 'MULTIPOLYGON':
                                     for geom_part in g_tmp:
+                                        most = QDateTime.currentDateTimeUtc()
+                                        attrs[19] = self.funcs.hashIDer(most, count_hrid)
+                                        count_hrid += 1
                                         vl.addFeature(self.fromMultiPolygonToSinglePolygon(geom_part,attrs))
                                 else:
+                                    most = QDateTime.currentDateTimeUtc()
+                                    attrs[19] = self.funcs.hashIDer(most, count_hrid)
+                                    count_hrid += 1
                                     vl.addFeature(self.fromMultiPolygonToSinglePolygon(g_tmp,attrs))
                 else:
                     feats = l1.selectedFeatures()
@@ -1945,8 +1959,6 @@ class VetEpiGIStool:
                             attrs[0] = feat.attributes()[feat.fieldNameIndex('localid')]
                             attrs[1] = feat.attributes()[feat.fieldNameIndex('code')]
                             attrs[2] = feat.attributes()[feat.fieldNameIndex('disease')]
-                            most = QDateTime.currentDateTimeUtc()
-                            attrs[19] = self.funcs.hashIDer(most)
 
                             if geom.intersects(geomB):
                                 g1wkt = ogr.CreateGeometryFromWkt(geom.asWkt())
@@ -1955,8 +1967,14 @@ class VetEpiGIStool:
 
                                 if g_tmp.GetGeometryName() == 'MULTIPOLYGON':
                                     for geom_part in g_tmp:
+                                        most = QDateTime.currentDateTimeUtc()
+                                        attrs[19] = self.funcs.hashIDer(most, count_hrid)
+                                        count_hrid += 1
                                         vl.addFeature(self.fromMultiPolygonToSinglePolygon(geom_part,attrs))
                                 else:
+                                    most = QDateTime.currentDateTimeUtc()
+                                    attrs[19] = self.funcs.hashIDer(most, count_hrid)
+                                    count_hrid += 1
                                     vl.addFeature(self.fromMultiPolygonToSinglePolygon(g_tmp,attrs))
 
                         #self.iface.emit(SIGNAL('featureProcessed()'))
@@ -2015,7 +2033,7 @@ class VetEpiGIStool:
 
         if dlg.exec_() == QDialog.Accepted:
             QApplication.setOverrideCursor(Qt.WaitCursor)
-
+            count_hrid = 1
             lyr = self.iface.mapCanvas().currentLayer()
             provider = lyr.dataProvider()
 
@@ -2079,7 +2097,8 @@ class VetEpiGIStool:
                     # del attrs[-16]
                     bf.setAttributes(attrs)
                     most = QDateTime.currentDateTimeUtc()
-                    bf.setAttribute(feat.fieldNameIndex('hrid'), self.funcs.hashIDer(most))
+                    bf.setAttribute(feat.fieldNameIndex('hrid'), self.funcs.hashIDer(most, count_hrid))
+                    count_hrid += 1
                     vl.addFeature(bf)
             else:
                 feats = lyp.selectedFeatures()
@@ -2111,7 +2130,8 @@ class VetEpiGIStool:
                     # del attrs[-16]
                     bf.setAttributes(attrs)
                     most = QDateTime.currentDateTimeUtc()
-                    bf.setAttribute(feat.fieldNameIndex('hrid'), self.funcs.hashIDer(most))
+                    bf.setAttribute(feat.fieldNameIndex('hrid'), self.funcs.hashIDer(most, count_hrid))
+                    count_hrid += 1
                     vl.addFeature(bf)
                     #self.iface.emit(SIGNAL('featureProcessed()'))
 
@@ -2400,7 +2420,7 @@ class casePicker(QgsMapTool):
                 feat.setAttribute(feat.fieldNameIndex('localid'), self.dlg.lineEdit_3.text())
                 feat.setAttribute(feat.fieldNameIndex('code'), self.dlg.lineEdit_5.text())
                 feat.setAttribute(feat.fieldNameIndex('activity'), self.dlg.comboBox.currentText())
-                feat.setAttribute(feat.fieldNameIndex('hrid'), self.funcs.hashIDer(QDateTime.currentDateTimeUtc()))
+                feat.setAttribute(feat.fieldNameIndex('hrid'), self.funcs.hashIDer(QDateTime.currentDateTimeUtc(),0))
 
                 pnt = QgsGeometry.fromPointXY(QgsPointXY(x,y))
                 feat.setGeometry(pnt)
