@@ -139,10 +139,17 @@ class VetEpiGIStool:
 
         self.polyn = 0
 
-        self.obrflds = ['gid', 'localid', 'code', 'largescale', 'disease', 'animalno', 'species', 'production', 'year', 'status', 'suspect', 'confirmation', 'expiration', 'notes', 'hrid', 'timestamp', 'grouping']
+        self.obrflds = ['gid', 'localid', 'code', 'largescale', 'disease', 'animalno', 'species', 'production', \
+            'year', 'status', 'suspect', 'confirmation', 'expiration', 'notes', 'hrid', 'timestamp', 'grouping']
         self.poiflds = self.obrflds[0:3]
         self.poiflds.append('activity')
         self.poiflds.append('hrid')
+        self.bufflds = self.obrflds[0:-1]
+        self.zonflds = ['localid', 'code', 'disease', 'zonetype', 'subpopulation', 'validity_start', \
+                'validity_end', 'legal_framework', 'competent_authority', 'biosecurity_measures', \
+                'control_of_vectors', 'control_of_wildlife_reservoir', 'modified_stamping_out', \
+                'movement_restriction', 'stamping_out', 'surveillance', 'vaccination', \
+                'other_measure', 'related', 'hrid', 'timestamp']
 
         self.funcs = qvfuncs.VetEpiGISFuncs()
 
@@ -516,28 +523,58 @@ class VetEpiGIStool:
         lst2 = []
         feats = prv.getFeatures()
         feat = QgsFeature()
-        if nslst==self.obrflds:
-            while feats.nextFeature(feat):
-                lst1.append(feat.attributes()[didx])
-                lst2.append(feat.attributes()[yidx])
+        #TODO: manage if layer is not a Norbert one
+        if (nslst==self.obrflds or nslst==self.bufflds or nslst == self.zonflds or nslst == self.poiflds):
+            #outbreak and/or buffer layers
+            if (nslst==self.obrflds or nslst==self.bufflds):
+                while feats.nextFeature(feat):
+                    lst1.append(feat.attributes()[didx])
+                    lst2.append(feat.attributes()[yidx])
+
+            #zone layer
+            elif nslst == self.zonflds:
+                yidx = lyr.fields().indexFromName('zonetype')
+                while feats.nextFeature(feat):
+                    lst1.append(feat.attributes()[didx])
+                    lst2.append(feat.attributes()[yidx])
+                #change the label of the table
+                dlg.label_year.setText('Zone type:')
+                item = dlg.tableWidget_right.horizontalHeaderItem(0)
+                item.setText('Zone type')
+
+            #poi layer
+            elif nslst == self.poiflds:
+                didx = lyr.fields().indexFromName('activity')
+                while feats.nextFeature(feat):
+                    lst1.append(feat.attributes()[didx])
+
+                #change the label of the table
+                dlg.label_disease.setText('Activity:')
+                dlg.label_year.setText('')
+                dlg.label_year.setEnabled(False)
+                dlg.tableWidget_right.setVisible(False)
+                item = dlg.tableWidget_left.horizontalHeaderItem(0)
+                item.setText('Activity')
 
             lst1 = sorted(set(lst1))
-            lst2 = sorted(set(lst2))
 
             for it in lst1:
-                dlg.tableWidget_disease.insertRow(dlg.tableWidget_disease.rowCount())
-                nr = dlg.tableWidget_disease.rowCount() - 1
+                dlg.tableWidget_left.insertRow(dlg.tableWidget_left.rowCount())
+                nr = dlg.tableWidget_left.rowCount() - 1
                 item = QTableWidgetItem(it)
-                dlg.tableWidget_disease.setItem(nr, 0, item)
+                dlg.tableWidget_left.setItem(nr, 0, item)
 
-            for it in lst2:
-                dlg.tableWidget_year.insertRow(dlg.tableWidget_year.rowCount())
-                nr = dlg.tableWidget_year.rowCount() - 1
-                item = QTableWidgetItem(str(it))
-                dlg.tableWidget_year.setItem(nr, 0, item)
+            dlg.tableWidget_left.selectAll()
 
-            dlg.tableWidget_disease.selectAll()
-            dlg.tableWidget_year.selectAll()
+            if lst2:
+                lst2 = sorted(set(lst2))
+                for it in lst2:
+                    dlg.tableWidget_right.insertRow(dlg.tableWidget_right.rowCount())
+                    nr = dlg.tableWidget_right.rowCount() - 1
+                    item = QTableWidgetItem(str(it))
+                    dlg.tableWidget_right.setItem(nr, 0, item)
+
+                dlg.tableWidget_right.selectAll()
 
         if dlg.exec_() == QDialog.Accepted:
             QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -576,11 +613,11 @@ class VetEpiGIStool:
             elif dlg.comboBox_format.currentText()=='SQLite database':
                 lsta = []
                 lstb = []
-                for it in dlg.tableWidget_disease.selectedItems():
+                for it in dlg.tableWidget_left.selectedItems():
                     lsta.append(it.text())
                     # self.iface.messageBar().pushMessage('Information', '%s' % it.text(), level=Qgis.Info)
 
-                for it in dlg.tableWidget_year.selectedItems():
+                for it in dlg.tableWidget_right.selectedItems():
                     lstb.append(str(it.text()))
 
                 outputDBName = dlg.lineEdit_output.text()
@@ -634,8 +671,12 @@ class VetEpiGIStool:
                 feat = QgsFeature()
                 while feats.nextFeature(feat):
                     # self.iface.messageBar().pushMessage('Information', '%s %s' % (feat.attributes()[didx], feat.attributes()[yidx]), level=Qgis.Info)
-                    if (feat.attributes()[didx] in lsta) and (str(feat.attributes()[yidx]) in lstb):
-                        vl.addFeature(feat)
+                    if lstb:
+                        if (feat.attributes()[didx] in lsta) and (str(feat.attributes()[yidx]) in lstb):
+                            vl.addFeature(feat)
+                    else:
+                        if (feat.attributes()[didx] in lsta):
+                            vl.addFeature(feat)
 
                 vl.commitChanges()
                 vl.updateExtents()
