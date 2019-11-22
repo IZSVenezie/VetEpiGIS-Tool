@@ -2367,7 +2367,7 @@ class casePicker(QgsMapTool):
         self.funcs = qvfuncs.VetEpiGISFuncs()
 
         self.canvas.setCursor(mutato)
-
+        self.iface.currentLayerChanged.connect(self.setPanTool)
 
     def canvasPressEvent(self, event):
         pass
@@ -2376,6 +2376,8 @@ class casePicker(QgsMapTool):
     def canvasMoveEvent(self, event):
         pass
 
+    def setPanTool(self):
+        self.iface.actionPan().trigger()
 
     def canvasReleaseEvent(self, event):
         x = event.pos().x()
@@ -2407,8 +2409,8 @@ class casePicker(QgsMapTool):
             self.addFeat(x, y)
             self.tt.setChecked(False)
 
-            QApplication.restoreOverrideCursor()
-
+        QApplication.restoreOverrideCursor()
+        self.iface.actionPan().trigger()
 
     def addFeat(self, x, y):
         self.lyr.startEditing()
@@ -2520,7 +2522,6 @@ class polyDraw(QgsMapTool):
 
         self.canvas.setCursor(mutato)
 
-
     def canvasReleaseEvent(self, event):
         if (event.button()==Qt.LeftButton):
             if self.pn == 0:
@@ -2558,11 +2559,11 @@ class polyDraw(QgsMapTool):
                     self.addFeat(geom)
                     self.tt.setChecked(False)
                     QApplication.restoreOverrideCursor()
+                    self.iface.actionPan().trigger()
 
                 self.pn = 0
                 self.pts = []
                 self.rb.reset()
-
 
     def addFeat(self, geom):
         self.lyr = self.iface.activeLayer()
