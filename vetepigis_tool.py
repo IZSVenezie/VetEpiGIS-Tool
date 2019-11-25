@@ -1824,7 +1824,7 @@ class VetEpiGIStool:
 
             vl.startEditing()
 
-            zonetype = dlg.comboBox_3.currentText() #mandatory no check the value
+            zonetype = dlg.comboBox_3.currentText()
 
             subpopulation = ''
             rn = dlg.tableWidget.rowCount()
@@ -1836,19 +1836,19 @@ class VetEpiGIStool:
 
             validity_start = self.funcs.dateCheck(dlg.dateEdit.date())
             validity_end = self.funcs.dateCheck(dlg.dateEdit_2.date())
-            legal_framework = self.checkValue(dlg.lineEdit_2.text())
-            competent_authority = self.checkValue(dlg.lineEdit_3.text())
-            biosecurity_measures = self.checkValue(dlg.comboBox_5.currentText())
-            control_of_vectors = self.checkValue(dlg.comboBox_6.currentText())
-            control_of_wildlife_reservoir = self.checkValue(dlg.comboBox_7.currentText())
-            modified_stamping_out = self.checkValue(dlg.comboBox_8.currentText())
-            movement_restriction = self.checkValue(dlg.comboBox_9.currentText())
-            stamping_out = self.checkValue(dlg.comboBox_10.currentText())
-            surveillance = self.checkValue(dlg.comboBox_11.currentText())
-            vaccination = self.checkValue(dlg.comboBox_12.currentText())
-            other_measure = self.checkValue(dlg.lineEdit_4.text())
+            legal_framework = dlg.lineEdit_2.text()
+            competent_authority = dlg.lineEdit_3.text()
+            biosecurity_measures = dlg.comboBox_5.currentText()
+            control_of_vectors = dlg.comboBox_6.currentText()
+            control_of_wildlife_reservoir = dlg.comboBox_7.currentText()
+            modified_stamping_out = dlg.comboBox_8.currentText()
+            movement_restriction = dlg.comboBox_9.currentText()
+            stamping_out = dlg.comboBox_10.currentText()
+            surveillance = dlg.comboBox_11.currentText()
+            vaccination = dlg.comboBox_12.currentText()
+            other_measure = dlg.lineEdit_4.text()
             timestamp = QDateTime.currentDateTimeUtc().toString('dd/MM/yyyy hh:mm:ss')
-            related = self.checkValue(dlg.comboBox_13.currentText())
+            related = dlg.comboBox_13.currentText()
 
             attrs = []
             attrs.append('')
@@ -2350,11 +2350,6 @@ class VetEpiGIStool:
             self.iface.mapCanvas().setMapTool(self.origtool)
             self.iface.actionPan().trigger()
 
-    def checkValue(self, value):
-        v = value
-        if not value:
-            v = None
-        return v
 
 class casePicker(QgsMapTool):
     # http://gis.stackexchange.com/questions/45094/how-to-programatically-check-for-a-mouse-click-in-qgis
@@ -2372,7 +2367,7 @@ class casePicker(QgsMapTool):
         self.funcs = qvfuncs.VetEpiGISFuncs()
 
         self.canvas.setCursor(mutato)
-        self.iface.currentLayerChanged.connect(self.setPanTool)
+
 
     def canvasPressEvent(self, event):
         pass
@@ -2381,8 +2376,6 @@ class casePicker(QgsMapTool):
     def canvasMoveEvent(self, event):
         pass
 
-    def setPanTool(self):
-        self.iface.actionPan().trigger()
 
     def canvasReleaseEvent(self, event):
         x = event.pos().x()
@@ -2414,8 +2407,8 @@ class casePicker(QgsMapTool):
             self.addFeat(x, y)
             self.tt.setChecked(False)
 
-        QApplication.restoreOverrideCursor()
-        self.iface.actionPan().trigger()
+            QApplication.restoreOverrideCursor()
+
 
     def addFeat(self, x, y):
         self.lyr.startEditing()
@@ -2465,9 +2458,9 @@ class casePicker(QgsMapTool):
             if self.lyr.geometryType() == QgsWkbTypes.PointGeometry:
                 flds = self.lyr.dataProvider().fields()
                 feat.setFields(flds, True)
-                feat.setAttribute(feat.fieldNameIndex('localid'), self.checkValue(self.dlg.lineEdit_3.text())) #mandatory
-                feat.setAttribute(feat.fieldNameIndex('code'), self.checkValue(self.dlg.lineEdit_5.text())) #mandatory
-                feat.setAttribute(feat.fieldNameIndex('activity'), self.dlg.comboBox.currentText()) #mandatory
+                feat.setAttribute(feat.fieldNameIndex('localid'), self.dlg.lineEdit_3.text())
+                feat.setAttribute(feat.fieldNameIndex('code'), self.dlg.lineEdit_5.text())
+                feat.setAttribute(feat.fieldNameIndex('activity'), self.dlg.comboBox.currentText())
                 feat.setAttribute(feat.fieldNameIndex('hrid'), self.funcs.hashIDer(QDateTime.currentDateTimeUtc(),0))
 
                 pnt = QgsGeometry.fromPointXY(QgsPointXY(x,y))
@@ -2479,6 +2472,7 @@ class casePicker(QgsMapTool):
         self.lyr.addFeature(feat)
         self.lyr.commitChanges()
         self.lyr.updateExtents()
+
 
     def activate(self):
         pass
@@ -2526,6 +2520,7 @@ class polyDraw(QgsMapTool):
 
         self.canvas.setCursor(mutato)
 
+
     def canvasReleaseEvent(self, event):
         if (event.button()==Qt.LeftButton):
             if self.pn == 0:
@@ -2563,11 +2558,11 @@ class polyDraw(QgsMapTool):
                     self.addFeat(geom)
                     self.tt.setChecked(False)
                     QApplication.restoreOverrideCursor()
-                    self.iface.actionPan().trigger()
 
                 self.pn = 0
                 self.pts = []
                 self.rb.reset()
+
 
     def addFeat(self, geom):
         self.lyr = self.iface.activeLayer()
