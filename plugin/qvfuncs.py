@@ -72,19 +72,19 @@ class VetEpiGISFuncs:
 
         flds = lyr.dataProvider().fields()
         feat.setFields(flds, True)
-        feat.setAttribute(feat.fieldNameIndex('localid'), dlg.lineEdit_3.text())
-        feat.setAttribute(feat.fieldNameIndex('code'), dlg.lineEdit_5.text())
+        feat.setAttribute(feat.fieldNameIndex('localid'), dlg.lineEdit_3.text()) #mandatory
+        feat.setAttribute(feat.fieldNameIndex('code'), dlg.lineEdit_5.text()) #mandatory
         feat.setAttribute(feat.fieldNameIndex('largescale'), dlg.comboBox_4.currentText())
-        feat.setAttribute(feat.fieldNameIndex('disease'), dlg.comboBox_2.currentText())
-        feat.setAttribute(feat.fieldNameIndex('animalno'), dlg.lineEdit_6.text())
-        feat.setAttribute(feat.fieldNameIndex('species'), species)
-        feat.setAttribute(feat.fieldNameIndex('production'), production)
-        feat.setAttribute(feat.fieldNameIndex('year'), dlg.lineEdit_4.text())
-        feat.setAttribute(feat.fieldNameIndex('status'), dlg.comboBox_3.currentText())
+        feat.setAttribute(feat.fieldNameIndex('disease'), dlg.comboBox_2.currentText()) #mandatory
+        feat.setAttribute(feat.fieldNameIndex('animalno'), self.checkIntValue(dlg.lineEdit_6.text())) #mandatory
+        feat.setAttribute(feat.fieldNameIndex('species'), species) #mandatory
+        feat.setAttribute(feat.fieldNameIndex('production'), self.checkValue(production))
+        feat.setAttribute(feat.fieldNameIndex('year'), self.checkIntValue(dlg.lineEdit_4.text()))#mandatory
+        feat.setAttribute(feat.fieldNameIndex('status'), dlg.comboBox_3.currentText())#mandatory
         feat.setAttribute(feat.fieldNameIndex('suspect'), self.dateCheck(dlg.dateEdit.date()))
         feat.setAttribute(feat.fieldNameIndex('confirmation'), self.dateCheck(dlg.dateEdit_2.date()))
         feat.setAttribute(feat.fieldNameIndex('expiration'), self.dateCheck(dlg.dateEdit_3.date()))
-        feat.setAttribute(feat.fieldNameIndex('notes'), dlg.textEdit.toPlainText())
+        feat.setAttribute(feat.fieldNameIndex('notes'), self.checkValue(dlg.textEdit.toPlainText()))
         feat.setAttribute(feat.fieldNameIndex('hrid'), self.hashIDer(most,0))
         feat.setAttribute(feat.fieldNameIndex('timestamp'), most.toString('dd/MM/yyyy hh:mm:ss'))
         return feat
@@ -93,9 +93,21 @@ class VetEpiGISFuncs:
     def dateCheck(self, qd):
         dt = qd.toString('dd/MM/yyyy')
         if dt=='01/01/2000':
-            dt = ''
+            dt = None
         return  dt
 
+    def checkIntValue(self, value):
+        try:
+            v = int(value)
+        except ValueError:
+            v = None
+        return v
+
+    def checkValue(self, value):
+        v = value
+        if not value:
+            v = None
+        return v
 
     def dec2deg(self, coord):
         dec = float(coord)
