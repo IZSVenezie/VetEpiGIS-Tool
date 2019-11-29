@@ -523,9 +523,11 @@ class VetEpiGIStool:
         lst2 = []
         feats = prv.getFeatures()
         feat = QgsFeature()
+        vetLayer = False
         #TODO: manage if layer is not a Norbert one
         if (nslst==self.obrflds or nslst==self.bufflds or nslst == self.zonflds or nslst == self.poiflds):
             #outbreak and/or buffer layers
+            vetLayer = True
             if (nslst==self.obrflds or nslst==self.bufflds):
                 while feats.nextFeature(feat):
                     lst1.append(feat.attributes()[didx])
@@ -575,6 +577,11 @@ class VetEpiGIStool:
                     dlg.tableWidget_right.setItem(nr, 0, item)
 
                 dlg.tableWidget_right.selectAll()
+        else:
+            dlg.tableWidget_left.setEnabled(False)
+            dlg.tableWidget_right.setEnabled(False)
+            dlg.label_year.setEnabled(False)
+            dlg.label_disease.setEnabled(False)
 
         if dlg.exec_() == QDialog.Accepted:
             QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -613,12 +620,13 @@ class VetEpiGIStool:
             elif dlg.comboBox_format.currentText()=='SQLite database':
                 lsta = []
                 lstb = []
-                for it in dlg.tableWidget_left.selectedItems():
-                    lsta.append(it.text())
-                    # self.iface.messageBar().pushMessage('Information', '%s' % it.text(), level=Qgis.Info)
+                if vetLayer:
+                    for it in dlg.tableWidget_left.selectedItems():
+                        lsta.append(it.text())
+                        # self.iface.messageBar().pushMessage('Information', '%s' % it.text(), level=Qgis.Info)
 
-                for it in dlg.tableWidget_right.selectedItems():
-                    lstb.append(str(it.text()))
+                    for it in dlg.tableWidget_right.selectedItems():
+                        lstb.append(str(it.text()))
 
                 outputDBName = dlg.lineEdit_output.text()
                 dbfold = os.path.join(self.plugin_dir, 'db')
@@ -636,9 +644,10 @@ class VetEpiGIStool:
                 edb = QSqlDatabase.addDatabase('QSPATIALITE')
                 edb.setDatabaseName(uri.database())
 
+                #Export also linestring
                 lgt = lyr.geometryType()
-                if lgt == 1:
-                    return
+                #if lgt == 1:
+                #    return
 
                 ntlst = self.fieldCheck(nslst)
                 sql = 'create table %s (' % ln
@@ -654,10 +663,17 @@ class VetEpiGIStool:
 
                 edb.open()
                 q = edb.exec_(sql)
-                if lgt == 0:
-                    sql = "SELECT AddGeometryColumn('%s', 'geom', 4326, 'POINT', 'XY')" % ln
-                elif lgt == 2:
-                    sql = "SELECT AddGeometryColumn('%s', 'geom', 4326, 'MULTIPOLYGON', 'XY')" % ln
+
+                prv = lyr.dataProvider()
+                if vetLayer:
+                    if lgt == 0:
+                        sql = "SELECT AddGeometryColumn('%s', 'geom', 4326, 'POINT', 'XY')" % ln
+                    elif lgt == 2:
+                        sql = "SELECT AddGeometryColumn('%s', 'geom', 4326, 'MULTIPOLYGON', 'XY')" % ln
+                else:
+                    #Add any kind of geometry type
+                    sql = self.addGeometryColumnSL(lyr,ln)
+
                 q = edb.exec_(sql)
                 edb.commit()
                 edb.close()
@@ -666,17 +682,19 @@ class VetEpiGIStool:
                 vl = QgsVectorLayer(uri.uri(), ln, 'spatialite')
                 vl.startEditing()
 
-                prv = lyr.dataProvider()
                 feats = prv.getFeatures()
                 feat = QgsFeature()
+                #TODO: manage the SRS
                 while feats.nextFeature(feat):
                     # self.iface.messageBar().pushMessage('Information', '%s %s' % (feat.attributes()[didx], feat.attributes()[yidx]), level=Qgis.Info)
                     if lstb:
                         if (feat.attributes()[didx] in lsta) and (str(feat.attributes()[yidx]) in lstb):
                             vl.addFeature(feat)
-                    else:
+                    elif lsta:
                         if (feat.attributes()[didx] in lsta):
                             vl.addFeature(feat)
+                    else:
+                        vl.addFeature(feat)
 
                 vl.commitChanges()
                 vl.updateExtents()
@@ -2349,6 +2367,47 @@ class VetEpiGIStool:
             self.iface.mapCanvas().setCursor(self.prevcur)
             self.iface.mapCanvas().setMapTool(self.origtool)
             self.iface.actionPan().trigger()
+
+
+
+    def addGeometryColumnSL(self, lyr, lyr_name):
+        """
+        Function that allows to create a sql query for SpatiaLite database and
+        add geometry column for different type of input layer.
+
+        Input:
+            lyr: QgsVectorLayer input layer
+            lyr_name: String with the name of the layer
+        """
+        crs_in = lyr.sourceCrs()
+        crs_epsg = crs_in.postgisSrid()
+
+        f_type = ''
+        lgt = lyr.geometryType()
+        if lgt == 0:
+            f_type = 'POINT'
+        elif lgt == 1:
+            f_type = 'LINESTRING'
+        elif lgt == 2:
+            f_type = 'POLYGON'
+
+        #TODO: linestring or multistring, polygon or multipoligon, 2D or 3D
+
+        l_type = QgsWkbTypes.isMultiType(lyr.wkbType())
+        if l_type:
+            f_type = 'MULTI' + f_type
+
+        dimension = 'XY'
+        if QgsWkbTypes.hasZ(lyr.wkbType()):
+            dimension = dimension + 'Z'
+
+        #sql = "SELECT AddGeometryColumn('%s', 'geom', %d, 'POINT', 'XY')" % (ln, crs_epsg)
+        sql = "SELECT AddGeometryColumn('%s', 'geom', %d, '%s', '%s')" % (lyr_name, crs_epsg,f_type,dimension)
+
+        return sql
+
+
+
 
 
 class casePicker(QgsMapTool):

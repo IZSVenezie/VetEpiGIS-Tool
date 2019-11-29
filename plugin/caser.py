@@ -34,14 +34,14 @@ from .xcoordtrafo import Dialog as xtrafodial
 from .qvfuncs import VetEpiGISFuncs as VetEpiGISFuncs
 
 
-class Dialog(QDialog, Ui_Dialog):         
+class Dialog(QDialog, Ui_Dialog):
     def __init__(self):
         """Constructor for the dialog.
-        
+
         """
 
-        QDialog.__init__(self)                               
-                        
+        QDialog.__init__(self)
+
         self.setupUi(self)
 
         self.btnsave = self.buttonBox.button(QDialogButtonBox.Save)
