@@ -515,6 +515,7 @@ class VetEpiGIStool:
         nslst = []
         tlst = []
         flds = lyr.dataProvider().fields()
+        plugin_title = 'Export selected layer'
         for fld in flds:
             nslst.append(fld.name())
             tlst.append(fld.type())
@@ -582,6 +583,8 @@ class VetEpiGIStool:
             dlg.tableWidget_right.setEnabled(False)
             dlg.label_year.setEnabled(False)
             dlg.label_disease.setEnabled(False)
+            dlg.checkBox_selection.setChecked(False)
+            dlg.checkBox_selection.setEnabled(False)
 
         if dlg.exec_() == QDialog.Accepted:
             QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -700,6 +703,7 @@ class VetEpiGIStool:
                 vl.updateExtents()
 
             QApplication.restoreOverrideCursor()
+            self.iface.messageBar().pushMessage(plugin_title, 'Layer exported.', level=Qgis.Info)
 
 
     def expDB(self):
@@ -2392,16 +2396,17 @@ class VetEpiGIStool:
             f_type = 'POLYGON'
 
         #TODO: linestring or multistring, polygon or multipoligon, 2D or 3D
+        l_type = QgsWkbTypes.isMultiType(lyr.getGeometry(0).wkbType())
 
-        l_type = QgsWkbTypes.isMultiType(lyr.wkbType())
         if l_type:
             f_type = 'MULTI' + f_type
 
         dimension = 'XY'
         if QgsWkbTypes.hasZ(lyr.wkbType()):
             dimension = dimension + 'Z'
+        if QgsWkbTypes.hasM(lyr.wkbType()):
+            dimension = dimension + 'M'
 
-        #sql = "SELECT AddGeometryColumn('%s', 'geom', %d, 'POINT', 'XY')" % (ln, crs_epsg)
         sql = "SELECT AddGeometryColumn('%s', 'geom', %d, '%s', '%s')" % (lyr_name, crs_epsg,f_type,dimension)
 
         return sql
