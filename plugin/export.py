@@ -105,8 +105,8 @@ class Dialog(QDialog, Ui_Dialog):
 
     def selItems(self):
         if self.checkBox_selection.isChecked():
-            self.tableWidget_disease.selectAll()
-            self.tableWidget_year.selectAll()
+            self.tableWidget_left.selectAll()
+            self.tableWidget_right.selectAll()
         else:
-            self.tableWidget_disease.clearSelection()
-            self.tableWidget_year.clearSelection()
+            self.tableWidget_left.clearSelection()
+            self.tableWidget_right.clearSelection()
