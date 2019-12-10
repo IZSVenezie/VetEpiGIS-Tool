@@ -498,11 +498,12 @@ class VetEpiGIStool:
 
     def expLayer(self):
         self.grp4.setDefaultAction(self.xprt)
+        plugin_title = 'Export selected layer'
         dlg = export.Dialog()
         x = (self.iface.mainWindow().x()+self.iface.mainWindow().width()/2)-dlg.width()/2
         y = (self.iface.mainWindow().y()+self.iface.mainWindow().height()/2)-dlg.height()/2
         dlg.move(x,y)
-        dlg.setWindowTitle('Export selected layer')
+        dlg.setWindowTitle(plugin_title)
 
         lyr = self.checklayer()
         if lyr is None:
@@ -515,7 +516,6 @@ class VetEpiGIStool:
         nslst = []
         tlst = []
         flds = lyr.dataProvider().fields()
-        plugin_title = 'Export selected layer'
         for fld in flds:
             nslst.append(fld.name())
             tlst.append(fld.type())
@@ -524,8 +524,7 @@ class VetEpiGIStool:
         lst2 = []
         feats = prv.getFeatures()
         feat = QgsFeature()
-        vetLayer = False
-        #TODO: manage if layer is not a Norbert one
+        vetLayer = False #check if it is a layer of vetepigis tool
         if (nslst==self.obrflds or nslst==self.bufflds or nslst == self.zonflds or nslst == self.poiflds):
             #outbreak and/or buffer layers
             vetLayer = True
@@ -623,6 +622,7 @@ class VetEpiGIStool:
             elif dlg.comboBox_format.currentText()=='SQLite database':
                 lsta = []
                 lstb = []
+                existing_layer = 'False'
                 if vetLayer:
                     for it in dlg.tableWidget_left.selectedItems():
                         lsta.append(it.text())
@@ -646,13 +646,33 @@ class VetEpiGIStool:
                 uri.setDatabase(outputDBName)
                 edb = QSqlDatabase.addDatabase('QSPATIALITE')
                 edb.setDatabaseName(uri.database())
+                edb.open()
 
-                #Export also linestring
+                layer_name = lyr.sourceName()
+                #TODO: check if layer already exixst
+                tablst = edb.tables()
+
+                if layer_name in tablst:
+                    #message box for overwrite layer
+                    # overwrite_msg = QMessageBox.question(self.iface.mainWindow(),
+                    #     "Warning", "Do you want overwrite existing layer?",
+                    #     QMessageBox.Yes, QMessageBox.No)
+                    # #if ok overwrite
+                    # if overwrite_msg == QMessageBox.Yes:
+                    #     existing_layer = True
+
+                    #TODO: don't delete the existing layer but save the "old" layer
+                    #and create a new one.
+                    #By now only display a message that the layer already exist and exits from the tool.
+                    existing_msg = QMessageBox.information(self.iface.mainWindow(),"Existing layer", \
+                        'There is already a layer with the same name.')
+
+                    return
+
                 lgt = lyr.geometryType()
-                #if lgt == 1:
-                #    return
 
                 ntlst = self.fieldCheck(nslst)
+
                 sql = 'create table %s (' % ln
                 for i in range(len(ntlst)):
                     t = 'text'
@@ -664,7 +684,6 @@ class VetEpiGIStool:
                 sql += ')'
                 sql = sql.replace(', )', ')')
 
-                edb.open()
                 q = edb.exec_(sql)
 
                 prv = lyr.dataProvider()
