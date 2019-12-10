@@ -498,11 +498,12 @@ class VetEpiGIStool:
 
     def expLayer(self):
         self.grp4.setDefaultAction(self.xprt)
+        plugin_title = 'Export selected layer'
         dlg = export.Dialog()
         x = (self.iface.mainWindow().x()+self.iface.mainWindow().width()/2)-dlg.width()/2
         y = (self.iface.mainWindow().y()+self.iface.mainWindow().height()/2)-dlg.height()/2
         dlg.move(x,y)
-        dlg.setWindowTitle('Export selected layer')
+        dlg.setWindowTitle(plugin_title)
 
         lyr = self.checklayer()
         if lyr is None:
@@ -523,9 +524,10 @@ class VetEpiGIStool:
         lst2 = []
         feats = prv.getFeatures()
         feat = QgsFeature()
-        #TODO: manage if layer is not a Norbert one
+        vetLayer = False #check if it is a layer of vetepigis tool
         if (nslst==self.obrflds or nslst==self.bufflds or nslst == self.zonflds or nslst == self.poiflds):
             #outbreak and/or buffer layers
+            vetLayer = True
             if (nslst==self.obrflds or nslst==self.bufflds):
                 while feats.nextFeature(feat):
                     lst1.append(feat.attributes()[didx])
@@ -575,6 +577,13 @@ class VetEpiGIStool:
                     dlg.tableWidget_right.setItem(nr, 0, item)
 
                 dlg.tableWidget_right.selectAll()
+        else:
+            dlg.tableWidget_left.setEnabled(False)
+            dlg.tableWidget_right.setEnabled(False)
+            dlg.label_year.setEnabled(False)
+            dlg.label_disease.setEnabled(False)
+            dlg.checkBox_selection.setChecked(False)
+            dlg.checkBox_selection.setEnabled(False)
 
         if dlg.exec_() == QDialog.Accepted:
             QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -613,12 +622,14 @@ class VetEpiGIStool:
             elif dlg.comboBox_format.currentText()=='SQLite database':
                 lsta = []
                 lstb = []
-                for it in dlg.tableWidget_left.selectedItems():
-                    lsta.append(it.text())
-                    # self.iface.messageBar().pushMessage('Information', '%s' % it.text(), level=Qgis.Info)
+                existing_layer = 'False'
+                if vetLayer:
+                    for it in dlg.tableWidget_left.selectedItems():
+                        lsta.append(it.text())
+                        # self.iface.messageBar().pushMessage('Information', '%s' % it.text(), level=Qgis.Info)
 
-                for it in dlg.tableWidget_right.selectedItems():
-                    lstb.append(str(it.text()))
+                    for it in dlg.tableWidget_right.selectedItems():
+                        lstb.append(str(it.text()))
 
                 outputDBName = dlg.lineEdit_output.text()
                 dbfold = os.path.join(self.plugin_dir, 'db')
@@ -635,12 +646,33 @@ class VetEpiGIStool:
                 uri.setDatabase(outputDBName)
                 edb = QSqlDatabase.addDatabase('QSPATIALITE')
                 edb.setDatabaseName(uri.database())
+                edb.open()
 
-                lgt = lyr.geometryType()
-                if lgt == 1:
+                layer_name = lyr.sourceName()
+                #TODO: check if layer already exixst
+                tablst = edb.tables()
+
+                if layer_name in tablst:
+                    #message box for overwrite layer
+                    # overwrite_msg = QMessageBox.question(self.iface.mainWindow(),
+                    #     "Warning", "Do you want overwrite existing layer?",
+                    #     QMessageBox.Yes, QMessageBox.No)
+                    # #if ok overwrite
+                    # if overwrite_msg == QMessageBox.Yes:
+                    #     existing_layer = True
+
+                    #TODO: don't delete the existing layer but save the "old" layer
+                    #and create a new one.
+                    #By now only display a message that the layer already exist and exits from the tool.
+                    existing_msg = QMessageBox.information(self.iface.mainWindow(),"Existing layer", \
+                        'There is already a layer with the same name.')
+
                     return
 
+                lgt = lyr.geometryType()
+
                 ntlst = self.fieldCheck(nslst)
+
                 sql = 'create table %s (' % ln
                 for i in range(len(ntlst)):
                     t = 'text'
@@ -652,12 +684,18 @@ class VetEpiGIStool:
                 sql += ')'
                 sql = sql.replace(', )', ')')
 
-                edb.open()
                 q = edb.exec_(sql)
-                if lgt == 0:
-                    sql = "SELECT AddGeometryColumn('%s', 'geom', 4326, 'POINT', 'XY')" % ln
-                elif lgt == 2:
-                    sql = "SELECT AddGeometryColumn('%s', 'geom', 4326, 'MULTIPOLYGON', 'XY')" % ln
+
+                prv = lyr.dataProvider()
+                if vetLayer:
+                    if lgt == 0:
+                        sql = "SELECT AddGeometryColumn('%s', 'geom', 4326, 'POINT', 'XY')" % ln
+                    elif lgt == 2:
+                        sql = "SELECT AddGeometryColumn('%s', 'geom', 4326, 'MULTIPOLYGON', 'XY')" % ln
+                else:
+                    #Add any kind of geometry type
+                    sql = self.addGeometryColumnSL(lyr,ln)
+
                 q = edb.exec_(sql)
                 edb.commit()
                 edb.close()
@@ -666,22 +704,25 @@ class VetEpiGIStool:
                 vl = QgsVectorLayer(uri.uri(), ln, 'spatialite')
                 vl.startEditing()
 
-                prv = lyr.dataProvider()
                 feats = prv.getFeatures()
                 feat = QgsFeature()
+                #TODO: manage the SRS
                 while feats.nextFeature(feat):
                     # self.iface.messageBar().pushMessage('Information', '%s %s' % (feat.attributes()[didx], feat.attributes()[yidx]), level=Qgis.Info)
                     if lstb:
                         if (feat.attributes()[didx] in lsta) and (str(feat.attributes()[yidx]) in lstb):
                             vl.addFeature(feat)
-                    else:
+                    elif lsta:
                         if (feat.attributes()[didx] in lsta):
                             vl.addFeature(feat)
+                    else:
+                        vl.addFeature(feat)
 
                 vl.commitChanges()
                 vl.updateExtents()
 
             QApplication.restoreOverrideCursor()
+            self.iface.messageBar().pushMessage(plugin_title, 'Layer exported.', level=Qgis.Info)
 
 
     def expDB(self):
@@ -1824,7 +1865,7 @@ class VetEpiGIStool:
 
             vl.startEditing()
 
-            zonetype = dlg.comboBox_3.currentText() #mandatory no check the value
+            zonetype = dlg.comboBox_3.currentText()
 
             subpopulation = ''
             rn = dlg.tableWidget.rowCount()
@@ -1836,19 +1877,19 @@ class VetEpiGIStool:
 
             validity_start = self.funcs.dateCheck(dlg.dateEdit.date())
             validity_end = self.funcs.dateCheck(dlg.dateEdit_2.date())
-            legal_framework = self.checkValue(dlg.lineEdit_2.text())
-            competent_authority = self.checkValue(dlg.lineEdit_3.text())
-            biosecurity_measures = self.checkValue(dlg.comboBox_5.currentText())
-            control_of_vectors = self.checkValue(dlg.comboBox_6.currentText())
-            control_of_wildlife_reservoir = self.checkValue(dlg.comboBox_7.currentText())
-            modified_stamping_out = self.checkValue(dlg.comboBox_8.currentText())
-            movement_restriction = self.checkValue(dlg.comboBox_9.currentText())
-            stamping_out = self.checkValue(dlg.comboBox_10.currentText())
-            surveillance = self.checkValue(dlg.comboBox_11.currentText())
-            vaccination = self.checkValue(dlg.comboBox_12.currentText())
-            other_measure = self.checkValue(dlg.lineEdit_4.text())
+            legal_framework = dlg.lineEdit_2.text()
+            competent_authority = dlg.lineEdit_3.text()
+            biosecurity_measures = dlg.comboBox_5.currentText()
+            control_of_vectors = dlg.comboBox_6.currentText()
+            control_of_wildlife_reservoir = dlg.comboBox_7.currentText()
+            modified_stamping_out = dlg.comboBox_8.currentText()
+            movement_restriction = dlg.comboBox_9.currentText()
+            stamping_out = dlg.comboBox_10.currentText()
+            surveillance = dlg.comboBox_11.currentText()
+            vaccination = dlg.comboBox_12.currentText()
+            other_measure = dlg.lineEdit_4.text()
             timestamp = QDateTime.currentDateTimeUtc().toString('dd/MM/yyyy hh:mm:ss')
-            related = self.checkValue(dlg.comboBox_13.currentText())
+            related = dlg.comboBox_13.currentText()
 
             attrs = []
             attrs.append('')
@@ -2350,11 +2391,48 @@ class VetEpiGIStool:
             self.iface.mapCanvas().setMapTool(self.origtool)
             self.iface.actionPan().trigger()
 
-    def checkValue(self, value):
-        v = value
-        if not value:
-            v = None
-        return v
+
+
+    def addGeometryColumnSL(self, lyr, lyr_name):
+        """
+        Function that allows to create a sql query for SpatiaLite database and
+        add geometry column for different type of input layer.
+
+        Input:
+            lyr: QgsVectorLayer input layer
+            lyr_name: String with the name of the layer
+        """
+        crs_in = lyr.sourceCrs()
+        crs_epsg = crs_in.postgisSrid()
+
+        f_type = ''
+        lgt = lyr.geometryType()
+        if lgt == 0:
+            f_type = 'POINT'
+        elif lgt == 1:
+            f_type = 'LINESTRING'
+        elif lgt == 2:
+            f_type = 'POLYGON'
+
+        #TODO: linestring or multistring, polygon or multipoligon, 2D or 3D
+        l_type = QgsWkbTypes.isMultiType(lyr.getGeometry(0).wkbType())
+
+        if l_type:
+            f_type = 'MULTI' + f_type
+
+        dimension = 'XY'
+        if QgsWkbTypes.hasZ(lyr.wkbType()):
+            dimension = dimension + 'Z'
+        if QgsWkbTypes.hasM(lyr.wkbType()):
+            dimension = dimension + 'M'
+
+        sql = "SELECT AddGeometryColumn('%s', 'geom', %d, '%s', '%s')" % (lyr_name, crs_epsg,f_type,dimension)
+
+        return sql
+
+
+
+
 
 class casePicker(QgsMapTool):
     # http://gis.stackexchange.com/questions/45094/how-to-programatically-check-for-a-mouse-click-in-qgis
@@ -2372,7 +2450,7 @@ class casePicker(QgsMapTool):
         self.funcs = qvfuncs.VetEpiGISFuncs()
 
         self.canvas.setCursor(mutato)
-        self.iface.currentLayerChanged.connect(self.setPanTool)
+
 
     def canvasPressEvent(self, event):
         pass
@@ -2381,8 +2459,6 @@ class casePicker(QgsMapTool):
     def canvasMoveEvent(self, event):
         pass
 
-    def setPanTool(self):
-        self.iface.actionPan().trigger()
 
     def canvasReleaseEvent(self, event):
         x = event.pos().x()
@@ -2414,8 +2490,8 @@ class casePicker(QgsMapTool):
             self.addFeat(x, y)
             self.tt.setChecked(False)
 
-        QApplication.restoreOverrideCursor()
-        self.iface.actionPan().trigger()
+            QApplication.restoreOverrideCursor()
+
 
     def addFeat(self, x, y):
         self.lyr.startEditing()
@@ -2465,9 +2541,9 @@ class casePicker(QgsMapTool):
             if self.lyr.geometryType() == QgsWkbTypes.PointGeometry:
                 flds = self.lyr.dataProvider().fields()
                 feat.setFields(flds, True)
-                feat.setAttribute(feat.fieldNameIndex('localid'), self.checkValue(self.dlg.lineEdit_3.text())) #mandatory
-                feat.setAttribute(feat.fieldNameIndex('code'), self.checkValue(self.dlg.lineEdit_5.text())) #mandatory
-                feat.setAttribute(feat.fieldNameIndex('activity'), self.dlg.comboBox.currentText()) #mandatory
+                feat.setAttribute(feat.fieldNameIndex('localid'), self.dlg.lineEdit_3.text())
+                feat.setAttribute(feat.fieldNameIndex('code'), self.dlg.lineEdit_5.text())
+                feat.setAttribute(feat.fieldNameIndex('activity'), self.dlg.comboBox.currentText())
                 feat.setAttribute(feat.fieldNameIndex('hrid'), self.funcs.hashIDer(QDateTime.currentDateTimeUtc(),0))
 
                 pnt = QgsGeometry.fromPointXY(QgsPointXY(x,y))
@@ -2479,6 +2555,7 @@ class casePicker(QgsMapTool):
         self.lyr.addFeature(feat)
         self.lyr.commitChanges()
         self.lyr.updateExtents()
+
 
     def activate(self):
         pass
@@ -2526,6 +2603,7 @@ class polyDraw(QgsMapTool):
 
         self.canvas.setCursor(mutato)
 
+
     def canvasReleaseEvent(self, event):
         if (event.button()==Qt.LeftButton):
             if self.pn == 0:
@@ -2563,11 +2641,11 @@ class polyDraw(QgsMapTool):
                     self.addFeat(geom)
                     self.tt.setChecked(False)
                     QApplication.restoreOverrideCursor()
-                    self.iface.actionPan().trigger()
 
                 self.pn = 0
                 self.pts = []
                 self.rb.reset()
+
 
     def addFeat(self, geom):
         self.lyr = self.iface.activeLayer()
