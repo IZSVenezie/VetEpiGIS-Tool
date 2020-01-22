@@ -664,9 +664,14 @@ class VetEpiGIStool:
                     #TODO: don't delete the existing layer but save the "old" layer
                     #and create a new one.
                     #By now only display a message that the layer already exist and exits from the tool.
+
+                    #Issue in ALTER TABLE RENAME command in spatialite, the geometry is removed
+                    #https://github.com/qgis/QGIS/issues/27425
+                    #https://github.com/qgis/QGIS/issues/22236
+
                     existing_msg = QMessageBox.information(self.iface.mainWindow(),"Existing layer", \
                         'There is already a layer with the same name.')
-
+                    QApplication.restoreOverrideCursor()
                     return
 
                 lgt = lyr.geometryType()
