@@ -1042,27 +1042,27 @@ class VetEpiGIStool:
         y = (self.iface.mainWindow().y()+self.iface.mainWindow().height()/2)-dlg.height()/2
         dlg.move(x,y)
         dlg.setWindowTitle('Create new case')
-        dlg.label_10.setVisible(False)
-        dlg.comboBox_5.setVisible(False)
-        dlg.label.setVisible(False)
-        dlg.lineEdit.setVisible(False)
-        dlg.toolButton_3.setVisible(False)
-        dlg.label_2.setVisible(False)
-        dlg.lineEdit_2.setVisible(False)
-        dlg.label_4.setVisible(False)
-        dlg.comboBox.setVisible(False)
+        dlg.label_10_outbreak_layer.setVisible(False)
+        dlg.comboBox_5_outbreak_layer.setVisible(False)
+        dlg.label_longitude.setVisible(False)
+        dlg.lineEdit_longitude.setVisible(False)
+        dlg.toolButton_3_dms.setVisible(False)
+        dlg.label_2_latitude.setVisible(False)
+        dlg.lineEdit_2_latitude.setVisible(False)
+        dlg.label_4_reference.setVisible(False)
+        dlg.comboBox_reference.setVisible(False)
 
-        dlg.comboBox_2.addItem('')
+        dlg.comboBox_2_disease.addItem('')
         for it in self.lsta:
-            dlg.comboBox_2.addItem(it)
+            dlg.comboBox_2_disease.addItem(it)
 
         dlg.lstb = self.lstb
 
-        dlg.lineEdit_3.setText(str(attr[1]))
-        dlg.lineEdit_5.setText(str(attr[2]))
-        dlg.comboBox_4.setCurrentIndex(dlg.comboBox_4.findText(attr[3], Qt.MatchExactly))
-        dlg.comboBox_2.setCurrentIndex(dlg.comboBox_2.findText(attr[4], Qt.MatchExactly))
-        dlg.lineEdit_6.setText(str(attr[5]))
+        dlg.lineEdit_3_id.setText(str(attr[1]))
+        dlg.lineEdit_5_code.setText(str(attr[2]))
+        dlg.comboBox_4_large_scale.setCurrentIndex(dlg.comboBox_4_large_scale.findText(attr[3], Qt.MatchExactly))
+        dlg.comboBox_2_disease.setCurrentIndex(dlg.comboBox_2_disease.findText(attr[4], Qt.MatchExactly))
+        dlg.lineEdit_6_num_animals.setText(str(attr[5]))
 
         slst = str(attr[6]).split(' | ')
         plst = str(attr[7]).split(' | ')
@@ -1074,33 +1074,33 @@ class VetEpiGIStool:
             item = QTableWidgetItem(str(plst[i]))
             dlg.tableWidget.setItem(nr, 1, item)
 
-        dlg.lineEdit_4.setText(str(attr[8]))
-        dlg.comboBox_3.setCurrentIndex(dlg.comboBox_3.findText(attr[9], Qt.MatchExactly))
+        dlg.lineEdit_4_year.setText(str(attr[8]))
+        dlg.comboBox_3_status.setCurrentIndex(dlg.comboBox_3_status.findText(attr[9], Qt.MatchExactly))
         k = '01/01/2000'
         f = 'dd/MM/yyyy'
         s = k
         if attr[10]!='':
             s = attr[10]
-            dlg.dateEdit.setEnabled(True)
-            dlg.checkBox.setChecked(True)
+            dlg.dateEdit_dates_suspect.setEnabled(True)
+            dlg.checkBox_dates_suspect.setChecked(True)
         qd = QDate.fromString(s, f)
-        dlg.dateEdit.setDate(qd)
+        dlg.dateEdit_dates_suspect.setDate(qd)
         s = k
         if attr[11]!='':
             s = attr[11]
-            dlg.dateEdit_2.setEnabled(True)
-            dlg.checkBox_2.setChecked(True)
+            dlg.dateEdit_2_dates_confirmation.setEnabled(True)
+            dlg.checkBox_2_dates_confirmation.setChecked(True)
         qd = QDate.fromString(s, f)
-        dlg.dateEdit_2.setDate(qd)
+        dlg.dateEdit_2_dates_confirmation.setDate(qd)
         s = k
         if attr[12]!='':
             s = attr[12]
-            dlg.dateEdit_3.setEnabled(True)
-            dlg.checkBox_3.setChecked(True)
+            dlg.dateEdit_3_dates_expiration.setEnabled(True)
+            dlg.checkBox_3_dates_expiration.setChecked(True)
         qd = QDate.fromString(s, f)
-        dlg.dateEdit_3.setDate(qd)
+        dlg.dateEdit_3_dates_expiration.setDate(qd)
 
-        dlg.textEdit.setText(attr[13])
+        dlg.textEdit_notes.setText(attr[13])
         if dlg.exec_() == QDialog.Accepted:
             QApplication.setOverrideCursor(Qt.WaitCursor)
 
@@ -1116,19 +1116,19 @@ class VetEpiGIStool:
                     species = species + ' | ' + dlg.tableWidget.item(i, 0).text()
                     production = production + ' | ' + dlg.tableWidget.item(i, 1).text()
 
-            lyr.changeAttributeValue(fid, 1, dlg.lineEdit_3.text())
-            lyr.changeAttributeValue(fid, 2, dlg.lineEdit_5.text())
-            lyr.changeAttributeValue(fid, 3, dlg.comboBox_4.currentText())
-            lyr.changeAttributeValue(fid, 4, dlg.comboBox_2.currentText())
-            lyr.changeAttributeValue(fid, 5, dlg.lineEdit_6.text())
+            lyr.changeAttributeValue(fid, 1, dlg.lineEdit_3_id.text())
+            lyr.changeAttributeValue(fid, 2, dlg.lineEdit_5_code.text())
+            lyr.changeAttributeValue(fid, 3, dlg.comboBox_4_large_scale.currentText())
+            lyr.changeAttributeValue(fid, 4, dlg.comboBox_2_disease.currentText())
+            lyr.changeAttributeValue(fid, 5, dlg.lineEdit_6_num_animals.text())
             lyr.changeAttributeValue(fid, 6, species)
             lyr.changeAttributeValue(fid, 7, production)
-            lyr.changeAttributeValue(fid, 8, dlg.lineEdit_4.text())
-            lyr.changeAttributeValue(fid, 9, dlg.comboBox_3.currentText())
-            lyr.changeAttributeValue(fid, 10, self.funcs.dateCheck(dlg.dateEdit.date()))
-            lyr.changeAttributeValue(fid, 11, self.funcs.dateCheck(dlg.dateEdit_2.date()))
-            lyr.changeAttributeValue(fid, 12, self.funcs.dateCheck(dlg.dateEdit_3.date()))
-            lyr.changeAttributeValue(fid, 13, dlg.textEdit.toPlainText())
+            lyr.changeAttributeValue(fid, 8, dlg.lineEdit_4_year.text())
+            lyr.changeAttributeValue(fid, 9, dlg.comboBox_3_status.currentText())
+            lyr.changeAttributeValue(fid, 10, self.funcs.dateCheck(dlg.dateEdit_dates_suspect.date()))
+            lyr.changeAttributeValue(fid, 11, self.funcs.dateCheck(dlg.dateEdit_2_dates_confirmation.date()))
+            lyr.changeAttributeValue(fid, 12, self.funcs.dateCheck(dlg.dateEdit_3_dates_expiration.date()))
+            lyr.changeAttributeValue(fid, 13, dlg.textEdit_notes.toPlainText())
             lyr.changeAttributeValue(fid, 15, QDateTime.currentDateTimeUtc().toString('dd/MM/yyyy hh:mm:ss'))
             lyr.commitChanges()
 
@@ -1173,10 +1173,10 @@ class VetEpiGIStool:
             dlg.comboBox.addItem(it)
 
         dlg.label.setVisible(False)
-        dlg.lineEdit.setVisible(False)
+        dlg.lineEdit_longitude.setVisible(False)
         dlg.toolButton.setVisible(False)
         dlg.label_2.setVisible(False)
-        dlg.lineEdit_2.setVisible(False)
+        dlg.lineEdit_2_latitude.setVisible(False)
         dlg.setMaximumHeight(150)
 
         dlg.lineEdit_3.setText(attr[1])
@@ -1397,11 +1397,11 @@ class VetEpiGIStool:
             y = (self.iface.mainWindow().y()+self.iface.mainWindow().height()/2)-dlg.height()/2
             dlg.move(x,y)
             dlg.setWindowTitle('Create new case')
-            dlg.label_10.setVisible(False)
-            dlg.comboBox_5.setVisible(False)
+            dlg.label_10_outbreak_layer.setVisible(False)
+            dlg.comboBox_5_outbreak_layer.setVisible(False)
 
             for it in self.lsta:
-                dlg.comboBox_2.addItem(it)
+                dlg.comboBox_2_disease.addItem(it)
 
             dlg.lstb = self.lstb
 
@@ -1427,10 +1427,10 @@ class VetEpiGIStool:
         y = (self.iface.mainWindow().y()+self.iface.mainWindow().height()/2)-dlg.height()/2
         dlg.move(x,y)
         dlg.setWindowTitle('Copy selected object')
-        dlg.label_4.setText('Source layer:')
+        dlg.label_4_reference.setText('Source layer:')
 
         for it in self.lsta:
-            dlg.comboBox_2.addItem(it)
+            dlg.comboBox_2_disease.addItem(it)
 
         dlg.lstb = self.lstb
 
@@ -1452,7 +1452,7 @@ class VetEpiGIStool:
                     if lyr.geometryType() == QgsWkbTypes.PolygonGeometry:
                         tlrs.append('poly')
                     if lyr.selectedFeatureCount()==1:
-                        dlg.comboBox.addItem(lyr.name())
+                        dlg.comboBox_reference.addItem(lyr.name())
                         n += 1
         if n==0:
             self.iface.messageBar().pushMessage('Copy an element to outbreak layer', ' Select ONE object to copy!', level=Qgis.Warning)
@@ -1464,22 +1464,22 @@ class VetEpiGIStool:
 
         dlg.lrs = lrs
         dlg.tlrs = tlrs
-        dlg.comboBox.currentIndexChanged.connect(dlg.outLSel)
+        dlg.comboBox_reference.currentIndexChanged.connect(dlg.outLSel)
         dlg.outLSel()
 
-        dlg.label.setVisible(False)
-        dlg.lineEdit.setVisible(False)
-        dlg.toolButton_3.setVisible(False)
-        dlg.label_2.setVisible(False)
-        dlg.lineEdit_2.setVisible(False)
+        dlg.label_longitude.setVisible(False)
+        dlg.lineEdit_longitude.setVisible(False)
+        dlg.toolButton_3_dms.setVisible(False)
+        dlg.label_2_latitude.setVisible(False)
+        dlg.lineEdit_2_latitude.setVisible(False)
 
         if dlg.exec_() == QDialog.Accepted:
             src = ''
             dst = ''
             for lyr in lyrs:
-                if lyr.name()== dlg.comboBox.currentText():
+                if lyr.name()== dlg.comboBox_reference.currentText():
                     src = lyr
-                elif lyr.name()== dlg.comboBox_5.currentText():
+                elif lyr.name()== dlg.comboBox_5_outbreak_layer.currentText():
                     dst = lyr
 
             prvsrc = src.dataProvider()
@@ -2324,24 +2324,24 @@ class VetEpiGIStool:
             dlg.move(x,y)
 
             dlg.setWindowTitle('Create new case')
-            dlg.label_10.setVisible(False)
-            dlg.comboBox_5.setVisible(False)
+            dlg.label_10_outbreak_layer.setVisible(False)
+            dlg.comboBox_5_outbreak_layer.setVisible(False)
 
             for it in self.lsta:
-                dlg.comboBox_2.addItem(it)
+                dlg.comboBox_2_disease.addItem(it)
 
             dlg.lstb = self.lstb
 
             if lyr.geometryType() == QgsWkbTypes.PolygonGeometry:
                 lyrs = [layer for layer in QgsProject.instance().mapLayers().values()]
-                dlg.comboBox.addItem('')
+                dlg.comboBox_reference.addItem('')
                 for lr in lyrs:
                     if lr.type()==0:
                         if lr.geometryType() == QgsWkbTypes.PolygonGeometry:
-                            dlg.comboBox.addItem(lr.name())
+                            dlg.comboBox_reference.addItem(lr.name())
             else:
-                dlg.label_4.setVisible(False)
-                dlg.comboBox.setVisible(False)
+                dlg.label_4_reference.setVisible(False)
+                dlg.comboBox_reference.setVisible(False)
 
             #psrid = self.iface.mapCanvas().mapRenderer().destinationCrs().srsid()
             psrid = self.iface.mapCanvas().mapSettings().destinationCrs().srsid()
@@ -2489,13 +2489,13 @@ class casePicker(QgsMapTool):
             x = ptb.x()
             y = ptb.y()
 
-        self.dlg.lineEdit.setText('%s' % x)
-        self.dlg.lineEdit_2.setText('%s' % y)
+        self.dlg.lineEdit_longitude.setText('%s' % x)
+        self.dlg.lineEdit_2_latitude.setText('%s' % y)
 
         if self.dlg.exec_() == QDialog.Accepted:
             QApplication.setOverrideCursor(Qt.WaitCursor)
-            x = float(self.dlg.lineEdit.text())
-            y = float(self.dlg.lineEdit_2.text())
+            x = float(self.dlg.lineEdit_longitude.text())
+            y = float(self.dlg.lineEdit_2_latitude.text())
             self.addFeat(x, y)
             self.tt.setChecked(False)
 
@@ -2638,16 +2638,16 @@ class polyDraw(QgsMapTool):
 
         elif (event.button()==Qt.RightButton):
             if self.pn > 2:
-                self.dlg.label_4.setVisible(False)
-                self.dlg.comboBox.setVisible(False)
-                self.dlg.label_10.setVisible(False)
-                self.dlg.comboBox_5.setVisible(False)
+                self.dlg.label_4_reference.setVisible(False)
+                self.dlg.comboBox_reference.setVisible(False)
+                self.dlg.label_10_outbreak_layer.setVisible(False)
+                self.dlg.comboBox_5_outbreak_layer.setVisible(False)
 
-                self.dlg.label.setVisible(False)
-                self.dlg.lineEdit.setVisible(False)
-                self.dlg.toolButton_3.setVisible(False)
-                self.dlg.label_2.setVisible(False)
-                self.dlg.lineEdit_2.setVisible(False)
+                self.dlg.label_longitude.setVisible(False)
+                self.dlg.lineEdit_longitude.setVisible(False)
+                self.dlg.toolButton_3_dms.setVisible(False)
+                self.dlg.label_2_latitude.setVisible(False)
+                self.dlg.lineEdit_2_latitude.setVisible(False)
 
                 if self.dlg.exec_() == QDialog.Accepted:
                     QApplication.setOverrideCursor(Qt.WaitCursor)

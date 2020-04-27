@@ -25,13 +25,13 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="tab_location">
       <attribute name="title">
        <string>Location</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_11">
        <item row="0" column="0">
-        <widget class="QLabel" name="label_3">
+        <widget class="QLabel" name="label_3_id">
          <property name="font">
           <font>
            <weight>75</weight>
@@ -44,7 +44,7 @@
         </widget>
        </item>
        <item row="0" column="1" colspan="3">
-        <widget class="QLineEdit" name="lineEdit_3">
+        <widget class="QLineEdit" name="lineEdit_3_id">
          <property name="minimumSize">
           <size>
            <width>311</width>
@@ -57,7 +57,7 @@
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="label_6">
+        <widget class="QLabel" name="label_6_code">
          <property name="font">
           <font>
            <weight>75</weight>
@@ -70,7 +70,7 @@
         </widget>
        </item>
        <item row="1" column="1" colspan="3">
-        <widget class="QLineEdit" name="lineEdit_5">
+        <widget class="QLineEdit" name="lineEdit_5_code">
          <property name="minimumSize">
           <size>
            <width>311</width>
@@ -83,7 +83,7 @@
         </widget>
        </item>
        <item row="2" column="0" colspan="2">
-        <widget class="QLabel" name="label_9">
+        <widget class="QLabel" name="label_9_large_scale">
          <property name="font">
           <font>
            <weight>75</weight>
@@ -96,7 +96,7 @@
         </widget>
        </item>
        <item row="2" column="2">
-        <widget class="QComboBox" name="comboBox_4">
+        <widget class="QComboBox" name="comboBox_4_large_scale">
          <property name="maximumSize">
           <size>
            <width>78</width>
@@ -119,7 +119,7 @@
         </spacer>
        </item>
        <item row="3" column="0" colspan="4">
-        <layout class="QGridLayout" name="gridLayout_2">
+        <layout class="QGridLayout" name="gridLayout_2_coords">
          <item row="0" column="0">
           <widget class="QLabel" name="label">
            <property name="text">
@@ -128,14 +128,14 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit">
+          <widget class="QLineEdit" name="lineEdit_longitude">
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>
          <item row="0" column="2" rowspan="2">
-          <widget class="QToolButton" name="toolButton_3">
+          <widget class="QToolButton" name="toolButton_3_dms">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -148,14 +148,14 @@
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="label_2">
+          <widget class="QLabel" name="label_2_latitude">
            <property name="text">
             <string>Latitude:</string>
            </property>
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QLineEdit" name="lineEdit_2">
+          <widget class="QLineEdit" name="lineEdit_2_latitude">
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
@@ -177,16 +177,16 @@
         </spacer>
        </item>
        <item row="5" column="0" colspan="4">
-        <layout class="QGridLayout" name="gridLayout_6">
+        <layout class="QGridLayout" name="gridLayout_6_reference">
          <item row="0" column="0">
-          <widget class="QLabel" name="label_4">
+          <widget class="QLabel" name="label_4_reference">
            <property name="text">
             <string>Reference layer:</string>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QComboBox" name="comboBox">
+          <widget class="QComboBox" name="comboBox_reference">
            <property name="minimumSize">
             <size>
              <width>241</width>
@@ -200,14 +200,14 @@
        <item row="6" column="0" colspan="4">
         <layout class="QGridLayout" name="gridLayout_3">
          <item row="0" column="0">
-          <widget class="QLabel" name="label_10">
+          <widget class="QLabel" name="label_10_outbreak_layer">
            <property name="text">
             <string>Outbreak layer:</string>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QComboBox" name="comboBox_5">
+          <widget class="QComboBox" name="comboBox_5_outbreak_layer">
            <property name="minimumSize">
             <size>
              <width>241</width>
@@ -220,15 +220,15 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2">
+     <widget class="QWidget" name="tab_2_disease">
       <attribute name="title">
        <string>Disease</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_12">
        <item row="0" column="0" colspan="2">
-        <layout class="QGridLayout" name="gridLayout_5">
+        <layout class="QGridLayout" name="gridLayout_5_disease">
          <item row="0" column="0">
-          <widget class="QLabel" name="label_5">
+          <widget class="QLabel" name="label_5_disease">
            <property name="font">
             <font>
              <weight>75</weight>
@@ -241,7 +241,7 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QComboBox" name="comboBox_2">
+          <widget class="QComboBox" name="comboBox_2_disease">
            <property name="minimumSize">
             <size>
              <width>280</width>
@@ -253,16 +253,16 @@
         </layout>
        </item>
        <item row="1" column="0" colspan="2">
-        <layout class="QGridLayout" name="gridLayout_4">
+        <layout class="QGridLayout" name="gridLayout_4_num_animals">
          <item row="0" column="0">
-          <widget class="QLabel" name="label_11">
+          <widget class="QLabel" name="label_11_num_animals">
            <property name="text">
             <string>Number of animals:</string>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit_6">
+          <widget class="QLineEdit" name="lineEdit_6_num_animals">
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
@@ -271,7 +271,7 @@
         </layout>
        </item>
        <item row="2" column="0">
-        <widget class="QTableWidget" name="tableWidget">
+        <widget class="QTableWidget" name="tableWidget_species">
          <property name="font">
           <font>
            <weight>50</weight>
@@ -327,9 +327,9 @@
         </widget>
        </item>
        <item row="2" column="1">
-        <layout class="QGridLayout" name="gridLayout_10">
+        <layout class="QGridLayout" name="gridLayout_10_species_add_remove">
          <item row="0" column="0">
-          <widget class="QToolButton" name="toolButton">
+          <widget class="QToolButton" name="toolButton_species_add">
            <property name="minimumSize">
             <size>
              <width>25</width>
@@ -355,7 +355,7 @@
           </spacer>
          </item>
          <item row="2" column="0">
-          <widget class="QToolButton" name="toolButton_5">
+          <widget class="QToolButton" name="toolButton_5_species_dots">
            <property name="text">
             <string>...</string>
            </property>
@@ -375,7 +375,7 @@
           </spacer>
          </item>
          <item row="4" column="0">
-          <widget class="QToolButton" name="toolButton_2">
+          <widget class="QToolButton" name="toolButton_2_species_remove">
            <property name="minimumSize">
             <size>
              <width>25</width>
@@ -391,15 +391,15 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_3">
+     <widget class="QWidget" name="tab_3_status">
       <attribute name="title">
        <string>Status</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_9">
        <item row="0" column="0">
-        <layout class="QGridLayout" name="gridLayout_7">
+        <layout class="QGridLayout" name="gridLayout_7_year">
          <item row="0" column="0">
-          <widget class="QLabel" name="label_8">
+          <widget class="QLabel" name="label_8_year">
            <property name="minimumSize">
             <size>
              <width>46</width>
@@ -418,7 +418,7 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit_4">
+          <widget class="QLineEdit" name="lineEdit_4_year">
            <property name="maximumSize">
             <size>
              <width>81</width>
@@ -458,9 +458,9 @@
         </layout>
        </item>
        <item row="1" column="0">
-        <layout class="QGridLayout" name="gridLayout_8">
+        <layout class="QGridLayout" name="gridLayout_8_status">
          <item row="0" column="0">
-          <widget class="QLabel" name="label_7">
+          <widget class="QLabel" name="label_7_status">
            <property name="font">
             <font>
              <weight>75</weight>
@@ -473,7 +473,7 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QComboBox" name="comboBox_3">
+          <widget class="QComboBox" name="comboBox_3_status">
            <property name="minimumSize">
             <size>
              <width>181</width>
@@ -498,7 +498,7 @@
         </layout>
        </item>
        <item row="2" column="0">
-        <widget class="QGroupBox" name="groupBox">
+        <widget class="QGroupBox" name="groupBox_dates">
          <property name="font">
           <font>
            <italic>false</italic>
@@ -509,7 +509,7 @@
          </property>
          <layout class="QGridLayout" name="gridLayout">
           <item row="0" column="0">
-           <widget class="QCheckBox" name="checkBox">
+           <widget class="QCheckBox" name="checkBox_dates_suspect">
             <property name="layoutDirection">
              <enum>Qt::LeftToRight</enum>
             </property>
@@ -519,14 +519,14 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QDateEdit" name="dateEdit">
+           <widget class="QDateEdit" name="dateEdit_dates_suspect">
             <property name="calendarPopup">
              <bool>true</bool>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QCheckBox" name="checkBox_2">
+           <widget class="QCheckBox" name="checkBox_2_dates_confirmation">
             <property name="layoutDirection">
              <enum>Qt::LeftToRight</enum>
             </property>
@@ -536,14 +536,14 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QDateEdit" name="dateEdit_2">
+           <widget class="QDateEdit" name="dateEdit_2_dates_confirmation">
             <property name="calendarPopup">
              <bool>true</bool>
             </property>
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QCheckBox" name="checkBox_3">
+           <widget class="QCheckBox" name="checkBox_3_dates_expiration">
             <property name="layoutDirection">
              <enum>Qt::LeftToRight</enum>
             </property>
@@ -553,7 +553,7 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QDateEdit" name="dateEdit_3">
+           <widget class="QDateEdit" name="dateEdit_3_dates_expiration">
             <property name="calendarPopup">
              <bool>true</bool>
             </property>
@@ -564,13 +564,13 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_4">
+     <widget class="QWidget" name="tab_4_notes">
       <attribute name="title">
        <string>Notes</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_13">
        <item row="0" column="0">
-        <widget class="QTextEdit" name="textEdit"/>
+        <widget class="QTextEdit" name="textEdit_notes"/>
        </item>
       </layout>
      </widget>
