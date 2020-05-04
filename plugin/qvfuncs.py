@@ -72,19 +72,19 @@ class VetEpiGISFuncs:
 
         flds = lyr.dataProvider().fields()
         feat.setFields(flds, True)
-        feat.setAttribute(feat.fieldNameIndex('localid'), dlg.lineEdit_3.text())#mandatory
-        feat.setAttribute(feat.fieldNameIndex('code'), dlg.lineEdit_5.text())#mandatory
-        feat.setAttribute(feat.fieldNameIndex('largescale'), dlg.comboBox_4.currentText())
-        feat.setAttribute(feat.fieldNameIndex('disease'), dlg.comboBox_2.currentText())#mandatory
-        feat.setAttribute(feat.fieldNameIndex('animalno'), dlg.lineEdit_6.text())#mandatory
+        feat.setAttribute(feat.fieldNameIndex('localid'), dlg.lineEdit_3_id.text())#mandatory
+        feat.setAttribute(feat.fieldNameIndex('code'), dlg.lineEdit_5_code.text())#mandatory
+        feat.setAttribute(feat.fieldNameIndex('largescale'), dlg.comboBox_4_large_scale.currentText())
+        feat.setAttribute(feat.fieldNameIndex('disease'), dlg.comboBox_2_disease.currentText())#mandatory
+        feat.setAttribute(feat.fieldNameIndex('animalno'), dlg.lineEdit_6_num_animals.text())#mandatory
         feat.setAttribute(feat.fieldNameIndex('species'), species)#mandatory
         feat.setAttribute(feat.fieldNameIndex('production'), production)
-        feat.setAttribute(feat.fieldNameIndex('year'), self.checkIntValue(dlg.lineEdit_4.text()))#mandatory
-        feat.setAttribute(feat.fieldNameIndex('status'), dlg.comboBox_3.currentText())#mandatory
-        feat.setAttribute(feat.fieldNameIndex('suspect'), self.dateCheck(dlg.dateEdit.date()))
-        feat.setAttribute(feat.fieldNameIndex('confirmation'), self.dateCheck(dlg.dateEdit_2.date()))
-        feat.setAttribute(feat.fieldNameIndex('expiration'), self.dateCheck(dlg.dateEdit_3.date()))
-        feat.setAttribute(feat.fieldNameIndex('notes'),  self.checkValue(dlg.textEdit.toPlainText()))
+        feat.setAttribute(feat.fieldNameIndex('year'), self.checkIntValue(dlg.lineEdit_4_year.text()))#mandatory
+        feat.setAttribute(feat.fieldNameIndex('status'), dlg.comboBox_3_status.currentText())#mandatory
+        feat.setAttribute(feat.fieldNameIndex('suspect'), self.dateCheck(dlg.dateEdit_dates_suspect.date()))
+        feat.setAttribute(feat.fieldNameIndex('confirmation'), self.dateCheck(dlg.dateEdit_2_dates_confirmation.date()))
+        feat.setAttribute(feat.fieldNameIndex('expiration'), self.dateCheck(dlg.dateEdit_3_dates_expiration.date()))
+        feat.setAttribute(feat.fieldNameIndex('notes'),  self.checkValue(dlg.textEdit_notes.toPlainText()))
         feat.setAttribute(feat.fieldNameIndex('hrid'), self.hashIDer(most,0))
         feat.setAttribute(feat.fieldNameIndex('timestamp'), most.toString('dd/MM/yyyy hh:mm:ss'))
         return feat

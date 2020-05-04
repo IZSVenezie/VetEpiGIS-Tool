@@ -30,14 +30,14 @@ from .qvfuncs import VetEpiGISFuncs as VetEpiGISFuncs
 
 from .poi_dialog import Ui_Dialog
 
-class Dialog(QDialog, Ui_Dialog):         
+class Dialog(QDialog, Ui_Dialog):
     def __init__(self):
         """Constructor for the dialog.
-        
+
         """
-        
-        QDialog.__init__(self)                               
-                        
+
+        QDialog.__init__(self)
+
         self.setupUi(self)
 
         self.btnsave = self.buttonBox.button(QDialogButtonBox.Save)
@@ -46,8 +46,8 @@ class Dialog(QDialog, Ui_Dialog):
 
         re = QRegExp('[0-9.]+')
         val = QRegExpValidator(re)
-        self.lineEdit.setValidator(val)
-        self.lineEdit_2.setValidator(val)
+        self.lineEdit_longitude.setValidator(val)
+        self.lineEdit_2_latitude.setValidator(val)
 
         self.toolButton.setToolTip('Degree - decimal conversion')
         self.toolButton.clicked.connect(self.trafo)
@@ -66,21 +66,21 @@ class Dialog(QDialog, Ui_Dialog):
         dlg.move(x,y)
         dlg.setWindowTitle('Degree to decimal conversion')
 
-        res = self.funcs.dec2deg(self.lineEdit.text())
+        res = self.funcs.dec2deg(self.lineEdit_longitude.text())
         dlg.lineEdit.setText(res[0])
         dlg.lineEdit_2.setText(res[1])
         dlg.lineEdit_3.setText(res[2])
 
-        res = self.funcs.dec2deg(self.lineEdit_2.text())
+        res = self.funcs.dec2deg(self.lineEdit_2_latitude.text())
         dlg.lineEdit_4.setText(res[0])
         dlg.lineEdit_5.setText(res[1])
         dlg.lineEdit_6.setText(res[2])
 
         if dlg.exec_() == QDialog.Accepted:
             res = self.funcs.deg2dec(dlg.lineEdit.text(), dlg.lineEdit_2.text(), dlg.lineEdit_3.text())
-            self.lineEdit.setText(str(res))
+            self.lineEdit_longitude.setText(str(res))
             res = self.funcs.deg2dec(dlg.lineEdit_4.text(), dlg.lineEdit_5.text(), dlg.lineEdit_6.text())
-            self.lineEdit_2.setText(str(res))
+            self.lineEdit_2_latitude.setText(str(res))
 
 
     def saveCtrl(self):
