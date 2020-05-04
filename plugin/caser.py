@@ -53,37 +53,37 @@ class Dialog(QDialog, Ui_Dialog):
         self.lrs = []
         self.tlrs = []
 
-        self.toolButton.setToolTip('Add new cases')
-        self.toolButton.clicked.connect(self.addNew)
+        self.toolButton_species_add.setToolTip('Add new cases')
+        self.toolButton_species_add.clicked.connect(self.addNew)
 
-        self.toolButton_2.setToolTip('Delete selected row')
-        self.toolButton_2.clicked.connect(self.removeRec)
+        self.toolButton_2_species_remove.setToolTip('Delete selected row')
+        self.toolButton_2_species_remove.clicked.connect(self.removeRec)
 
-        self.toolButton_5.setToolTip('Edit selected row')
-        self.toolButton_5.clicked.connect(self.editRec)
+        self.toolButton_5_species_dots.setToolTip('Edit selected row')
+        self.toolButton_5_species_dots.clicked.connect(self.editRec)
 
-        self.toolButton_3.setToolTip('Degree - decimal conversion')
-        self.toolButton_3.clicked.connect(self.trafo)
+        self.toolButton_3_dms.setToolTip('Degree - decimal conversion')
+        self.toolButton_3_dms.clicked.connect(self.trafo)
 
-        self.comboBox_3.addItem('')
-        self.comboBox_3.addItem('Suspected')
-        self.comboBox_3.addItem('Confirmed')
-        self.comboBox_3.addItem('Not confirmed')
-        self.comboBox_3.addItem('Expired')
+        self.comboBox_3_status.addItem('')
+        self.comboBox_3_status.addItem('Suspected')
+        self.comboBox_3_status.addItem('Confirmed')
+        self.comboBox_3_status.addItem('Not confirmed')
+        self.comboBox_3_status.addItem('Expired')
 
-        self.comboBox_4.addItem('')
-        self.comboBox_4.addItem('No')
-        self.comboBox_4.addItem('Yes')
+        self.comboBox_4_large_scale.addItem('')
+        self.comboBox_4_large_scale.addItem('No')
+        self.comboBox_4_large_scale.addItem('Yes')
 
         re = QRegExp('[0-9]+')
         val = QRegExpValidator(re)
-        self.lineEdit_4.setValidator(val)
-        self.lineEdit_6.setValidator(val)
+        self.lineEdit_4_year.setValidator(val)
+        self.lineEdit_6_num_animals.setValidator(val)
 
         re2 = QRegExp('[0-9.]+')
         val2 = QRegExpValidator(re2)
-        self.lineEdit.setValidator(val2)
-        self.lineEdit_2.setValidator(val2)
+        self.lineEdit_longitude.setValidator(val2)
+        self.lineEdit_2_latitude.setValidator(val2)
 
         # self.db.open()
         # query = QSqlQuery("select disease from xdiseases where lang='en' order by disease")
@@ -102,58 +102,58 @@ class Dialog(QDialog, Ui_Dialog):
         # # fnt.setWeight(8)
         # self.tableWidget.horizontalHeader().setFont(fnt)
 
-        self.checkBox.clicked.connect(self.date1set)
-        self.checkBox_2.clicked.connect(self.date2set)
-        self.checkBox_3.clicked.connect(self.date3set)
+        self.checkBox_dates_suspect.clicked.connect(self.date1set)
+        self.checkBox_2_dates_confirmation.clicked.connect(self.date2set)
+        self.checkBox_3_dates_expiration.clicked.connect(self.date3set)
 
-        self.checkBox.setChecked(False)
-        self.checkBox_2.setChecked(False)
-        self.checkBox_3.setChecked(False)
-        self.dateEdit.setEnabled(False)
-        self.dateEdit_2.setEnabled(False)
-        self.dateEdit_3.setEnabled(False)
+        self.checkBox_dates_suspect.setChecked(False)
+        self.checkBox_2_dates_confirmation.setChecked(False)
+        self.checkBox_3_dates_expiration.setChecked(False)
+        self.dateEdit_dates_suspect.setEnabled(False)
+        self.dateEdit_2_dates_confirmation.setEnabled(False)
+        self.dateEdit_3_dates_expiration.setEnabled(False)
 
         self.funcs = VetEpiGISFuncs()
 
-        self.lineEdit_3.textChanged.connect(self.saveCtrl)
-        self.lineEdit_4.textChanged.connect(self.saveCtrl)
-        self.lineEdit_5.textChanged.connect(self.saveCtrl)
-        self.comboBox_2.currentIndexChanged.connect(self.saveCtrl)
-        self.comboBox_3.currentIndexChanged.connect(self.saveCtrl)
-        self.comboBox_4.currentIndexChanged.connect(self.saveCtrl)
-
+        self.lineEdit_3_id.textChanged.connect(self.saveCtrl)
+        self.lineEdit_4_year.textChanged.connect(self.saveCtrl)
+        self.lineEdit_5_code.textChanged.connect(self.saveCtrl)
+        self.comboBox_2_disease.currentIndexChanged.connect(self.saveCtrl)
+        self.comboBox_3_status.currentIndexChanged.connect(self.saveCtrl)
+        self.comboBox_4_large_scale.currentIndexChanged.connect(self.saveCtrl)
+        self.lineEdit_6_num_animals.setText(str(1))
         self.saveCtrl()
 
 
     def date1set(self):
-        if self.checkBox.isChecked():
-            self.dateEdit.setEnabled(True)
+        if self.checkBox_dates_suspect.isChecked():
+            self.dateEdit_dates_suspect.setEnabled(True)
         else:
-            self.dateEdit.setEnabled(False)
+            self.dateEdit_dates_suspect.setEnabled(False)
 
 
     def date2set(self):
-        if self.checkBox_2.isChecked():
-            self.dateEdit_2.setEnabled(True)
+        if self.checkBox_2_dates_confirmation.isChecked():
+            self.dateEdit_2_dates_confirmation.setEnabled(True)
         else:
-            self.dateEdit_2.setEnabled(False)
+            self.dateEdit_2_dates_confirmation.setEnabled(False)
 
 
     def date3set(self):
-        if self.checkBox_3.isChecked():
-            self.dateEdit_3.setEnabled(True)
+        if self.checkBox_3_dates_expiration.isChecked():
+            self.dateEdit_3_dates_expiration.setEnabled(True)
         else:
-            self.dateEdit_3.setEnabled(False)
+            self.dateEdit_3_dates_expiration.setEnabled(False)
 
 
     def outLSel(self):
-        self.comboBox_5.clear()
-        id = self.lrs.index(self.comboBox.currentText())
+        self.comboBox_5_outbreak_layer.clear()
+        id = self.lrs.index(self.comboBox_reference.currentText())
         tp = self.tlrs[id]
         n = 0
         for l in self.lrs:
-            if self.tlrs[n]==tp and self.lrs[n]!=self.comboBox.currentText():
-                self.comboBox_5.addItem(l)
+            if self.tlrs[n]==tp and self.lrs[n]!=self.comboBox_reference.currentText():
+                self.comboBox_5_outbreak_layer.addItem(l)
             n += 1
 
 
@@ -232,36 +232,36 @@ class Dialog(QDialog, Ui_Dialog):
         dlg.move(x,y)
         dlg.setWindowTitle('Degree to decimal conversion')
 
-        res = self.funcs.dec2deg(self.lineEdit.text())
+        res = self.funcs.dec2deg(self.lineEdit_longitude.text())
         dlg.lineEdit.setText(res[0])
         dlg.lineEdit_2.setText(res[1])
         dlg.lineEdit_3.setText(res[2])
 
-        res = self.funcs.dec2deg(self.lineEdit_2.text())
+        res = self.funcs.dec2deg(self.lineEdit_2_latitude.text())
         dlg.lineEdit_4.setText(res[0])
         dlg.lineEdit_5.setText(res[1])
         dlg.lineEdit_6.setText(res[2])
 
         if dlg.exec_() == QDialog.Accepted:
             res = self.funcs.deg2dec(dlg.lineEdit.text(), dlg.lineEdit_2.text(), dlg.lineEdit_3.text())
-            self.lineEdit.setText(str(res))
+            self.lineEdit_longitude.setText(str(res))
             res = self.funcs.deg2dec(dlg.lineEdit_4.text(), dlg.lineEdit_5.text(), dlg.lineEdit_6.text())
-            self.lineEdit_2.setText(str(res))
+            self.lineEdit_2_latitude.setText(str(res))
 
 
     def saveCtrl(self):
         n = 0
-        if self.lineEdit_3.text()=='':
+        if self.lineEdit_3_id.text()=='':
             n += 1
-        if self.lineEdit_4.text()=='':
+        if self.lineEdit_4_year.text()=='':
             n += 1
-        if self.lineEdit_5.text()=='':
+        if self.lineEdit_5_code.text()=='':
             n += 1
-        if self.comboBox_2.currentText()=='':
+        if self.comboBox_2_disease.currentText()=='':
             n += 1
-        if self.comboBox_3.currentText()=='':
+        if self.comboBox_3_status.currentText()=='':
             n += 1
-        if self.comboBox_4.currentText()=='':
+        if self.comboBox_4_large_scale.currentText()=='':
             n += 1
         if self.tableWidget.rowCount()==0:
             n += 1

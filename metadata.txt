@@ -10,8 +10,8 @@
 name=VetEpiGIStool
 qgisMinimumVersion=3.4
 description=QGIS plugin to support animal disease control measures
-version=0.810
-author=Paola Bonato,Matteo Mazzucato,Norbert Solymosi 
+version=0.851
+author=Paola Bonato,Matteo Mazzucato,Norbert Solymosi
 email=gis@izsvenezie.it
 about=VetEpiGIStool is a free QGIS tool that helps veterinarian users in the management of spatial data related to animal disease. This plug-in combined the huge amount of GIS functions offered by QGIS with a simple user interface that allows to the user the possibility to manage data without the necessity to define the data model, the data organization model, and the data presentation, because these issues are pre-organised in the “piece” of software specifically developed.
 
@@ -22,6 +22,18 @@ about=VetEpiGIStool is a free QGIS tool that helps veterinarian users in the man
 # Uncomment the following line and add your changelog:
 changelog=
     ** General **
+    0.851:
+    	- Change empty cell with NULL value;
+
+	0.850:
+    	- Change names of different tools;
+        - Split 'Export tools' to 'Export selected layer' and 'Export complete database';
+        - Add messages information for different tools;
+        - Update voices and styles of QGIS menu;
+		- Enhanced 'Database maintenance tool' to avoid that layer in TOC will be deleted;
+		- Update code for hrid field generation;
+		- Fixed minor bugs;
+
 	0.810:
     	- Fixed crash when creating buffer on POI;
         - Fixed SLD styles for outbreak, buffer and zones;
@@ -42,7 +54,7 @@ category=Plugins
 icon=icon.png
 
 # experimental flag
-experimental=True
+experimental=False
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
