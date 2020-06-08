@@ -951,6 +951,7 @@ class VetEpiGIStool:
 
         if dlg.exec_() == QDialog.Accepted:
             self.loadModel()
+            self.loadLists() #reload lists after the upadate
 
         self.iface.messageBar().clearWidgets()
 
