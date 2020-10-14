@@ -2105,10 +2105,12 @@ class VetEpiGIStool:
         tn = ''
 
         #check type of geometry: point
+        """
         geom = lyr.geometryType()
         if geom != QgsWkbTypes.PointGeometry:
            msgBox = QMessageBox.information(dlg, "Warning", "Select a point layer")
            return
+        """
 
         #Check if layer selected is outbreak or poi
         if flst == self.poiflds:
@@ -2150,7 +2152,7 @@ class VetEpiGIStool:
             provi = lyp.dataProvider()
             feat = QgsFeature()
             polynum = lyp.featureCount()
-
+            #prendo solo la prima coordinata del poligono per capire in quale sitestema di riferimento sono
             if lyp.selectedFeatureCount()==0:
                 for feat in provi.getFeatures(QgsFeatureRequest()):
 
@@ -2167,15 +2169,20 @@ class VetEpiGIStool:
                     crsd.createFromSrsId(utm.srsid())
                     trafo = QgsCoordinateTransform(crss, crsd, QgsProject.instance())
 
-                    ba = QgsGeometry(feat.geometry()).asPoint()
+                    #ba = QgsGeometry(feat.geometry()).asPoint()
+                    ba = feat.geometry()
 
-                    tba = trafo.transform(ba, QgsCoordinateTransform.ForwardTransform)
+                    #tba = trafo.transform(ba, QgsCoordinateTransform.ForwardTransform)
+                    ba.transform(trafo, QgsCoordinateTransform.ForwardTransform)
 
-                    tbb = QgsGeometry.fromPointXY(tba)
-                    bar = QgsGeometry.asQPolygonF(tbb.buffer(r, r))
+                    #tbb = QgsGeometry.fromPointXY(tba)
+                    #tbb = tba
 
-                    trafo.transformPolygon(bar, QgsCoordinateTransform.ReverseTransform)
-                    tbar = QgsGeometry.fromPolygonXY(QgsGeometry.createPolygonFromQPolygonF(bar))
+                    #bar = QgsGeometry.asQPolygonF(tbb.buffer(r, r))
+                    tbar = ba.buffer(r,r)
+                    tbar.transform(trafo, QgsCoordinateTransform.ReverseTransform)
+                    #trafo.transformPolygon(bar, QgsCoordinateTransform.ReverseTransform)
+                    #tbar = QgsGeometry.fromPolygonXY(QgsGeometry.createPolygonFromQPolygonF(bar))
                     # self.iface.messageBar().pushMessage(' ', "%s" % tbar.asWkt(), level=Qgis.Info)
 
                     bf = QgsFeature()
@@ -2201,15 +2208,20 @@ class VetEpiGIStool:
                     crsd.createFromSrsId(utm.srsid())
                     trafo = QgsCoordinateTransform(crss, crsd, QgsProject.instance())
 
-                    ba = QgsGeometry(feat.geometry()).asPoint()
+                    #ba = QgsGeometry(feat.geometry()).asPoint()
+                    ba = feat.geometry()
 
-                    tba = trafo.transform(ba, QgsCoordinateTransform.ForwardTransform)
+                    #tba = trafo.transform(ba, QgsCoordinateTransform.ForwardTransform)
+                    ba.transform(trafo, QgsCoordinateTransform.ForwardTransform)
 
-                    tbb = QgsGeometry.fromPointXY(tba)
-                    bar = QgsGeometry.asQPolygonF(tbb.buffer(r, r))
+                    #tbb = QgsGeometry.fromPointXY(tba)
+                    #bar = QgsGeometry.asQPolygonF(tbb.buffer(r, r))
 
-                    trafo.transformPolygon(bar, QgsCoordinateTransform.ReverseTransform)
-                    tbar = QgsGeometry.fromPolygonXY(QgsGeometry.createPolygonFromQPolygonF(bar))
+                    #trafo.transformPolygon(bar, QgsCoordinateTransform.ReverseTransform)
+                    #tbar = QgsGeometry.fromPolygonXY(QgsGeometry.createPolygonFromQPolygonF(bar))
+
+                    tbar = ba.buffer(r,r)
+                    tbar.transform(trafo, QgsCoordinateTransform.ReverseTransform)
 
                     bf = QgsFeature()
                     bf.setGeometry(tbar)
@@ -2246,7 +2258,6 @@ class VetEpiGIStool:
 
             QApplication.restoreOverrideCursor()
 
-
     def getUTMzone(self, feat, psrid):
         #http://www.qgistutorials.com/tr/docs/custom_python_functions.html
         tfeat = feat
@@ -2255,8 +2266,16 @@ class VetEpiGIStool:
             trA = QgsCoordinateTransform(psrid, 3452)
             tfeat = trA.transform(feat)
 
+        # If geometry is different from point, take only the first coordinate to understand
+        # the UTM zone
         geom = tfeat.geometry()
-        pt = geom.asPoint()
+        pt = ''
+        if geom.type() == QgsWkbTypes.PolygonGeometry:
+            pt = geom.asPolygon()[0][0]
+        elif geom.type() == QgsWkbTypes.LineGeometry:
+            pt = geom.asPolyline()[0][0]
+        else:
+            pt = geom.asPoint()
 
         zn = int(math.floor(((pt.x()+180)/6) % 60)+1)
         if pt.y()>0:
@@ -2287,7 +2306,7 @@ class VetEpiGIStool:
         dlg.textEdit.setFontWeight(QFont.Bold)
         dlg.textEdit.append('Contributors:')
         dlg.textEdit.setFontWeight(ow)
-        dlg.textEdit.append(u'Nicola Ferrè *;\nPaolo Mulati *;\n* from Istituto Zooprofilattico Sperimentale delle Venezie.\n')
+        dlg.textEdit.append(u'Nicola Ferrè *;\nPaolo Mulatti *;\n* from Istituto Zooprofilattico Sperimentale delle Venezie.\n')
         dlg.textEdit.setFontWeight(QFont.Bold)
         dlg.textEdit.append('Contacts:')
         dlg.textEdit.setFontWeight(ow)
