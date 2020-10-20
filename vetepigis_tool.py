@@ -2335,6 +2335,11 @@ class VetEpiGIStool:
                 self.Caser.setChecked(False)
                 return
 
+            if flst == self.obrflds and lyr.geometryType() != QgsWkbTypes.PointGeometry:
+                self.iface.messageBar().pushMessage(' ', 'It is not a POINT OUTBREAK layer!', level=Qgis.Warning)
+                self.Caser.setChecked(False)
+                return
+
             self.prevcur = self.iface.mapCanvas().cursor()
             self.iface.mapCanvas().setCursor(Qt.CrossCursor)
 
@@ -2536,7 +2541,7 @@ class casePicker(QgsMapTool):
             elif self.lyr.geometryType() == QgsWkbTypes.PolygonGeometry:
                 lyrB = None
                 for l in QgsProject.instance().mapLayers().values():
-                    if l.name() == self.dlg.comboBox.currentText():
+                    if l.name() == self.dlg.comboBox_reference.currentText():
                         lyrB = l
 
                 srid = lyrB.dataProvider().crs().srsid()
