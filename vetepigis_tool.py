@@ -2370,7 +2370,7 @@ class VetEpiGIStool:
 
             #psrid = self.iface.mapCanvas().mapRenderer().destinationCrs().srsid()
             psrid = self.iface.mapCanvas().mapSettings().destinationCrs().srsid()
-            self.iface.messageBar().pushMessage(' ', '%s' % psrid, level=Qgis.Warning)
+            #self.iface.messageBar().pushMessage(' ', '%s' % psrid, level=Qgis.Warning)
             tool = casePicker(dlg, psrid, self.iface, self.Caser, 'case', lyr)
             self.iface.mapCanvas().setMapTool(tool)
 
