@@ -1080,28 +1080,29 @@ class VetEpiGIStool:
         k = '01/01/2000'
         f = 'dd/MM/yyyy'
         s = k
-        if attr[10]!='':
+        if attr[10]!='' and not attr[10].isNull():
             s = attr[10]
             dlg.dateEdit_dates_suspect.setEnabled(True)
             dlg.checkBox_dates_suspect.setChecked(True)
-        qd = QDate.fromString(s, f)
-        dlg.dateEdit_dates_suspect.setDate(qd)
+            qd = QDate.fromString(s, f)
+            dlg.dateEdit_dates_suspect.setDate(qd)
         s = k
-        if attr[11]!='':
+        if attr[11]!='' and not attr[11].isNull():
             s = attr[11]
             dlg.dateEdit_2_dates_confirmation.setEnabled(True)
             dlg.checkBox_2_dates_confirmation.setChecked(True)
-        qd = QDate.fromString(s, f)
-        dlg.dateEdit_2_dates_confirmation.setDate(qd)
+            qd = QDate.fromString(s, f)
+            dlg.dateEdit_2_dates_confirmation.setDate(qd)
         s = k
-        if attr[12]!='':
+        if attr[12]!='' and not attr[12].isNull():
             s = attr[12]
             dlg.dateEdit_3_dates_expiration.setEnabled(True)
             dlg.checkBox_3_dates_expiration.setChecked(True)
-        qd = QDate.fromString(s, f)
-        dlg.dateEdit_3_dates_expiration.setDate(qd)
+            qd = QDate.fromString(s, f)
+            dlg.dateEdit_3_dates_expiration.setDate(qd)
 
-        dlg.textEdit_notes.setText(attr[13])
+        if attr[13]!='' and not attr[13].isNull():
+            dlg.textEdit_notes.setText(attr[13])
         if dlg.exec_() == QDialog.Accepted:
             QApplication.setOverrideCursor(Qt.WaitCursor)
 
@@ -1388,6 +1389,7 @@ class VetEpiGIStool:
             if flst == self.obrflds and lyr.geometryType() != QgsWkbTypes.PolygonGeometry:
                 self.iface.messageBar().pushMessage(' ', 'It is not an AREA outbreak layer!', level=Qgis.Warning)
                 self.handy.setChecked(False)
+                self.iface.actionPan().trigger()
                 return
 
             self.prevcur = self.iface.mapCanvas().cursor()
@@ -1410,6 +1412,7 @@ class VetEpiGIStool:
                 psrid = self.iface.mapCanvas().mapSettings().destinationCrs().srsid()
                 tool = polyDraw(dlg, psrid, self.iface, self.handy)
                 self.iface.mapCanvas().setMapTool(tool)
+
             else:
                 self.iface.mapCanvas().setCursor(self.prevcur)
                 self.iface.mapCanvas().setMapTool(self.origtool)
@@ -2335,6 +2338,13 @@ class VetEpiGIStool:
                 self.Caser.setChecked(False)
                 return
 
+            if flst == self.obrflds and lyr.geometryType() != QgsWkbTypes.PointGeometry:
+                self.iface.messageBar().pushMessage(' ', 'It is not a POINT OUTBREAK layer!', level=Qgis.Warning)
+                self.Caser.setChecked(False)
+                self.iface.actionPan().trigger()
+                #self.iface.mapCanvas().setCursor(Qt.ArrowCursor)
+                return
+
             self.prevcur = self.iface.mapCanvas().cursor()
             self.iface.mapCanvas().setCursor(Qt.CrossCursor)
 
@@ -2365,7 +2375,7 @@ class VetEpiGIStool:
 
             #psrid = self.iface.mapCanvas().mapRenderer().destinationCrs().srsid()
             psrid = self.iface.mapCanvas().mapSettings().destinationCrs().srsid()
-            self.iface.messageBar().pushMessage(' ', '%s' % psrid, level=Qgis.Warning)
+            #self.iface.messageBar().pushMessage(' ', '%s' % psrid, level=Qgis.Warning)
             tool = casePicker(dlg, psrid, self.iface, self.Caser, 'case', lyr)
             self.iface.mapCanvas().setMapTool(tool)
 
@@ -2536,7 +2546,7 @@ class casePicker(QgsMapTool):
             elif self.lyr.geometryType() == QgsWkbTypes.PolygonGeometry:
                 lyrB = None
                 for l in QgsProject.instance().mapLayers().values():
-                    if l.name() == self.dlg.comboBox.currentText():
+                    if l.name() == self.dlg.comboBox_reference.currentText():
                         lyrB = l
 
                 srid = lyrB.dataProvider().crs().srsid()
@@ -2584,6 +2594,7 @@ class casePicker(QgsMapTool):
         self.lyr.addFeature(feat)
         self.lyr.commitChanges()
         self.lyr.updateExtents()
+        self.iface.actionPan().trigger()
 
     def checkValue2(self, value):
         v = value
@@ -2705,6 +2716,8 @@ class polyDraw(QgsMapTool):
         self.lyr.addFeature(self.feat)
         self.lyr.commitChanges()
         self.lyr.updateExtents()
+        self.iface.actionPan().trigger()
+
 
 
     def activate(self):
